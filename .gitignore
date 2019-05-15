@@ -1,2 +1,4 @@
 /node_modules/
-/.idea/*
+/.idea
+/server/pdfs
+/server/temp_image

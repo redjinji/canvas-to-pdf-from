@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<link type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css">
+	<style>
+		html {
+			font-size: 10px;
+		}
+		#can {
+			border: .1rem solid;
+
+		}
+	</style>
+</head>
+<body>
+<canvas id="can" width="300" height="300"></canvas>
+<input type="file" id="file">
+<img id="imageMe">
+<script src="/js/main.js"></script>
+<button onclick="copyCanvas()"> copy canvas</button>
+<button onclick="submitToPdf()">Go PDF</button>
+
+<form action="/something" method="post">
+	<input name="me" type="text">
+	<button type="submit">sub</button>
+</form>
+
+<script>
+	function submitToPdf() {
+		/*var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				console.log('done posting')
+			}
+		};
+		let params = JSON.stringify({fname:'Henry',lname:'Ford'});
+		xhttp.open("POST", "/something", true);
+		xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		// xhttp.setRequestHeader("Content-length", params.length);
+		// xhttp.setRequestHeader("Connection", "close");
+		xhttp.send("params="+params);
+		// xhttp.send('foo=bar&lorem=ipsum');
+		xhttp.onerror = (e)=>console.log(e);
+		xhttp.onload = (e)=>console.log(e);*/
+
+		let canva = document.querySelector('#can');
+		canva.toBlob( function(blob) {
+
+			let formData = new FormData();
+
+			formData.append('image_file', blob, 'canvas1.jpg');
+			formData.append('userName', 'myName');
+			let size = 0;
+			for(let pair of formData.entries()) {
+				if (pair[1] instanceof Blob)
+					size += pair[1].size;
+				else
+					size += pair[1].length;
+			}
+			var xhr = new XMLHttpRequest;
+			xhr.open( 'POST', '/something',true);
+			// xhr.setRequestHeader('Content-Length', size);
+			// xhr.setRequestHeader('Content-type', 'multipart/form-data');
+			// xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			xhr.send(formData);
+
+		}, 'image/jpeg');
+	}
+</script>
+</body>
+</html>
