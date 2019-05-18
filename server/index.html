@@ -16,18 +16,28 @@
 </head>
 <body>
 <canvas id="can" width="300" height="300"></canvas>
-<input type="file" id="file">
+<input type="file" id="file" accept="image/*" capture="camera" value="בחר קובץ">
 <img id="imageMe">
 <script src="/js/main.js"></script>
-<button onclick="copyCanvas()"> copy canvas</button>
-<button onclick="submitToPdf()">Go PDF</button>
+<!--<button onclick="copyCanvas()"> copy canvas</button>-->
+<button onclick="submitToPdf()">שלח טופס</button>
 
+<!--
 <form action="/something" method="post">
 	<input name="me" type="text">
 	<button type="submit">sub</button>
 </form>
+-->
 
 <script>
+	/*navigator.mediaDevices.getUserMedia({ video: true })
+	.then(function(stream) {
+		console.log(stream);
+	})
+	.catch(function(err) {
+		console.log(err);
+
+	});*/
 	function submitToPdf() {
 		/*var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function() {

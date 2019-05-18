@@ -19,16 +19,16 @@ for (let i = 0; i < 10; i++) {
 c.strokeStyle = '#f00';
 c.fillStyle = 'rgba(0,256,0,.5)';
 
-c.beginPath();
-c.moveTo(60, 60);
-c.lineTo(61, 61);
-c.stroke();
+// c.beginPath();
+// c.moveTo(60, 60);
+// c.lineTo(61, 61);
+// c.stroke();
 
 // c.beginPath();
-c.arc(60, 60, 30, 0.5 * Math.PI, 1 * Math.PI, true);
+// c.arc(60, 60, 30, 0.5 * Math.PI, 1 * Math.PI, true);
 // c.arc(x,y,radius,startAngel,endAngle,anticlockwise);
 // c.stroke();
-c.fill();
+// c.fill();
 var firstClick = true;
 var points = {
 	x: {s: 0, e: 0},

@@ -6,9 +6,13 @@ const formidable = require('formidable');
 const http = require('http');
 const path = require('path');
 const fs = require('fs-extra');
+const readline = require('readline');
+const {google} = require('googleapis');
 
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 const app = express();
+var driveAUTH;
+var drive;
 
 async function generatPdf(data) {
 	try {
@@ -16,9 +20,9 @@ async function generatPdf(data) {
 		const browser = await puppet.launch();
 		const page = await browser.newPage();
 		
-		await page.setContent(`<h1>Hello World</h1>
+		await page.setContent(`<body dir="rtl"></bocy><h1 style="">טופס הזמנת מדרסים</h1>
 <img alt="this is the camvas" style="background-color: red" width="300" height="300" src="http://localhost:3000/temp_image/canvas1.jpg" />
-<p>end of pdf</p>
+<p>סוף טופס הזמנת מדרסים</p></body>
 `);
 		await page.emulateMedia('screen');
 		await page.pdf({
@@ -29,6 +33,7 @@ async function generatPdf(data) {
 		console.log('done');
 		await browser.close();
 		console.log('close');
+		uploadPdf();
 	} catch (e) {
 		console.log('our error', e);
 	}
@@ -49,7 +54,12 @@ app.get('/css/:filename', (req, res) => {
 });
 
 app.get('/temp_image/:filename', (req, res) => {
-	res.sendFile(path.join(__dirname + '/temp_image/' + req.params.filename));
+	res.sendFile(path.join(__dirname + '/temp_i' +
+		'mage/' + req.params.filename));
+});
+
+app.get('/pdfs/:filename', (req, res) => {
+	res.sendFile(path.join(__dirname + '/pdfs/' + req.params.filename));
 });
 
 app.get('/some/:params', (req, res) => {
@@ -103,4 +113,92 @@ app.post('/something', (req, res) => {
 	// res.end();
 });
 
+const SCOPES = ['https://www.googleapis.com/auth/drive'];
+const TOKEN_PATH = 'token.json';
+fs.readFile('driveCredentials.json', (err, content) => {
+	if (err) return console.log('Error loading client secret file:', err);
+	// Authorize a client with credentials, then call the Google Drive API.
+	authorize(JSON.parse(content), listFiles);
+});
+function authorize(credentials, callback) {
+	const {client_secret, client_id, redirect_uris} = credentials.installed;
+	const oAuth2Client = new google.auth.OAuth2(
+		client_id, client_secret, redirect_uris[0]);
+	
+	// Check if we have previously stored a token.
+	fs.readFile(TOKEN_PATH, (err, token) => {
+		if (err) return getAccessToken(oAuth2Client, callback);
+		oAuth2Client.setCredentials(JSON.parse(token));
+		callback(oAuth2Client);
+	});
+}
+function getAccessToken(oAuth2Client, callback) {
+	const authUrl = oAuth2Client.generateAuthUrl({
+		access_type: 'offline',
+		scope: SCOPES,
+	});
+	console.log('Authorize this app by visiting this url:', authUrl);
+	const rl = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout,
+	});
+	rl.question('Enter the code from that page here: ', (code) => {
+		rl.close();
+		oAuth2Client.getToken(code, (err, token) => {
+			if (err) return console.error('Error retrieving access token', err);
+			oAuth2Client.setCredentials(token);
+			// Store the token to disk for later program executions
+			fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+				if (err) return console.error(err);
+				console.log('Token stored to', TOKEN_PATH);
+			});
+			callback(oAuth2Client);
+		});
+	});
+}
+function listFiles(auth) {
+	driveAUTH = auth;
+	drive = google.drive({version: 'v3', auth});
+	drive.files.list({
+		pageSize: 10,
+		fields: 'nextPageToken, files(id, name)',
+	}, (err, res) => {
+		if (err) return console.log('The API returned an error: ' + err);
+		const files = res.data.files;
+		if (files.length) {
+			console.log('Files:');
+			files.map((file) => {
+				console.log(`${file.name} (${file.id})`);
+			});
+		} else {
+			console.log('No files found.');
+		}
+	});
+}
+
+function uploadPdf(params) {
+	console.log('pdf',fs.createReadStream(__dirname +'/pdfs/mypdf.pdf'));
+	// console.log('jpg', fs.createReadStream(__dirname + '/temp_image/canvas1.jpg'));
+	console.log('----------');
+	const fileMetadata = {
+		'name': 'mypdf.pdf',
+		parents:['1jlag_Kq8VCH-MkD10whsaxacOxUPOECp']
+	};
+	const media = {
+		mimeType: 'application/pdf',
+		body: fs.createReadStream(__dirname +'/pdfs/mypdf.pdf')
+	};
+	drive.files.create({
+		resource: fileMetadata,
+		media: media,
+		fields: 'id'
+	}, function (err, file) {
+		if (err) {
+			// Handle error
+			console.error('error uploding',err);
+		} else {
+			console.log('File Id: ', file.id);
+		}
+	});
+}
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
