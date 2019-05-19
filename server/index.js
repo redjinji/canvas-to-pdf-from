@@ -6,11 +6,14 @@ const path = require('path');
 const fs = require('fs-extra');
 const readline = require('readline');
 const {google} = require('googleapis');
+const process = require('process');
 
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 const app = express();
 var driveAUTH;
 var drive;
+console.log('process',process.cwd());
+console.log('dir',__dirname);
 
 async function generatPdf(data) {
 	try {
@@ -40,24 +43,23 @@ async function generatPdf(data) {
 const port = 3000;
 
 app.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname + '/index.html'));
+	res.sendFile(path.join(process.cwd() + '/client/index.html'));
 });
 
 app.get('/js/:filename', (req, res) => {
-	res.sendFile(path.join(__dirname + '/js/' + req.params.filename));
+	res.sendFile(path.join(process.cwd() + '/client/js/' + req.params.filename));
 });
 
 app.get('/css/:filename', (req, res) => {
-	res.sendFile(path.join(__dirname + '/css/' + req.params.filename));
+	res.sendFile(path.join(process.cwd() + '/client/css/' + req.params.filename));
 });
 
 app.get('/temp_image/:filename', (req, res) => {
-	res.sendFile(path.join(__dirname + '/temp_i' +
-		'mage/' + req.params.filename));
+	res.sendFile(path.join(process.cwd() + '/server/temp_image/' + req.params.filename));
 });
 
 app.get('/pdfs/:filename', (req, res) => {
-	res.sendFile(path.join(__dirname + '/pdfs/' + req.params.filename));
+	res.sendFile(path.join(process.cwd() + '/server/pdfs/' + req.params.filename));
 });
 
 app.get('/some/:params', (req, res) => {
@@ -68,13 +70,13 @@ app.get('/some/:params', (req, res) => {
 
 app.post('/something', (req, res) => {
 	var form = new formidable.IncomingForm({
-		uploadDir: __dirname + '/temp_image',
+		uploadDir: process.cwd() + '/server/temp_image',
 		encoding: 'binary',
 		keepExtensions: false,
 	});
 	
 	form.on('fileBegin', function (name, file) {
-		file.path = __dirname + '/temp_image/' + file.name;
+		file.path = process.cwd() + '/server/temp_image/' + file.name;
 	});
 	
 	form.addListener('file', function (name, file) {
@@ -106,14 +108,14 @@ app.post('/something', (req, res) => {
 	// console.log(req.body.image_file);
 	// console.log(req.body.userName);
 	
-	res.sendFile(path.join(__dirname + '/index.html'));
+	res.sendFile(path.join(process.cwd() + '/client/index.html'));
 	
 	// res.end();
 });
 
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
 const TOKEN_PATH = 'token.json';
-fs.readFile('driveCredentials.json', (err, content) => {
+fs.readFile('server/driveCredentials.json', (err, content) => {
 	if (err) return console.log('Error loading client secret file:', err);
 	// Authorize a client with credentials, then call the Google Drive API.
 	authorize(JSON.parse(content), listFiles);
@@ -175,7 +177,7 @@ function listFiles(auth) {
 }
 
 function uploadPdf(params) {
-	console.log('pdf',fs.createReadStream(__dirname +'/pdfs/mypdf.pdf'));
+	console.log('pdf',fs.createReadStream(process.cwd() +'/server/pdfs/mypdf.pdf'));
 	// console.log('jpg', fs.createReadStream(__dirname + '/temp_image/canvas1.jpg'));
 	console.log('----------');
 	const fileMetadata = {
@@ -184,7 +186,7 @@ function uploadPdf(params) {
 	};
 	const media = {
 		mimeType: 'application/pdf',
-		body: fs.createReadStream(__dirname +'/pdfs/mypdf.pdf')
+		body: fs.createReadStream(process.cwd() +'/server/pdfs/mypdf.pdf')
 	};
 	drive.files.create({
 		resource: fileMetadata,
@@ -199,4 +201,4 @@ function uploadPdf(params) {
 		}
 	});
 }
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
