@@ -1,0 +1,3 @@
+{
+  "ignore": ["/server/google_api_js/*"]
+}
