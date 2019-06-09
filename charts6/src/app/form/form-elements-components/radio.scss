@@ -1,0 +1,19 @@
+@import "../../style/varible";
+
+label {
+  border-radius: 0rem;
+  background-color: $color-unselected;
+  padding: .5rem;
+  width: 10rem;
+  height: 10rem;
+  display: table-cell;
+  vertical-align: middle;
+  transition: .4s;
+}
+input {
+  position: absolute;
+  visibility: hidden;
+}
+input:checked ~ label {
+  background-color: $color-green;
+}

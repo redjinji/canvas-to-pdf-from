@@ -1,0 +1,18 @@
+<div class="login-popup">
+	<img src="/assets/5-5.jpg" class="main-logo">
+	<form #loginForm="ngForm" (ngSubmit)="login(loginForm.value)">
+		<div class="user-name">
+			<label for="userName">שם משתמש:</label>
+			<input type="text" [(ngModel)]="userName" name="userName" id="userName" required>
+		</div>
+		<div class="password">
+			<label for="password">סיסמה:</label>
+			<input type="password" [(ngModel)]="password" name="password" id="password" required>
+		</div>
+		<div class="submit">
+			<span (mouseenter)="mouseoverLogin=true" (mouseleave)="mouseoverLogin=false">
+				<button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">התחבר</button>
+			</span>
+		</div>
+	</form>
+</div>

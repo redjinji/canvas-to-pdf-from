@@ -1,0 +1,68 @@
+$mobile: 767px;
+$tablet: 1280px;
+$unit: 1;
+$mobile_plus_1: ($mobile + 1) * $unit;
+$tablet: $tablet * $unit;
+$tablet_minus_1: ($tablet - 1) * $unit;
+
+@mixin respond-to($media) {
+  @if $media == portrait {
+    @media only screen and (orientation: portrait) {
+      @content;
+    }
+  }
+  @if $media == landscape {
+    @media only screen and (orientation: landscape) {
+      @content;
+    }
+  }
+  @if $media == mobile {
+    @media only screen and (max-width: $mobile) {
+      @content;
+    }
+  }
+  @if $media == mobile-portrait {
+    @media only screen and (max-width: $mobile) and (orientation: portrait) {
+      @content;
+    }
+  }
+  @if $media == mobile-landscape {
+    @media only screen and (max-width: $mobile) and (orientation: landscape) {
+      @content;
+    }
+  } @else if $media == mobile-tablet {
+    @media only screen and (max-width: $mobile) {
+      @content;
+    }
+    @media only screen and (min-width: $mobile_plus_1) and (max-width: $tablet_minus_1) {
+      @content;
+    }
+  } @else if $media == mobile-tablet-portrait {
+    @media only screen and (max-width: $mobile) {
+      @content;
+    }
+    @media only screen and (min-width: $mobile_plus_1) and (max-width: $tablet_minus_1) and (orientation: portrait) {
+      @content;
+    }
+  } @else if $media == tablet {
+    @media only screen and (min-width: $mobile_plus_1) and (max-width: $tablet_minus_1) {
+      @content;
+    }
+  } @else if $media == tablet-portrait {
+    @media only screen and (min-width: $mobile_plus_1) and (max-width: $tablet_minus_1) and (orientation: portrait) {
+      @content;
+    }
+  } @else if $media == tablet-landscape {
+    @media only screen and (min-width: $mobile_plus_1) and (max-width: $tablet_minus_1) and (orientation: landscape) {
+      @content;
+    }
+  } @else if $media == desktop {
+    @media only screen and (min-width: $tablet) {
+      @content;
+    }
+  } @else if $media == nodesktop {
+    @media only screen and (max-width: $tablet) {
+      @content;
+    }
+  }
+}

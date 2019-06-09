@@ -1,0 +1,35 @@
+@import "../style/varible";
+
+.login-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: fit-content;
+
+  label {
+    color: $color-white;
+    font-size: 1.6rem;
+    margin-left: .5rem;
+    min-width: 9rem;
+  }
+  input {
+    border: 0;
+    border-radius: .4rem;
+    line-height: 2rem;
+  }
+}
+.user-name {
+  margin-bottom: 1rem;
+}
+.password {
+  margin-bottom: 1rem;
+}
+.main-logo {
+  width: 20rem;
+  display: block;
+  margin: 0 auto 4rem;
+}
+.btn-primary {
+  width: 22rem;
+}

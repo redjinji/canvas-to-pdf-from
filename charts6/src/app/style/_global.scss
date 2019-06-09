@@ -1,0 +1,19 @@
+body {
+  background-color: $color-main;
+}
+.btn-primary {
+  background-color: green;
+}
+
+input.ng-invalid.ng-touched {
+  background-color: $color-error;
+}
+.btn-primary {
+  font-size: 2rem;
+  font-weight: bold;
+  background-color: $color-green;
+  color: $color-white;
+  border-radius: .4rem;
+  padding: .5rem 1rem;
+  margin: 1rem 0;
+}

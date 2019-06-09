@@ -1,0 +1,76 @@
+@import "../style/varible";
+@import "../style/mixin-mediaQuery";
+
+.navigation {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: $color-dark-blue;
+  padding: 1.5rem;
+}
+
+.btn {
+  font-size: 2rem;
+  color: $color-white;
+  margin: 0 1rem;
+  background-color: green;
+  min-width: 8rem;
+  &.disable {
+    background-color: $color-unselected;
+  }
+}
+
+.main-logo {
+  max-width: 25rem;
+  width: 90%;
+  margin-bottom: 5rem;
+  @include respond-to(mobile){
+    margin-bottom: 2rem;
+  }
+}
+
+.midras-form__wrapper {
+  font-size: 2.5rem;
+  color: $color-white;
+  text-align: center;
+  width: 100vw;
+  overflow: hidden;
+  margin-bottom: 8rem;
+  margin-top: 5rem;
+  @include respond-to(mobile){
+    margin-top: 2.5rem;
+  }
+}
+
+.midras-form {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100vw;
+  transform: translateX(700%);
+  transition: .5s;
+}
+
+.screen {
+  width: 100vw;
+}
+
+.title {
+  width: 100vw;
+  font-size: 4rem;
+  margin-bottom: 2rem;
+  padding: 0 3rem;
+}
+
+.subTitle {
+  padding: 0 3rem;
+}
+
+.radio-container {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.input-radio {
+  margin: .5rem;
+}

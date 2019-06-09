@@ -1,0 +1,29 @@
+<div class="midras-form__wrapper">
+	<img src="/assets/5-5.jpg" class="main-logo">
+	<form #midrasForm="ngForm" #screenContainer class="midras-form">
+		<div *ngFor="let elem of formElements;let i =index" class="screen screen-{{i}}">
+			<h3 class="title">{{elem.title}}</h3>
+			<p class="subTitle" *ngIf="elem.subtitle">{{elem.subtitle}}</p>
+			<div class="radio-container" *ngIf="elem.radio">
+				<input-radio (nextSlide)="nextStep()" class="input-radio" *ngFor="let radio of elem.radio" [radio]="radio"></input-radio>
+			</div>
+			<div *ngIf="elem.textarea">
+				<textarea-component class="textarea-component" [ta]="elem.textarea"></textarea-component>
+			</div>
+
+			<div *ngIf="elem.footImage" class="foot-image__container">
+				<foot-image></foot-image>
+				<video-capture (takePhoto)="captureImage($event)"></video-capture>
+			</div>
+			<!--
+			<div>
+				טופס פרטי לקוח
+			</div>
+			-->
+		</div>
+	</form>
+	<nav class="navigation">
+		<button class="btn " [ngClass]="{disable: prevDisable}" (click)="prevStep()">הקודם</button>
+		<button class="btn" [ngClass]="{disable: nextDisable}" (click)="nextStep()">הבא</button>
+	</nav>
+</div>
