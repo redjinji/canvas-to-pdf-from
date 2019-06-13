@@ -24,3 +24,4 @@ export interface IFormElement {
     text?: Text,
     footImage?: boolean
 }
+
