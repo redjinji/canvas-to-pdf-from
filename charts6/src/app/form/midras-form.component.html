@@ -13,13 +13,12 @@
 
 			<div *ngIf="elem.footImage" class="foot-image__container">
 				<foot-image></foot-image>
-				<video-capture (takePhoto)="captureImage($event)"></video-capture>
+				<!--<video-capture (takePhoto)="captureImage($event)"></video-capture>-->
+				<video-capture *ngIf="!killVideo" (takePhoto)="captureImage($event)"></video-capture>
 			</div>
-			<!--
 			<div>
 				טופס פרטי לקוח
 			</div>
-			-->
 		</div>
 	</form>
 	<nav class="navigation">

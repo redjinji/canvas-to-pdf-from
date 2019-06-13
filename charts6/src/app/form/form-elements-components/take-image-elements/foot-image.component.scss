@@ -13,8 +13,9 @@
 
 canvas {
   background-color: $color-white;
-  width: 30rem;
-  max-width: 95%;
-  height: 30rem;
+  width: 95vw;
+  max-width: 74rem;
+  max-height: 55rem;
+  height: calc(95vw * 0.75);
   margin-bottom: 1rem;
 }

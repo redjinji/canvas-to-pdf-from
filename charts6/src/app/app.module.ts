@@ -17,6 +17,7 @@ import {
     UserAnthentityService,
     LoginRouteActivatorService
 } from "./login";
+import {VideoService} from "./form/form-elements-components/take-image-elements";
 
 @NgModule({
     declarations: [
@@ -37,7 +38,8 @@ import {
     providers: [
         UserAnthentityService,
         LoginRouteActivatorService,
-        FormService
+        FormService,
+        VideoService
     ],
     bootstrap: [AppComponent]
 })

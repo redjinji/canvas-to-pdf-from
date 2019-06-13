@@ -1,78 +1,105 @@
-import {Component, ElementRef, OnInit, ViewChild} from "@angular/core";
+import {Component, ElementRef, HostListener, OnInit, ViewChild} from "@angular/core";
+import {VideoService} from "./video.service";
 
 @Component({
     selector: 'foot-image',
     template: `
-<canvas #canvas (click)="updateLine($event)"></canvas><br/>
-<label class="choose-file__btn" for="file"> בחר קובץ
-<input (change)="updateImage($event)" type="file" id="file" accept="image/*">
-</label>
-<label class="choose-file__btn" for="file"> צלם
-<input (change)="updateImage($event)" type="file" id="file" accept="image/*" capture="camera">
-</label>
-`,
+        <canvas #canvas (click)="updateLine($event)" [width]="canvasParams.canvasWidth" [height]="canvasParams.canvasHight"></canvas><br/>
+        <label class="choose-file__btn" for="file"> בחר קובץ
+            <input (change)="updateImageFromFile($event)" type="file" id="file" accept="image/*">
+        </label>
+        <label class="choose-file__btn" for="file"> צלם
+            <input (change)="updateImageFromFile($event)" type="file" id="file" accept="image/*" capture="camera">
+        </label>
+    `,
     styleUrls: ['./foot-image.component.scss']
 })
 
-export class FootImageComponent implements OnInit{
-    @ViewChild('canvas') canvas:ElementRef;
+export class FootImageComponent implements OnInit {
+    @ViewChild('canvas') canvas: ElementRef;
     canvasContext;
     canvasParams = {
         right: 280,
         left: 20,
-        image:undefined
+        image: undefined,
+        canvasWidth: 0,
+        canvasHight: 0
     };
-    ngOnInit(){
-        this.canvasContext = this.canvas.nativeElement.getContext('2d');
-        this.updateCanvas();
+    @HostListener('window:resize', ['$event'])
+    onResize(event) {
+        this.updateCanvasSize();
+        setTimeout(this.updateCanvasElements.bind(this),0); //wait for resize to finish
+    }
+    constructor(private videoService: VideoService) {
     }
     
-    updateLine(event){
+    ngOnInit() {
+        this.updateCanvasSize();
+        this.canvasParams.right = this.canvasParams.canvasWidth * 0.8;
+        this.canvasParams.left = this.canvasParams.canvasWidth * 0.2;
+        this.canvasContext = this.canvas.nativeElement.getContext('2d');
+        this.videoService.change.subscribe(this.updateImageFromVideo.bind(this))
+        setTimeout(this.updateCanvasElements.bind(this),0); //wait for resize to finish
+    }
+    
+    updateCanvasSize(){
+        this.canvasParams.canvasWidth = Math.floor(this.canvas.nativeElement.offsetWidth);
+        this.canvasParams.canvasHight = Math.floor(this.canvas.nativeElement.offsetHeight);
+    }
+    
+    updateLine(event) {
         event.preventDefault();
-        this.canvasContext.clearRect(0, 0, 300, 300);
-        if(event.offsetX > 150){
+        this.canvasContext.clearRect(0, 0, this.canvasParams.canvasWidth, this.canvasParams.canvasHight);
+        if (event.offsetX > this.canvasParams.canvasWidth / 2) {
             this.canvasParams.right = event.offsetX;
         } else {
             this.canvasParams.left = event.offsetX;
         }
         
-        this.updateCanvas();
+        this.updateCanvasElements();
     }
     
-    updateCanvas(){
+    updateCanvasElements() {
         //image
-        if(this.canvasParams.image){
-            this.canvasContext.drawImage(this.canvasParams.image,0,0);
+        if (this.canvasParams.image) {
+            this.canvasContext.drawImage(this.canvasParams.image, 0, 0, this.canvasParams.canvasWidth, this.canvasParams.canvasHight);
         }
         
         //right
         this.canvasContext.strokeStyle = 'red';
         this.canvasContext.beginPath();
-        this.canvasContext.setLineDash([5,3]);
-        this.canvasContext.moveTo(this.canvasParams.right,0);
-        this.canvasContext.lineTo(this.canvasParams.right,300);
+        this.canvasContext.setLineDash([5, 3]);
+        this.canvasContext.moveTo(this.canvasParams.right, 0);
+        this.canvasContext.lineTo(this.canvasParams.right, this.canvasParams.canvasHight);
         this.canvasContext.stroke();
         
         //left
         this.canvasContext.strokeStyle = 'red';
         this.canvasContext.beginPath();
-        this.canvasContext.setLineDash([5,3]);
-        this.canvasContext.moveTo(this.canvasParams.left,0);
-        this.canvasContext.lineTo(this.canvasParams.left,300);
+        this.canvasContext.setLineDash([5, 3]);
+        this.canvasContext.moveTo(this.canvasParams.left, 0);
+        this.canvasContext.lineTo(this.canvasParams.left, this.canvasParams.canvasHight);
         this.canvasContext.stroke();
     }
     
-    updateImage(event){
+    updateImageFromVideo(videoElement) {
+        this.canvasParams.image = videoElement;
+        this.updateCanvasElements();
+    }
+    
+    updateImageFromFile(event) {
         var img = new Image();
         img.onload = this.drew.bind(this, img);
         img.onerror = this.failed;
         img.src = URL.createObjectURL(event.target.files[0]);
         this.canvasParams.image = img;
     }
-    drew(){
-        this.updateCanvas();
+    
+    drew() {
+        this.updateCanvasElements();
     }
-    failed(){
-        console.log('thammmmm!');
+    
+    failed() {
+        console.log('dammmmm!');
     }
 }

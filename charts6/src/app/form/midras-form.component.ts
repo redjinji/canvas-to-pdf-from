@@ -3,6 +3,7 @@ import {Router} from "@angular/router";
 import {UserAnthentityService} from "../login";
 import {IFormElement} from "./form-elements-components";
 import {FormService} from "./form.service";
+import {VideoService} from "./form-elements-components/take-image-elements";
 
 @Component({
     selector:'midras-form',
@@ -15,8 +16,9 @@ export class MidrasFormComponent implements OnInit{
     currentIndex = 0;
     prevDisable = true;
     nextDisable = false;
+    killVideo= false;
     @ViewChild('screenContainer') screenContainer:ElementRef;
-    constructor(private router:Router, private auth:UserAnthentityService, private formService:FormService){
+    constructor(private router:Router, private auth:UserAnthentityService, private formService:FormService, private videoService:VideoService){
     
     }
     
@@ -25,6 +27,8 @@ export class MidrasFormComponent implements OnInit{
         if(!isUserLogin) this.router.navigate(['/login']);
         
         this.getElement();
+    
+        this.videoService.change.subscribe(function(){this.killVideo = true}.bind(this))
     }
     
     getElement(){

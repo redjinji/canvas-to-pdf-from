@@ -1,15 +1,22 @@
 import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from "@angular/core";
+import {VideoService} from "./video.service";
 
 @Component({
     selector: 'video-capture',
     template: `
-        <video (click)="captureImage()" autoplay="true" id="videoElement" #videoElement></video>
-    `
+        <!--<div class="videoCroping">-->
+            <video (click)="captureImage()" autoplay="true" id="videoElement" #videoElement></video>
+        <!--</div>-->
+    `,
+    styleUrls: ['./video.component.scss']
 })
 
 export class VideosComponent implements OnInit{
     @ViewChild('videoElement') video:ElementRef;
     @Output() takePhoto =new EventEmitter();
+    
+    constructor(private videoService:VideoService){}
+    
     ngOnInit(){
         this.activeVideo();
     }
@@ -31,6 +38,8 @@ export class VideosComponent implements OnInit{
     }
     
     captureImage(){
-        this.takePhoto.emit(this.video)
+        // this.takePhoto.emit(this.video);
+        
+        this.videoService.done(this.video.nativeElement);
     }
 }
