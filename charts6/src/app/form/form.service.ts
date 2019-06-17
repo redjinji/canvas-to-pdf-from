@@ -3,24 +3,24 @@ import {IFormElement} from "./form-elements-components/";
 
 @Injectable()
 export class FormService {
-    getFormElements(){
+    getFormElements() {
         return FORM_ELEMENTS;
     }
 }
 
-const FORM_ELEMENTS:IFormElement[] = [
+const FORM_ELEMENTS: IFormElement[] = [
     {
         title: 'קשת קשיחה?',
         radio: [
             {
-                id:'keshet-yes',
+                id: 'keshet-yes',
                 name: 'keshet',
-                text: 'כן'
+                label: 'כן'
             },
             {
-                id:'keshet-no',
+                id: 'keshet-no',
                 name: 'keshet',
-                text: 'לא'
+                label: 'לא'
             }
         ]
     },
@@ -30,22 +30,22 @@ const FORM_ELEMENTS:IFormElement[] = [
             {
                 id: 'walkIn',
                 name: 'referred',
-                text: 'מזדמן'
+                label: 'מזדמן'
             },
             {
                 id: 'advertising',
                 name: 'referred',
-                text: 'פרסום'
+                label: 'פרסום'
             },
             {
                 id: 'myPatient',
                 name: 'referred',
-                text: 'מטופל שלי'
+                label: 'מטופל שלי'
             },
             {
                 id: 'other-referred',
                 name: 'referred',
-                text: 'אחר'
+                label: 'אחר'
             }
         ]
     },
@@ -55,29 +55,29 @@ const FORM_ELEMENTS:IFormElement[] = [
             {
                 id: 'clalit',
                 name: 'insurance',
-                text: 'כללית'
+                label: 'כללית'
             },
             {
                 id: 'macabi',
                 name: 'insurance',
-                text: 'מכבי'
+                label: 'מכבי'
             },
             {
                 id: 'meuhedet',
                 name: 'insurance',
-                text: 'מאוחדת'
+                label: 'מאוחדת'
             },
             {
                 id: 'leumit',
                 name: 'insurance',
-                text: 'לאומית'
+                label: 'לאומית'
             },
             {
                 id: 'other-insurance',
                 name: 'insurance',
-                text: 'אחר'
+                label: 'אחר'
             },
-            
+        
         ]
     },
     {
@@ -108,12 +108,12 @@ const FORM_ELEMENTS:IFormElement[] = [
             {
                 id: 'kolaps-bow-yes',
                 name: 'kolaps-bow',
-                text: 'כן'
+                label: 'כן'
             },
             {
                 id: 'kolaps-bow-no',
                 name: 'kolaps-bow',
-                text: 'לא'
+                label: 'לא'
             }
         ]
     },
@@ -124,18 +124,145 @@ const FORM_ELEMENTS:IFormElement[] = [
             {
                 id: 'movement-limitation-yes',
                 name: 'movement-limitation',
-                text: 'כן'
+                label: 'כן'
             },
             {
                 id: 'movement-limitation-no',
                 name: 'movement-limitation',
-                text: 'לא'
+                label: 'לא'
             },
-
+        
         ]
     },
     {
         title: 'צלם תמונה',
         footImage: true
+    },
+    {
+        title: 'פרטי לקוח',
+        class: 'customer-details',
+        customerDetails: [
+            {
+                radio:[
+                    {
+                        id: 'male',
+                        label: 'זכר',
+                        name: 'gender'
+                    },
+                    {
+                        id: 'female',
+                        label: 'נקבה',
+                        name: 'gender'
+                    }
+                ]
+            },
+            {
+                input: {
+                    id: 'id-number',
+                    name: 'id',
+                    placeholder: 'ת.ז',
+                    type: 'number',
+                    label: 'ת.ז'
+                }
+            },
+            {
+                input: {
+                    id: 'client-name',
+                    name: 'name',
+                    placeholder: 'שם פרטי ומשפחה',
+                    type: 'text',
+                    label: 'שם פרטי ומשפחה'
+                }
+            },
+            {
+                input: {
+                    id: 'birthday',
+                    name: 'surname',
+                    type: 'date',
+                    maxDate: new Date(),
+                    required: true,
+                    label: 'תאריך לידה'
+                }
+            },
+            {
+                input: {
+                    id: 'phone',
+                    name: 'phone',
+                    placeholder: 'מספר טלפון',
+                    type: 'number',
+                    label: 'מספר טלפון'
+                }
+            },
+            {
+                input: {
+                    id: 'email',
+                    name: 'email',
+                    placeholder: 'אימייל',
+                    type: 'email',
+                    label: 'אימייל'
+                }
+            },
+            {
+                class: 'shoes',
+                input: {
+                    id: 'shoes-size',
+                    name: 'shoes',
+                    placeholder: 'מידת נעלים',
+                    type: 'number',
+                    label: 'מידת נעלים'
+                },
+                select: {
+                    name: 'shoes-measure-type',
+                    options: [
+                        {
+                            text: 'EUR'
+                        },
+                        {
+                            text: 'US'
+                        },
+                        {
+                            text: 'CM'
+                        }
+                    ]
+                }
+            },
+            {
+                select: {
+                    label: 'סוג מדרס',
+                    id: 'midras-type',
+                    name: 'midras-type',
+                    options: [
+                        {
+                            text: 'Soft Step',
+                        },
+                        {
+                            text: 'Balance Step',
+                        },
+                        {
+                            text: 'Moonwalk',
+                        },
+                        {
+                            text: 'On Cloud',
+                        },
+                        {
+                            text: 'Ortostep',
+                        },
+                        {
+                            text: 'Other',
+                        }
+                        
+                    ]
+                }
+            },
+            {
+                input: {
+                    id: 'weight',
+                    name: 'weight',
+                    placeholder: 'משקל',
+                    type: 'number',
+                    label: 'משקל'
+                }
+            }
+        ]
     }
 ];

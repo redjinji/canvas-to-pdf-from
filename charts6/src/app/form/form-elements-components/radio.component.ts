@@ -7,7 +7,7 @@ import {validate} from "codelyzer/walkerFactory/walkerFn";
     selector: 'input-radio',
     template: `
         <input (change)="handleChage($event)" type="radio" id="{{radio.id}}" name="{{radio.name}}" value="{{radio.text}}" required>
-        <label for="{{radio.id}}">{{radio.text}}</label>
+        <label for="{{radio.id}}">{{radio.label}}</label>
     `,
     styleUrls:['./radio.scss']
 })

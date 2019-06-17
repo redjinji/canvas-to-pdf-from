@@ -8,6 +8,10 @@ body {
 input.ng-invalid.ng-touched {
   background-color: $color-error;
 }
+textarea {
+  width: 85%;
+  max-width: 50rem;
+}
 .btn-primary {
   font-size: 2rem;
   font-weight: bold;

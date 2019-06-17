@@ -38,7 +38,7 @@ export class FootImageComponent implements OnInit {
         this.canvasParams.right = this.canvasParams.canvasWidth * 0.8;
         this.canvasParams.left = this.canvasParams.canvasWidth * 0.2;
         this.canvasContext = this.canvas.nativeElement.getContext('2d');
-        this.videoService.change.subscribe(this.updateImageFromVideo.bind(this))
+        this.videoService.change.subscribe(this.updateImageFromVideo.bind(this));
         setTimeout(this.updateCanvasElements.bind(this),0); //wait for resize to finish
     }
     

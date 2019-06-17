@@ -1,0 +1,48 @@
+@import "../style/varible";
+
+.customer-details__form {
+  max-width: 25rem;
+  margin: auto;
+  text-align: right;
+  .input__container {
+    margin-bottom: 1rem;
+  }
+  label {
+    display: block;
+    justify-content: space-between;
+  }
+  .radios__container {
+    label {
+      height: 4rem;
+      width: 6rem;
+      margin: 1rem 0 1rem 1rem;
+      display: inline-block;
+      font-size: 2rem;
+    }
+  }
+}
+
+.shoes select[name=shoes-measure-type] {
+  width: 5.7rem;
+  border-right: .5rem solid $color-main;
+}
+select-component {
+  position: relative;
+  .arrow {
+    border-right: .5rem solid transparent;
+    border-left: .5rem solid transparent;
+    border-top: .5rem solid $color-main;
+    position: absolute;
+    top: 50%;
+    left: 0.6rem;
+    z-index: 1;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+}
+input {
+  border: 0;
+  width: 17.3rem;
+  height: 2.8rem;
+  text-align: right;
+}

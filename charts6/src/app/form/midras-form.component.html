@@ -16,8 +16,8 @@
 				<!--<video-capture (takePhoto)="captureImage($event)"></video-capture>-->
 				<video-capture *ngIf="!killVideo" (takePhoto)="captureImage($event)"></video-capture>
 			</div>
-			<div>
-				טופס פרטי לקוח
+			<div *ngIf="elem.customerDetails" [ngClass]="elem.class" class="customer-details__form">
+				<simple-form [customerForm]="elem.customerDetails"></simple-form>
 			</div>
 		</div>
 	</form>

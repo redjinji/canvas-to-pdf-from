@@ -30,7 +30,7 @@
 }
 
 .midras-form__wrapper {
-  font-size: 2.5rem;
+  font-size: 1.5rem;
   color: $color-white;
   text-align: center;
   width: 100vw;
@@ -46,7 +46,7 @@
   display: flex;
   flex-wrap: nowrap;
   width: 100vw;
-  transform: translateX(700%);
+  transform: translateX(800%);
   transition: .5s;
 }
 
@@ -64,6 +64,10 @@ foot-image {
   font-size: 4rem;
   margin-bottom: 2rem;
   padding: 0 3rem;
+  font-weight: bold;
+  @include respond-to(mobile) {
+    font-size: 3rem;
+  }
 }
 
 .subTitle {

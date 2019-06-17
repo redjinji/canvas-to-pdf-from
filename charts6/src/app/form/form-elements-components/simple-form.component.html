@@ -1,0 +1,8 @@
+<div *ngFor="let elem of customerForm" [ngClass]="elem.class" class="input__container">
+	<div class="radios__container" *ngIf="elem.radio">
+		<input-radio *ngFor="let radio of elem.radio" [radio]="radio"></input-radio>
+	</div>
+	<textarea-component *ngIf="elem.textarea" [ta]="elem.textarea"></textarea-component>
+	<input-component *ngIf="elem.input" [inputElem]="elem.input"></input-component>
+	<select-component *ngIf="elem.select" [selectElem]="elem.select"></select-component>
+</div>

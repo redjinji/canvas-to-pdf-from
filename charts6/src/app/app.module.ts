@@ -10,7 +10,10 @@ import {
     RadioComponent,
     FootImageComponent,
     VideosComponent,
-    TextAreaComponent
+    TextAreaComponent,
+    InputComponent,
+    SimpleFormComponent,
+    SelectComponent
 } from "./form";
 import {
     LoginComponent,
@@ -24,10 +27,13 @@ import {VideoService} from "./form/form-elements-components/take-image-elements"
         AppComponent,
         LoginComponent,
         MidrasFormComponent,
+        SimpleFormComponent,
         RadioComponent,
         TextAreaComponent,
         FootImageComponent,
-        VideosComponent
+        VideosComponent,
+        InputComponent,
+        SelectComponent
     ],
     imports: [
         BrowserModule,
