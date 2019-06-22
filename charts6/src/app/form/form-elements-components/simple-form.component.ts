@@ -1,5 +1,6 @@
 import {Component, Input} from "@angular/core";
 import {ICustomerDetails} from "./form-interface";
+import {FormGroup} from "@angular/forms";
 
 @Component({
     selector: 'simple-form',
@@ -8,4 +9,6 @@ import {ICustomerDetails} from "./form-interface";
 })
 export class SimpleFormComponent {
     @Input() customerForm: ICustomerDetails[];
+    @Input() parentForm:FormGroup;
+
 }

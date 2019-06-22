@@ -11,74 +11,74 @@ export class FormService {
 const FORM_ELEMENTS: IFormElement[] = [
     {
         title: 'קשת קשיחה?',
-        radio: [
-            {
-                id: 'keshet-yes',
-                name: 'keshet',
-                label: 'כן'
-            },
-            {
-                id: 'keshet-no',
-                name: 'keshet',
-                label: 'לא'
-            }
-        ]
+        radio: {
+            name: 'keshet',
+            required: true,
+            elements: [
+                {
+                    id: 'keshet-yes',
+                    label: 'כן'
+                },
+                {
+                    id: 'keshet-no',
+                    label: 'לא'
+                }
+            ]
+        }
     },
     {
         title: 'מקור הגעה',
-        radio: [
-            {
-                id: 'walkIn',
-                name: 'referred',
-                label: 'מזדמן'
-            },
-            {
-                id: 'advertising',
-                name: 'referred',
-                label: 'פרסום'
-            },
-            {
-                id: 'myPatient',
-                name: 'referred',
-                label: 'מטופל שלי'
-            },
-            {
-                id: 'other-referred',
-                name: 'referred',
-                label: 'אחר'
-            }
-        ]
+        radio: {
+            name: 'referred',
+            required: true,
+            elements: [
+                {
+                    id: 'walkIn',
+                    label: 'מזדמן'
+                },
+                {
+                    id: 'advertising',
+                    label: 'פרסום'
+                },
+                {
+                    id: 'myPatient',
+                    label: 'מטופל שלי'
+                },
+                {
+                    id: 'other-referred',
+                    label: 'אחר'
+                }
+            ]
+        }
     },
     {
         title: 'ביטוח בריאות',
-        radio: [
-            {
-                id: 'clalit',
-                name: 'insurance',
-                label: 'כללית'
-            },
-            {
-                id: 'macabi',
-                name: 'insurance',
-                label: 'מכבי'
-            },
-            {
-                id: 'meuhedet',
-                name: 'insurance',
-                label: 'מאוחדת'
-            },
-            {
-                id: 'leumit',
-                name: 'insurance',
-                label: 'לאומית'
-            },
-            {
-                id: 'other-insurance',
-                name: 'insurance',
-                label: 'אחר'
-            },
-        
-        ]
+        radio: {
+            name: 'insurance',
+            required: true,
+            elements: [
+                {
+                    id: 'clalit',
+                    label: 'כללית',
+                },
+                {
+                    id: 'macabi',
+                    label: 'מכבי'
+                },
+                {
+                    id: 'meuhedet',
+                    label: 'מאוחדת'
+                },
+                {
+                    id: 'leumit',
+                    label: 'לאומית'
+                },
+                {
+                    id: 'other-insurance',
+                    label: 'אחר'
+                }
+            ]
+        }
     },
     {
         title: 'האם קיימת פתולוגיה או תלונות כאב',
@@ -86,8 +86,8 @@ const FORM_ELEMENTS: IFormElement[] = [
             id: 'patalog',
             length: 10000,
             placeHolder: 'שים פה את הטקסט',
+            required: true,
             rows: 5,
-            required: true
         }
     },
     {
@@ -97,42 +97,46 @@ const FORM_ELEMENTS: IFormElement[] = [
             id: 'activity',
             length: 10000,
             placeHolder: 'שים פה את הטקסט',
+            required: true,
             rows: 5,
-            required: true
         }
     },
     {
         title: 'קריסת קשת רוחבית',
         subtitle: 'יש צורך בהגבהה מטטראסל',
-        radio: [
-            {
-                id: 'kolaps-bow-yes',
-                name: 'kolaps-bow',
-                label: 'כן'
-            },
-            {
-                id: 'kolaps-bow-no',
-                name: 'kolaps-bow',
-                label: 'לא'
-            }
-        ]
+        radio: {
+            name: 'kolaps-bow',
+            required: true,
+            elements: [
+                {
+                    id: 'kolaps-bow-yes',
+                    label: 'כן'
+                },
+                {
+                    id: 'kolaps-bow-no',
+                    label: 'לא'
+                }
+            ]
+        }
     },
     {
         title: 'טווחי תנועה',
         subtitle: 'יש הגבלה בתנועה',
-        radio: [
-            {
-                id: 'movement-limitation-yes',
-                name: 'movement-limitation',
-                label: 'כן'
-            },
-            {
-                id: 'movement-limitation-no',
-                name: 'movement-limitation',
-                label: 'לא'
-            },
-        
-        ]
+        radio: {
+            name: 'movement-limitation',
+            required: true,
+            elements: [
+                {
+                    id: 'movement-limitation-yes',
+                    label: 'כן'
+                },
+                {
+                    id: 'movement-limitation-no',
+                    label: 'לא'
+                },
+    
+            ]
+        }
     },
     {
         title: 'צלם תמונה',
@@ -143,23 +147,26 @@ const FORM_ELEMENTS: IFormElement[] = [
         class: 'customer-details',
         customerDetails: [
             {
-                radio:[
-                    {
-                        id: 'male',
-                        label: 'זכר',
-                        name: 'gender'
-                    },
-                    {
-                        id: 'female',
-                        label: 'נקבה',
-                        name: 'gender'
-                    }
-                ]
+                radio: {
+                    required: true,
+                    name: 'gender',
+                    elements: [
+                        {
+                            id: 'male',
+                            label: 'זכר',
+                        },
+                        {
+                            id: 'female',
+                            label: 'נקבה',
+                        }
+                    ]
+                }
             },
             {
                 input: {
+                    required: true,
                     id: 'id-number',
-                    name: 'id',
+                    name: 'idNumber',
                     placeholder: 'ת.ז',
                     type: 'number',
                     label: 'ת.ז'
@@ -167,6 +174,7 @@ const FORM_ELEMENTS: IFormElement[] = [
             },
             {
                 input: {
+                    required: true,
                     id: 'client-name',
                     name: 'name',
                     placeholder: 'שם פרטי ומשפחה',
@@ -176,16 +184,17 @@ const FORM_ELEMENTS: IFormElement[] = [
             },
             {
                 input: {
+                    required: true,
                     id: 'birthday',
                     name: 'surname',
                     type: 'date',
                     maxDate: new Date(),
-                    required: true,
                     label: 'תאריך לידה'
                 }
             },
             {
                 input: {
+                    required: true,
                     id: 'phone',
                     name: 'phone',
                     placeholder: 'מספר טלפון',
@@ -195,6 +204,7 @@ const FORM_ELEMENTS: IFormElement[] = [
             },
             {
                 input: {
+                    required: true,
                     id: 'email',
                     name: 'email',
                     placeholder: 'אימייל',
@@ -205,6 +215,7 @@ const FORM_ELEMENTS: IFormElement[] = [
             {
                 class: 'shoes',
                 input: {
+                    required: true,
                     id: 'shoes-size',
                     name: 'shoes',
                     placeholder: 'מידת נעלים',
@@ -213,6 +224,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                 },
                 select: {
                     name: 'shoes-measure-type',
+                    required: true,
                     options: [
                         {
                             text: 'EUR'
@@ -231,6 +243,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                     label: 'סוג מדרס',
                     id: 'midras-type',
                     name: 'midras-type',
+                    required: true,
                     options: [
                         {
                             text: 'Soft Step',
@@ -250,7 +263,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                         {
                             text: 'Other',
                         }
-                        
+                    
                     ]
                 }
             },
@@ -260,6 +273,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                     name: 'weight',
                     placeholder: 'משקל',
                     type: 'number',
+                    required: true,
                     label: 'משקל'
                 }
             }

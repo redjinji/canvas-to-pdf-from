@@ -1,8 +1,13 @@
 export interface IRadio {
-    id: string,
-    label: string,
     name: string,
-    class?: string
+    class?: string,
+    required?: true,
+    elements: IRadioElement[]
+}
+
+export interface IRadioElement {
+    label: string,
+    id: string,
 }
 
 export interface ITextArea {
@@ -10,7 +15,7 @@ export interface ITextArea {
     length: number,
     placeHolder?: string,
     rows: number,
-    required: boolean,
+    required?: boolean,
     class?: string
 }
 
@@ -31,6 +36,7 @@ export interface ISelect {
     id?: string,
     name: string,
     class?: string
+    required?: true,
     options: ISelectOption[]
 }
 
@@ -43,7 +49,7 @@ export interface ISelectOption {
 export interface ICustomerDetails {
     input?: IInput,
     textarea?: ITextArea,
-    radio?: IRadio[],
+    radio?: IRadio,
     select?: ISelect,
     class?: string
 }
@@ -51,10 +57,9 @@ export interface ICustomerDetails {
 export interface IFormElement {
     title: string,
     subtitle?: string,
-    text?: Text,
-    footImage?: boolean,
     class?: string,
-    radio?: IRadio[],
+    footImage?: boolean,
+    radio?: IRadio,
     textarea?: ITextArea,
     customerDetails?: ICustomerDetails[]
 }

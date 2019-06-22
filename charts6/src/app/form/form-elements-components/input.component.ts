@@ -1,20 +1,26 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {IInput} from "./form-interface";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 
 @Component({
     selector: 'input-component',
     template: `
+<div [formGroup]="parentForm">
         <label for="{{inputElem.id}}"> {{inputElem.label}}
         </label>
-        <input [attr.required]="inputElem.required"
+        <input
+         formControlName="{{inputElem.name}}"
          [attr.max]="inputElem.maxDate ? inputElem.maxDateParsed : null"
          [attr.min]="inputElem.maxDate ? '1900-01-01' : null"
          id="{{inputElem.id}}" type="{{inputElem.type}}" name="{{inputElem.name}}"
+         [attr.required]="inputElem.required ? '' : null"
          [attr.placeholder]="inputElem.placeholder ? inputElem.placeholder : null"/>
+         </div>
     `
 })
 export class InputComponent implements OnInit{
     @Input() inputElem: IInput;
+    @Input() parentForm:FormGroup;
     
     ngOnInit(){
         if(this.inputElem.maxDate) {
@@ -30,6 +36,8 @@ export class InputComponent implements OnInit{
             const date = `${year}-${mounth}-${day}`;
             this.inputElem.maxDateParsed = date;
         }
+        const formControlValidationNeeded = this.inputElem.required ? new FormControl('',Validators.required) : new FormControl();
+        this.parentForm.addControl(this.inputElem.name, formControlValidationNeeded);
     }
     
 }
