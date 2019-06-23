@@ -1,12 +1,13 @@
-import {Component, ElementRef, HostListener, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, HostListener, OnChanges, OnInit, ViewChild} from "@angular/core";
 import {VideoService} from "./video.service";
 
 @Component({
     selector: 'foot-image',
     template: `
-        <canvas #canvas (click)="updateLine($event)" [width]="canvasParams.canvasWidth" [height]="canvasParams.canvasHight"></canvas><br/>
+        <canvas #canvas [ngClass]="{'video-camera--on':!cameraOn}" (click)="updateLine($event)" [width]="canvasParams.canvasWidth" [height]="canvasParams.canvasHight"></canvas><br/>
         <label class="choose-file__btn" for="file"> בחר קובץ
-            <input (change)="updateImageFromFile($event)" type="file" id="file" accept="image/*">
+            <!--<input (change)="updateImageFromFile($event)" type="file" id="file" accept="image/*">-->
+            <button (click)="activateCamera()" >הפעל מצלמה</button>
         </label>
         <label class="choose-file__btn" for="file"> צלם
             <input (change)="updateImageFromFile($event)" type="file" id="file" accept="image/*" capture="camera">
@@ -15,9 +16,10 @@ import {VideoService} from "./video.service";
     styleUrls: ['./foot-image.component.scss']
 })
 
-export class FootImageComponent implements OnInit {
+export class FootImageComponent implements OnInit, AfterViewInit {
     @ViewChild('canvas') canvas: ElementRef;
     canvasContext;
+    cameraOn: boolean = false;
     canvasParams = {
         right: 280,
         left: 20,
@@ -25,24 +27,39 @@ export class FootImageComponent implements OnInit {
         canvasWidth: 0,
         canvasHight: 0
     };
+    
     @HostListener('window:resize', ['$event'])
     onResize(event) {
         this.updateCanvasSize();
-        setTimeout(this.updateCanvasElements.bind(this),0); //wait for resize to finish
+        setTimeout(this.updateCanvasElements.bind(this), 0); //wait for resize to finish
     }
+    
     constructor(private videoService: VideoService) {
+        this.cameraOn = false;
+    }
+    
+    ngAfterViewInit() {
+        setTimeout(function () {
+            this.updateCanvasSize();
+            this.canvasParams.right = this.canvasParams.canvasWidth * 0.8;
+            this.canvasParams.left = this.canvasParams.canvasWidth * 0.2;
+            this.canvasContext = this.canvas.nativeElement.getContext('2d');
+            // this.updateCanvasElements();
+            setTimeout(this.updateCanvasElements.bind(this), 0); //wait for resize to finish
+        }.bind(this));
+        
     }
     
     ngOnInit() {
-        this.updateCanvasSize();
-        this.canvasParams.right = this.canvasParams.canvasWidth * 0.8;
-        this.canvasParams.left = this.canvasParams.canvasWidth * 0.2;
-        this.canvasContext = this.canvas.nativeElement.getContext('2d');
         this.videoService.change.subscribe(this.updateImageFromVideo.bind(this));
-        setTimeout(this.updateCanvasElements.bind(this),0); //wait for resize to finish
     }
     
-    updateCanvasSize(){
+    activateCamera() {
+        this.cameraOn = true;
+        this.videoService.activeCamera();
+    }
+    
+    updateCanvasSize() {
         this.canvasParams.canvasWidth = Math.floor(this.canvas.nativeElement.offsetWidth);
         this.canvasParams.canvasHight = Math.floor(this.canvas.nativeElement.offsetHeight);
     }
@@ -83,6 +100,8 @@ export class FootImageComponent implements OnInit {
     }
     
     updateImageFromVideo(videoElement) {
+        console.log(videoElement);
+        this.cameraOn = false;
         this.canvasParams.image = videoElement;
         this.updateCanvasElements();
     }

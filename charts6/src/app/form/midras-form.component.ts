@@ -18,7 +18,7 @@ export class MidrasFormComponent implements OnInit {
     currentIndex = 0;
     prevDisable = true;
     nextDisable = false;
-    killVideo= false;
+    killVideo = true;
     @ViewChild('screenContainer') screenContainer:ElementRef;
     constructor(private router:Router, private auth:UserAnthentityService,
                 private formService:FormService,
@@ -33,6 +33,7 @@ export class MidrasFormComponent implements OnInit {
         this.getElement();
         this.parentForm = this.formBuilder.group({});
         this.videoService.change.subscribe(function(){this.killVideo = true}.bind(this));
+        this.videoService.cameraOn.subscribe(function(){this.killVideo = false}.bind(this));
     }
     
     getElement(){

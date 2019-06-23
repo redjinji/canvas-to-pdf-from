@@ -16,7 +16,7 @@ module.exports = {
 		});
 		
 		app.get('/force-restart', (req, res) => {
-			res.redirect('http://localhost:4201/login');
+			res.redirect('http://localhost:4200/login');
 			
 			fs.writeFile('server/assets/forceUpdate.json', JSON.stringify({updateMe:Math.random()}), (err) => {
 				if (err) return console.error(err);
