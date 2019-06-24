@@ -5,6 +5,7 @@ import {VideoService} from "./video.service";
     selector: 'foot-image',
     template: `
         <canvas #canvas [ngClass]="{'video-camera--on':!cameraOn}" (click)="updateLine($event)" [width]="canvasParams.canvasWidth" [height]="canvasParams.canvasHight"></canvas><br/>
+        <video-capture *ngIf="!killVideo" (takePhoto)="captureImage($event)"></video-capture><br/>
         <label class="choose-file__btn" for="file"> בחר קובץ
             <!--<input (change)="updateImageFromFile($event)" type="file" id="file" accept="image/*">-->
             <button (click)="activateCamera()" >הפעל מצלמה</button>
@@ -19,6 +20,7 @@ import {VideoService} from "./video.service";
 export class FootImageComponent implements OnInit, AfterViewInit {
     @ViewChild('canvas') canvas: ElementRef;
     canvasContext;
+    killVideo = true;
     cameraOn: boolean = false;
     canvasParams = {
         right: 280,
@@ -51,7 +53,12 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     }
     
     ngOnInit() {
-        this.videoService.change.subscribe(this.updateImageFromVideo.bind(this));
+        this.videoService.change.subscribe(function(event){
+            this.updateImageFromVideo(event);
+            this.killVideo = true;
+        }.bind(this));
+        // this.videoService.change.subscribe(.bind(this));
+        this.videoService.cameraOn.subscribe(function(){this.killVideo = false}.bind(this));
     }
     
     activateCamera() {
@@ -101,8 +108,8 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     
     updateImageFromVideo(videoElement) {
         console.log(videoElement);
-        this.cameraOn = false;
         this.canvasParams.image = videoElement;
+        this.cameraOn = false;
         this.updateCanvasElements();
     }
     

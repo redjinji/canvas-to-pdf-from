@@ -15,7 +15,6 @@
 			<div *ngIf="elem.footImage" class="form-elememt-component__container foot-image__container">
 				<foot-image></foot-image>
 				<!--<video-capture (takePhoto)="captureImage($event)"></video-capture>-->
-				<video-capture *ngIf="!killVideo" (takePhoto)="captureImage($event)"></video-capture>
 			</div>
 			<div *ngIf="elem.customerDetails" [ngClass]="elem.class" class="form-elememt-component__container customer-details__form">
 				<simple-form [parentForm]="parentForm" [customerForm]="elem.customerDetails"></simple-form>

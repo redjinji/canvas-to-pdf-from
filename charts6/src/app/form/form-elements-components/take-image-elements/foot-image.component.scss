@@ -18,4 +18,9 @@ canvas {
   max-height: 55rem;
   height: calc(95vw * 0.75);
   margin-bottom: 1rem;
+  display: none;
+}
+
+.video-camera--on {
+  display: block;
 }

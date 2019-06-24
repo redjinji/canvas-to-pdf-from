@@ -7,7 +7,8 @@ import {LoginRouteActivatorService} from "./login/login-route-activator.service"
 const routes: Routes = [
     {path:'', redirectTo:'form',pathMatch:'full'},
     {path:'login', component:LoginComponent},
-    {path:'form', component:MidrasFormComponent, canActivate:[LoginRouteActivatorService]}
+    {path:'form', component:MidrasFormComponent, canActivate:[LoginRouteActivatorService]},
+    {path:'form-send', component:LoginComponent}
     
 ];
 

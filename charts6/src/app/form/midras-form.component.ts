@@ -1,10 +1,11 @@
-import {Component, ElementRef, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {Router} from "@angular/router";
 import {UserAnthentityService} from "../login";
 import {IFormElement} from "./form-elements-components";
 import {FormService} from "./form.service";
 import {VideoService} from "./form-elements-components/take-image-elements";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {delay} from "rxjs/internal/operators";
 
 @Component({
     selector:'midras-form',
@@ -12,13 +13,12 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
     styleUrls: ['./midras-form.component.scss']
 })
 
-export class MidrasFormComponent implements OnInit {
+export class MidrasFormComponent implements OnInit, AfterViewInit {
     parentForm: FormGroup;
     formElements:IFormElement[];
     currentIndex = 0;
     prevDisable = true;
     nextDisable = false;
-    killVideo = true;
     @ViewChild('screenContainer') screenContainer:ElementRef;
     constructor(private router:Router, private auth:UserAnthentityService,
                 private formService:FormService,
@@ -26,14 +26,17 @@ export class MidrasFormComponent implements OnInit {
                 private formBuilder:FormBuilder){
     }
     
+    ngAfterViewInit(){
+        this.parentForm.removeControl('inValidForInit');
+    }
+    
     ngOnInit():void{
         const isUserLogin = this.auth.isLogin();
         if(!isUserLogin) this.router.navigate(['/login']);
-        
+
         this.getElement();
-        this.parentForm = this.formBuilder.group({});
-        this.videoService.change.subscribe(function(){this.killVideo = true}.bind(this));
-        this.videoService.cameraOn.subscribe(function(){this.killVideo = false}.bind(this));
+        this.parentForm = this.formBuilder.group({inValidForInit:new FormControl('',Validators.required)});
+        console.log(this.parentForm);
     }
     
     getElement(){
