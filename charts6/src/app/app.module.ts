@@ -21,6 +21,7 @@ import {
     LoginRouteActivatorService
 } from "./login";
 import {VideoService} from "./form/form-elements-components/take-image-elements";
+import {SuccessPageComponent} from "./final-page/success-page-component";
 
 @NgModule({
     declarations: [
@@ -33,7 +34,8 @@ import {VideoService} from "./form/form-elements-components/take-image-elements"
         FootImageComponent,
         VideosComponent,
         InputComponent,
-        SelectComponent
+        SelectComponent,
+        SuccessPageComponent
     ],
     imports: [
         BrowserModule,

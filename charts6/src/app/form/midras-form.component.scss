@@ -116,3 +116,26 @@ foot-image {
     bottom: 6.9rem;
   }
 }
+
+.send-from-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: $color-main;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity .5s;
+
+  &.active {
+    z-index: 5;
+    opacity: 1;
+  }
+  .spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}

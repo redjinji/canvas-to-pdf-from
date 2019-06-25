@@ -7,10 +7,10 @@ import {VideoService} from "./video.service";
         <canvas #canvas [ngClass]="{'video-camera--on':!cameraOn}" (click)="updateLine($event)" [width]="canvasParams.canvasWidth" [height]="canvasParams.canvasHight"></canvas><br/>
         <video-capture *ngIf="!killVideo" (takePhoto)="captureImage($event)"></video-capture><br/>
         <label class="choose-file__btn" for="file"> בחר קובץ
-            <!--<input (change)="updateImageFromFile($event)" type="file" id="file" accept="image/*">-->
-            <button (click)="activateCamera()" >הפעל מצלמה</button>
+            <input (change)="updateImageFromFile($event)" type="file" id="file" accept="image/*">
         </label>
-        <label class="choose-file__btn" for="file"> צלם
+        <button *ngIf="isMobileDevice()" class="choose-file__btn" (click)="activateCamera()" >הפעל מצלמה</button>
+        <label *ngIf="!isMobileDevice()" class="choose-file__btn" for="file"> צלם
             <input (change)="updateImageFromFile($event)" type="file" id="file" accept="image/*" capture="camera">
         </label>
     `,
@@ -128,4 +128,8 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     failed() {
         console.log('dammmmm!');
     }
+    
+    isMobileDevice() {
+        return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+    };
 }

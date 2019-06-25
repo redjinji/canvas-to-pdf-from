@@ -14,7 +14,11 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
             [attr.required]="selectElem.required ? '' : null"
             formControlName="{{selectElem.name}}"
             >
-        <option *ngFor="let option of selectElem.options" [value]="option.value ? option.value : option.text">{{option.text}}</option>
+        <option *ngFor="let option of selectElem.options"
+         [attr.selected]="option.defaultSelect? '': null"
+         [attr.disabled]="option.disabled? '': null"
+         [attr.hidden]="option.hidden? '': null"
+         [value]="checkDefaultValue(option.hidden, option.disabled, option.defaultSelect, option.value, option.text)">{{option.text}}</option>
         </select>
         </div>
     `,
@@ -39,5 +43,15 @@ export class SelectComponent implements OnInit{
         const formControlValidationNeeded = this.selectElem.required ? new FormControl('',Validators.required) : new FormControl();
         this.parentForm.addControl(this.selectElem.name,formControlValidationNeeded);
         
+    }
+    
+    checkDefaultValue(hidden, disable, defaultSelect, value, text){
+        if(hidden && disable && defaultSelect) {
+            return '';
+        } else if (value) {
+            return value
+        } else {
+            return text;
+        }
     }
 }

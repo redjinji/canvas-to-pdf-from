@@ -1,0 +1,24 @@
+@import "../style/varible";
+@import "../style/mixin-mediaQuery";
+
+.success-page-container {
+  margin: 10rem 0;
+}
+
+.main-logo {
+  max-width: 40rem;
+  width: 80%;
+  margin: auto;
+  display: block;
+}
+
+.main-title {
+  color: $color-white;
+  text-align: center;
+  font-weight: bold;
+  font-size: 3rem;
+  margin-top: 3rem;
+  @include respond-to(tablet){
+    font-size: 5rem;
+  }
+}

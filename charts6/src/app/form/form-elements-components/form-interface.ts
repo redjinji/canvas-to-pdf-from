@@ -43,7 +43,10 @@ export interface ISelect {
 export interface ISelectOption {
     text: string,
     value?: string,
-    class?: string
+    class?: string,
+    defaultSelect?: boolean,
+    disabled?: boolean,
+    hidden?: boolean
 }
 
 export interface ICustomerDetails {

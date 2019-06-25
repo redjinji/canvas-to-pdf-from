@@ -5,7 +5,6 @@ import {IFormElement} from "./form-elements-components";
 import {FormService} from "./form.service";
 import {VideoService} from "./form-elements-components/take-image-elements";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {delay} from "rxjs/internal/operators";
 
 @Component({
     selector:'midras-form',
@@ -19,7 +18,9 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     currentIndex = 0;
     prevDisable = true;
     nextDisable = false;
+    activeSpinner = false;
     @ViewChild('screenContainer') screenContainer:ElementRef;
+    @ViewChild('overlaySpinner') overlaySpinner:ElementRef;
     constructor(private router:Router, private auth:UserAnthentityService,
                 private formService:FormService,
                 private videoService:VideoService,
@@ -36,7 +37,6 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
 
         this.getElement();
         this.parentForm = this.formBuilder.group({inValidForInit:new FormControl('',Validators.required)});
-        console.log(this.parentForm);
     }
     
     getElement(){
@@ -52,7 +52,6 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
         } else {
             this.nextDisable = true;
         }
-        console.log(this.parentForm);
     }
     
     prevStep(){
@@ -70,4 +69,10 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
         console.log('parent video:',data);
     }
     
+    sendForm(){
+        if(this.parentForm.valid) {
+            this.activeSpinner= true;
+            setTimeout(() => this.router.navigate(['/success-form']), 3000)
+        }
+    }
 }

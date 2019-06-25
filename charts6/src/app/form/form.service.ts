@@ -227,7 +227,13 @@ const FORM_ELEMENTS: IFormElement[] = [
                     required: true,
                     options: [
                         {
-                            text: 'EUR'
+                            text: 'בחר יחידת מידה',
+                            defaultSelect: true,
+                            disabled: true,
+                            hidden: true
+                        },
+                        {
+                            text: 'EUR',
                         },
                         {
                             text: 'US'
@@ -246,7 +252,14 @@ const FORM_ELEMENTS: IFormElement[] = [
                     required: true,
                     options: [
                         {
+                            text: 'בחר סוג מדרס',
+                            defaultSelect: true,
+                            disabled: true,
+                            hidden: true
+                        },
+                        {
                             text: 'Soft Step',
+                            defaultSelect: true
                         },
                         {
                             text: 'Balance Step',
