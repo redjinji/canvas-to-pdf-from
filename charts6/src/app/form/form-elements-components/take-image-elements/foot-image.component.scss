@@ -8,7 +8,13 @@
 .choose-file__btn {
   background-color: $color-green;
   padding: 1rem;
-  margin: 0 1rem;
+  margin: 1rem;
+  position: relative;
+  line-height: 6rem;
+  input {
+    position: absolute;
+    visibility: hidden;
+  }
 }
 
 canvas {
@@ -22,5 +28,57 @@ canvas {
 }
 
 .video-camera--on {
+  display: block;
+}
+
+.foot-layout, .leg-layout {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  position: relative;
+  p{
+    color: $color-unselected;
+  }
+}
+.leg-layout {
+  justify-content: space-evenly;
+}
+
+.leg-lyaout__selected, .leg-lyaout__unselected {
+  width: 9rem;
+  padding: 0 2rem;
+}
+.leg-lyaout__selected {
+  display: none;
+}
+.leg-lyaout__unselected {
+  display: block;
+}
+.leg-layout__radio {
+  position: absolute;
+  visibility: hidden;
+}
+.leg-layout__radio:checked ~ .leg-lyaout__selected {
+  display: block;
+}
+.leg-layout__radio:checked ~ .leg-lyaout__unselected {
+  display: none;
+}
+
+.leg-layout__radio:checked ~ p {
+  color: $color-white;
+}
+
+.take-image__container {
+  display: flex;
+  justify-content: space-around;
+  .take-image__file, .take-image__thumbnail, .take-image__camera {
+    display: flex;
+    flex-direction: column;
+  }
+}
+.foot__image__thumbnail {
+  width: 10rem;
+  height: 10rem;
   display: block;
 }

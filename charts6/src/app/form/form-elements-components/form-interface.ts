@@ -8,6 +8,11 @@ export interface IRadio {
 export interface IRadioElement {
     label: string,
     id: string,
+    imgs?:IImage[]
+}
+
+export interface IImage {
+    src: string
 }
 
 export interface ITextArea {

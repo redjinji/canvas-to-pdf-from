@@ -1,31 +1,29 @@
-import {AfterViewInit, Component, ElementRef, HostListener, OnChanges, OnInit, ViewChild} from "@angular/core";
+import {
+    AfterViewInit, Component, ElementRef, HostListener, Input, OnChanges, OnInit, QueryList, ViewChild,
+    ViewChildren
+} from "@angular/core";
 import {VideoService} from "./video.service";
+import {FormControl, FormGroup} from "@angular/forms";
 
 @Component({
     selector: 'foot-image',
-    template: `
-        <canvas #canvas [ngClass]="{'video-camera--on':!cameraOn}" (click)="updateLine($event)" [width]="canvasParams.canvasWidth" [height]="canvasParams.canvasHight"></canvas><br/>
-        <video-capture *ngIf="!killVideo" (takePhoto)="captureImage($event)"></video-capture><br/>
-        <label class="choose-file__btn" for="file"> בחר קובץ
-            <input (change)="updateImageFromFile($event)" type="file" id="file" accept="image/*">
-        </label>
-        <button *ngIf="isMobileDevice()" class="choose-file__btn" (click)="activateCamera()" >הפעל מצלמה</button>
-        <label *ngIf="!isMobileDevice()" class="choose-file__btn" for="file"> צלם
-            <input (change)="updateImageFromFile($event)" type="file" id="file" accept="image/*" capture="camera">
-        </label>
-    `,
+    templateUrl: 'foot-image-component.html',
     styleUrls: ['./foot-image.component.scss']
 })
 
 export class FootImageComponent implements OnInit, AfterViewInit {
     @ViewChild('canvas') canvas: ElementRef;
+    @ViewChildren('thumbnailGalleryItem') thumbnailGalleryItem: QueryList<any>;
+    @Input() parentForm: FormGroup;
+    
+    currentCameraInput: number;
     canvasContext;
     killVideo = true;
     cameraOn: boolean = false;
     canvasParams = {
         right: 280,
         left: 20,
-        image: undefined,
+        images: [],
         canvasWidth: 0,
         canvasHight: 0
     };
@@ -47,21 +45,32 @@ export class FootImageComponent implements OnInit, AfterViewInit {
             this.canvasParams.left = this.canvasParams.canvasWidth * 0.2;
             this.canvasContext = this.canvas.nativeElement.getContext('2d');
             // this.updateCanvasElements();
-            setTimeout(this.updateCanvasElements.bind(this), 0); //wait for resize to finish
+            setTimeout(this.updateCanvasElements.bind(this, this.currentCameraInput), 0); //wait for resize to finish
+            this.canvasParams.images = ['../../../../assets/SoftwareIcons_Type01.png',
+                '../../../../assets/SoftwareIcons_Type01.png',
+                '../../../../assets/SoftwareIcons_Type01.png'];
+            // this.initThumbnailPlaceHolder('../../../../assets/SoftwareIcons_Type01.png');
+            this.initThumbnailPlaceHolder();
         }.bind(this));
-        
+        this.parentForm.addControl('image0', new FormControl());
+        this.parentForm.addControl('image1', new FormControl());
+        this.parentForm.addControl('image2', new FormControl());
     }
     
     ngOnInit() {
-        this.videoService.change.subscribe(function(event){
+        this.videoService.change.subscribe(function (event) {
             this.updateImageFromVideo(event);
             this.killVideo = true;
         }.bind(this));
         // this.videoService.change.subscribe(.bind(this));
-        this.videoService.cameraOn.subscribe(function(){this.killVideo = false}.bind(this));
+        this.videoService.cameraOn.subscribe(function () {
+            this.killVideo = false
+        }.bind(this));
     }
     
-    activateCamera() {
+    activateCamera(event, index) {
+        console.log(index);
+        this.currentCameraInput = index;
         this.cameraOn = true;
         this.videoService.activeCamera();
     }
@@ -85,8 +94,8 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     
     updateCanvasElements() {
         //image
-        if (this.canvasParams.image) {
-            this.canvasContext.drawImage(this.canvasParams.image, 0, 0, this.canvasParams.canvasWidth, this.canvasParams.canvasHight);
+        if (this.canvasParams.images[this.currentCameraInput]) {
+            this.canvasContext.drawImage(this.canvasParams.images[this.currentCameraInput], 0, 0, this.canvasParams.canvasWidth, this.canvasParams.canvasHight);
         }
         
         //right
@@ -107,22 +116,39 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     }
     
     updateImageFromVideo(videoElement) {
-        console.log(videoElement);
-        this.canvasParams.image = videoElement;
         this.cameraOn = false;
-        this.updateCanvasElements();
+        this.drew(videoElement, this.currentCameraInput);
     }
     
-    updateImageFromFile(event) {
+    updateImageFromFile(event, index) {
         var img = new Image();
-        img.onload = this.drew.bind(this, img);
+        img.onload = this.drew.bind(this, img, index);
         img.onerror = this.failed;
         img.src = URL.createObjectURL(event.target.files[0]);
-        this.canvasParams.image = img;
     }
     
-    drew() {
-        this.updateCanvasElements();
+    updateFormWithImage(image, index) {
+        this.parentForm.controls[`image${index}`].setValue(image);
+    }
+    
+    updateCanvasThumbnails(image, index) {
+        console.log(image);
+        console.log(index);
+        console.log(this.thumbnailGalleryItem);
+        console.log(this.thumbnailGalleryItem.toArray()[index].nativeElement);
+        let thumbContext = this.thumbnailGalleryItem.toArray()[index].nativeElement.getContext('2d');
+        console.log(thumbContext);
+        thumbContext.drawImage(image, 0, 0, 100, 100);
+    }
+    
+    drew(image, index) {
+        console.log('%c'+index,'background-color:green;font-size:16px;color:#fff');
+        this.currentCameraInput = index;
+        this.canvasParams.images[this.currentCameraInput] = image;
+        this.updateCanvasThumbnails(image, index);
+        // this.updateCanvasElements();
+        // this.updateFormWithImage(image, index);
+        
     }
     
     failed() {
@@ -132,4 +158,20 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     isMobileDevice() {
         return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
     };
+    
+    updateMainImage(index) {
+        this.currentCameraInput = index;
+        this.updateCanvasElements();
+    }
+    
+    initThumbnailPlaceHolder(fileDir) {
+        var img = new Image();
+        img.onload = function (img) {
+            this.canvasParams.images.push(img);
+            this.canvasParams.images.push(img);
+            this.canvasParams.images.push(img);
+        }.bind(this, img);
+        img.onerror = this.failed;
+        img.src = fileDir;
+    }
 }

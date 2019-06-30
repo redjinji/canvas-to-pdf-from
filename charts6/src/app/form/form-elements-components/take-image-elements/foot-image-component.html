@@ -1,0 +1,55 @@
+<div [formGroup]="parentForm">
+	<div class="leg-layout">
+		<label>
+			<input type="radio" name="legLine" id="legNormal" class="leg-layout__radio" checked>
+			<img src="../../../../assets/SoftwareIcons_Natural02.png" class="leg-lyaout__selected">
+			<img src="../../../../assets/SoftwareIcons_Natural01.png" class="leg-lyaout__unselected">
+			<p>ניטראלית</p>
+		</label>
+		<label>
+			<input type="radio" name="legLine" id="legInside" class="leg-layout__radio">
+			<img src="../../../../assets/SoftwareIcons_Pronation02.png" class="leg-lyaout__selected">
+			<img src="../../../../assets/SoftwareIcons_Pronation01.png" class="leg-lyaout__unselected">
+			<p>נטיה פינמה</p>
+		</label>
+		<label>
+			<input type="radio" name="legLine" id="legOutside" class="leg-layout__radio">
+			<img src="../../../../assets/SoftwareIcons_Supination02.png" class="leg-lyaout__selected">
+			<img src="../../../../assets/SoftwareIcons_Supination01.png" class="leg-lyaout__unselected">
+			<p>נטיה החוצה</p>
+		</label>
+	</div>
+
+	<canvas #canvas [ngClass]="{'video-camera--on':!cameraOn}" (click)="updateLine($event)"
+			[width]="canvasParams.canvasWidth" [height]="canvasParams.canvasHight"></canvas>
+	<br/>
+	<video-capture *ngIf="!killVideo" (takePhoto)="captureImage($event)"></video-capture>
+
+	<div class="take-image__container">
+		<div class="take-image__file">
+			<label  *ngFor="let img of canvasParams.images;let i = index" class="choose-file__btn take-image__item" for="fileSystem{{i}}"> בחר קובץ
+				<input (change)="updateImageFromFile($event, i)" [attr.data-index]="i" type="file" id="fileSystem{{i}}" accept="image/*">
+			</label>
+		</div>
+
+		<div class="take-image__thumbnail">
+			<canvas width="100" #thumbnailGalleryItem height="100" *ngFor="let img of canvasParams.images;let i = index" (click)="updateMainImage(i)" class="foot__image__thumbnail"></canvas>
+			<!--<canvas width="100" height="100" (click)="updateMainImage(0)" class="e0 foot__image__thumbnail"></canvas>-->
+			<!--<canvas width="100" height="100" (click)="updateMainImage(1)" class="e1 foot__image__thumbnail"></canvas>-->
+			<!--<canvas width="100" height="100" (click)="updateMainImage(2)" class="e2 foot__image__thumbnail"></canvas>-->
+		</div>
+
+		<div class="take-image__camera">
+			<div class="take-image__item--container" *ngFor="let img of canvasParams.images;let i = index">
+				<button *ngIf="isMobileDevice()" [attr.data-index]="i" class="choose-file__btn take-image__item" (click)="activateCamera($event, i)">
+					הפעל מצלמה
+				</button>
+				<label *ngIf="!isMobileDevice()" class="choose-file__btn take-image__item" for="cameraFile{{i}}"> צלם
+					<input (change)="updateImageFromFile($event, i)" [attr.data-index]="i" type="file" id="cameraFile{{i}}" accept="image/*"
+						   capture="camera">
+				</label>
+			</div>
+
+		</div>
+	</div>
+</div>

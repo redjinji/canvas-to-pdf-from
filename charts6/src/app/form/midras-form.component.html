@@ -1,6 +1,5 @@
 <div class="midras-form__wrapper">
-	<img src="/assets/5-5.jpgs" class="main-logo">
-		<!--<p>midrasForm {{midrasForm.valid}}</p>-->
+	<img src="/assets/5-5.jpg" class="main-logo">
 	<form #midrasForm="ngForm" #screenContainer (ngSubmit)="sendForm()" id="main-form" class="midras-form" [formGroup]="parentForm">
 		<div *ngFor="let elem of formElements;let i =index" class="screen screen-{{i}}">
 			<h3 class="title">{{elem.title}}</h3>
@@ -13,7 +12,7 @@
 			</div>
 
 			<div *ngIf="elem.footImage" class="form-elememt-component__container foot-image__container">
-				<foot-image></foot-image>
+				<foot-image [parentForm]="parentForm"></foot-image>
 				<!--<video-capture (takePhoto)="captureImage($event)"></video-capture>-->
 			</div>
 			<div *ngIf="elem.customerDetails" [ngClass]="elem.class" class="form-elememt-component__container customer-details__form">

@@ -29,6 +29,7 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     
     ngAfterViewInit(){
         this.parentForm.removeControl('inValidForInit');
+        console.log(this.parentForm);
     }
     
     ngOnInit():void{

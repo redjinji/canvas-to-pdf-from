@@ -139,6 +139,44 @@ const FORM_ELEMENTS: IFormElement[] = [
         }
     },
     {
+        title: 'טביעת רגל',
+        subtitle: 'סוג קשת פלנטארית',
+        radio: {
+            name: 'footPrint',
+            required: true,
+            elements: [
+                {
+                    id: 'footCollapse',
+                    label: 'קריסה',
+                    imgs: [
+                        {src:'../../../../assets/SoftwareIcons_FootCollapsed.png'}
+                    ]
+                },
+                {
+                    id: 'footHigh',
+                    label: 'גבוהה',
+                    imgs: [
+                        {src:'../../../../assets/SoftwareIcons_FootHigh.png'}
+                    ]
+                },
+                {
+                    id: 'footLow',
+                    label: 'נמוכה',
+                    imgs: [
+                        {src:'../../../../assets/SoftwareIcons_FootLow.png'}
+                    ]
+                },
+                {
+                    id: 'footNormal',
+                    label: 'נורמאלית',
+                    imgs: [
+                        {src:'../../../../assets/SoftwareIcons_FootNormal.png'}
+                    ]
+                }
+            ]
+        }
+    },
+    {
         title: 'צלם תמונה',
         footImage: true
     },

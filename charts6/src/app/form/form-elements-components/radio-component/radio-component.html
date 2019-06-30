@@ -1,0 +1,19 @@
+<div class="radios-container" [formGroup]="parentForm" >
+	<ng-template let-isRequired="radios.required" ngFor let-radioElem [ngForOf]="radio.elements">
+		<label for="{{radioElem.id}}" [ngClass]="{'checked': parentForm.controls[radio.name].value == radioElem.label,'radio__image-include':radioElem.imgs}">
+			<input (change)="handleChange($event)"
+				   formControlName="{{radio.name}}"
+				   [attr.required]="radio.required ? '' : null"
+				   type="radio"
+				   id="{{radioElem.id}}"
+				   value="{{radioElem.label}}"
+				   class="radio-elem"
+			>
+			<img *ngIf="mainImageNeeded(radioElem)" src="{{radioElem.imgs[0].src}}" class="radio-image">
+			<img *ngIf="radioElem.imgs && radioElem.imgs[1]  && parentForm.controls[radio.name].value == radioElem.label" src="{{radioElem.imgs[1].src}}" class="radio-image">
+			<span class="radio-text">
+            {{radioElem.label}}
+            </span>
+		</label>
+	</ng-template>
+</div>
