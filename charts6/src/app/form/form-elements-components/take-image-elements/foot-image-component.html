@@ -27,20 +27,20 @@
 
 	<div class="take-image__container">
 		<div class="take-image__file">
-			<label  *ngFor="let img of canvasParams.images;let i = index" class="choose-file__btn take-image__item" for="fileSystem{{i}}"> בחר קובץ
+			<label  *ngFor="let img of thumbnailGalleryAmount;let i = index" class="choose-file__btn take-image__item" for="fileSystem{{i}}"> בחר קובץ
 				<input (change)="updateImageFromFile($event, i)" [attr.data-index]="i" type="file" id="fileSystem{{i}}" accept="image/*">
 			</label>
 		</div>
 
 		<div class="take-image__thumbnail">
-			<canvas width="100" #thumbnailGalleryItem height="100" *ngFor="let img of canvasParams.images;let i = index" (click)="updateMainImage(i)" class="foot__image__thumbnail"></canvas>
+			<canvas width="100" #thumbnailGalleryItem height="100" *ngFor="let img of thumbnailGalleryAmount;let i = index" (click)="updateMainImage(i)" class="foot__image__thumbnail"></canvas>
 			<!--<canvas width="100" height="100" (click)="updateMainImage(0)" class="e0 foot__image__thumbnail"></canvas>-->
 			<!--<canvas width="100" height="100" (click)="updateMainImage(1)" class="e1 foot__image__thumbnail"></canvas>-->
 			<!--<canvas width="100" height="100" (click)="updateMainImage(2)" class="e2 foot__image__thumbnail"></canvas>-->
 		</div>
 
 		<div class="take-image__camera">
-			<div class="take-image__item--container" *ngFor="let img of canvasParams.images;let i = index">
+			<div class="take-image__item--container" *ngFor="let img of thumbnailGalleryAmount;let i = index">
 				<button *ngIf="isMobileDevice()" [attr.data-index]="i" class="choose-file__btn take-image__item" (click)="activateCamera($event, i)">
 					הפעל מצלמה
 				</button>

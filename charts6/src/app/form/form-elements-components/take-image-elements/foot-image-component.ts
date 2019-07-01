@@ -27,6 +27,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
         canvasWidth: 0,
         canvasHight: 0
     };
+    thumbnailGalleryAmount = [];
     
     @HostListener('window:resize', ['$event'])
     onResize(event) {
@@ -49,6 +50,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
             this.canvasParams.images = ['../../../../assets/SoftwareIcons_Type01.png',
                 '../../../../assets/SoftwareIcons_Type01.png',
                 '../../../../assets/SoftwareIcons_Type01.png'];
+            this.thumbnailGalleryAmount[this.canvasParams.images.length - 1] = '';
             // this.initThumbnailPlaceHolder('../../../../assets/SoftwareIcons_Type01.png');
             this.initThumbnailPlaceHolder();
         }.bind(this));
