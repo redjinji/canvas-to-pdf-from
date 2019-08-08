@@ -1,20 +1,21 @@
 const formidable = require('formidable'),
 	googleApi = require('./google_api'),
+    fs = require('fs-extra'),
 	puppet = require('puppeteer'),
+	htmlTemplate = require('angular-template'),
 	process = require('process');
 
 module.exports = {
 	init:function (req, res) {
-		
-		async function generatPdf(callbackFunc) {
+		var reqBody = req.body;
+		async function generatPdf(callbackFunc, fields) {
 			try {
 				const browser = await puppet.launch();
 				const page = await browser.newPage();
-
-				await page.setContent(`<body dir="rtl"></bocy><h1 style="">טופס הזמנת מדרסים</h1>
-<img alt="this is the camvas" style="background-color: red" width="300" height="300" src="http://localhost:3000/temp_image/canvas1.jpg" />
-<p>סוף טופס הזמנת מדרסים</p></body>
-`);
+				
+				const htmlToParce = htmlTemplate(__dirname + '/final-form.html', fields);
+                fs.writeFile('server/assets/testMeText.html', htmlToParce);
+                await page.setContent(htmlToParce);
 
 				await page.emulateMedia('screen');
 				await page.pdf({
@@ -24,18 +25,15 @@ module.exports = {
 				});
 				await browser.close();
 
-				callbackFunc();
+				// callbackFunc();
 			} catch (e) {
 				console.log('our error', e);
 			}
-		}
-		
+		};
 		var form = new formidable.IncomingForm({
 			uploadDir: process.cwd() + '/server/temp_image',
-			encoding: 'binary',
-			keepExtensions: false,
+			keepExtensions: true,
 		});
-		
 		form.on('fileBegin', function (name, file) {
 			file.path = process.cwd() + '/server/temp_image/' + file.name;
 		});
@@ -43,16 +41,27 @@ module.exports = {
 		form.addListener('file', function (name, file) {
 		});
 		form.parse(req, function(err, fields, files) {
+			let lessfiled = fields;
+            fs.writeFile('server/assets/testMeText.json', JSON.stringify(fields));
+            console.log('???????????');
+			console.log(fields);
+			console.log('===========');
+			console.log(files);
+			// console.log(req);
 			if (err) {
 				// Check for and handle any errors here.
 				console.error('error parse: ',err.message);
 				return;
 			}
-			generatPdf(googleApi.sendToDrive);
+			// generatPdf(()=>{});
+			generatPdf(googleApi.sendToDrive, fields);
 		}.bind(this));
 		
 		// res.sendFile(path.join(process.cwd() + '/client/index.html'));
 		
 		// res.end();
-	}
+	},
+	getTemplate: function () {
+		return fs.readFileSync('final-form.html');
+    }
 };

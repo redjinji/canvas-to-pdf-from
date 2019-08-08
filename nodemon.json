@@ -1,3 +1,8 @@
 {
-  "ignore": ["/server/google_api_js/*"]
+  "ignore": [
+    "/server/google_api_js/*",
+    "server/assets/testMeText.json",
+    "server/assets/testMeTextBody.json",
+    "server/assets/testMeTextBody.html"
+  ]
 }

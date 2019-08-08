@@ -22,6 +22,7 @@ import {
 } from "./login";
 import {VideoService} from "./form/form-elements-components/take-image-elements";
 import {SuccessPageComponent} from "./final-page/success-page-component";
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
     declarations: [
@@ -41,7 +42,8 @@ import {SuccessPageComponent} from "./final-page/success-page-component";
         BrowserModule,
         AppRoutingModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        HttpClientModule
     ],
     providers: [
         UserAnthentityService,

@@ -18,7 +18,6 @@ app.use(function(req, res, next) {
 	next();
 });
 
-
 rout.rout(app);
 
 const port = 3000;

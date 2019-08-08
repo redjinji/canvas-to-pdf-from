@@ -224,7 +224,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                 input: {
                     required: true,
                     id: 'birthday',
-                    name: 'surname',
+                    name: 'birthday',
                     type: 'date',
                     maxDate: new Date(),
                     label: 'תאריך לידה'
@@ -261,7 +261,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                     label: 'מידת נעלים'
                 },
                 select: {
-                    name: 'shoes-measure-type',
+                    name: 'shoesMeasureType',
                     required: true,
                     options: [
                         {

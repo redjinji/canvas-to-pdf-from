@@ -11,6 +11,7 @@ import {Router} from "@angular/router";
 export class LoginComponent {
     userName;
     password;
+    mouseoverLogin: boolean;
     constructor(private auth:UserAnthentityService,private router:Router){
     }
     

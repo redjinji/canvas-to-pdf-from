@@ -71,7 +71,6 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     }
     
     activateCamera(event, index) {
-        console.log(index);
         this.currentCameraInput = index;
         this.cameraOn = true;
         this.videoService.activeCamera();
@@ -130,27 +129,29 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     }
     
     updateFormWithImage(image, index) {
-        this.parentForm.controls[`image${index}`].setValue(image);
+        this.canvas.nativeElement.toBlob(function(blob){
+            console.log(blob);
+            let fileReader = new FileReader();
+            fileReader.readAsDataURL(blob);
+            fileReader.onloadend = function() {
+                let base64data = fileReader.result;
+                this.parentForm.controls[`image${index}`].setValue(base64data);
+            }.bind(this);
+            console.log(this.parentForm.controls[`image${index}`]);
+        }.bind(this));
     }
     
     updateCanvasThumbnails(image, index) {
-        console.log(image);
-        console.log(index);
-        console.log(this.thumbnailGalleryItem);
-        console.log(this.thumbnailGalleryItem.toArray()[index].nativeElement);
         let thumbContext = this.thumbnailGalleryItem.toArray()[index].nativeElement.getContext('2d');
-        console.log(thumbContext);
         thumbContext.drawImage(image, 0, 0, 100, 100);
     }
     
     drew(image, index) {
-        console.log('%c'+index,'background-color:green;font-size:16px;color:#fff');
         this.currentCameraInput = index;
         this.canvasParams.images[this.currentCameraInput] = image;
         this.updateCanvasThumbnails(image, index);
-        // this.updateCanvasElements();
-        // this.updateFormWithImage(image, index);
-        
+        this.updateCanvasElements();
+        this.updateFormWithImage(image, index);
     }
     
     failed() {

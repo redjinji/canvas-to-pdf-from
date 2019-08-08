@@ -7,7 +7,6 @@
 }
 
 label {
-  border-radius: 0;
   background-color: $color-unselected;
   padding: .5rem;
   width: 10rem;
@@ -19,6 +18,7 @@ label {
   margin: 0 1rem 1rem;
   position: relative;
   text-align: center;
+  border-radius: 1.5rem;
   &.checked {
     background-color: $color-green;
   }

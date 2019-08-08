@@ -8,7 +8,8 @@ module.exports = {
 	rout: (app) => {
 		app.get('/', (req, res) => {
 			console.log('home');
-			res.sendFile(path.join(process.cwd() + '/client/index.html'));
+			res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
+			// res.sendFile(path.join(process.cwd() + '/client/index.html'));
 		});
 		
 		app.post('/get-user-sheets', (req, res) => {
@@ -25,6 +26,11 @@ module.exports = {
 			
 			// res.sendFile(path.join(process.cwd() + '/client/js/' + req.params.filename));
 		});
+        
+        app.post('/sendForm', (req, res) => {
+        	fs.writeFile('server/assets/testMeTextBody.json', JSON.stringify(req.body));
+        	pdfGenerate.init(req, res);
+        });
 		
 		app.get('/js/:filename', (req, res) => {
 			res.sendFile(path.join(process.cwd() + '/client/js/' + req.params.filename));
@@ -46,8 +52,22 @@ module.exports = {
 			pdfGenerate.init(req, res);
 		});
 		
+		app.get('/assets/:fileName', (req, res) => {
+			console.log(req.params);
+			if(req.params.fileName !== 'undefined') {
+				res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/assets/' + req.params.fileName));
+			} else {
+				res.sendStatus(404);
+			}
+		});
+		
 		app.get('/:fileName', (req, res) => {
-			res.sendFile(path.join(process.cwd() + '/client/dist/' +req.params.fileName));
+			console.log(req.params);
+			if(req.params.fileName !== 'undefined') {
+				res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/' + req.params.fileName));
+			} else {
+				res.sendStatus(404);
+			}
 		});
 	}
 };
