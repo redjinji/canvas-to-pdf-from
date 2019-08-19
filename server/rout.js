@@ -11,6 +11,12 @@ module.exports = {
 			res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
 			// res.sendFile(path.join(process.cwd() + '/client/index.html'));
 		});
+        
+        app.get('/form', (req, res) => {
+            console.log('form');
+            res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
+            // res.sendFile(path.join(process.cwd() + '/client/index.html'));
+        });
 		
 		app.post('/get-user-sheets', (req, res) => {
 			sheetsHandle.getSheets(req, res);
