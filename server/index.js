@@ -20,7 +20,11 @@ app.use(function(req, res, next) {
 
 rout.rout(app);
 
-const port = 3000;
+let port = process.env.PORT;
+if (port === null || port === '') {
+    port = 3000;
+}
+app.listen(port);
 
 app.get('/some/:params', (req, res) => {
 	app.use(bodyParser);
