@@ -105,7 +105,7 @@ const FORM_ELEMENTS: IFormElement[] = [
         title: 'קריסת קשת רוחבית',
         subtitle: 'יש צורך בהגבהה מטטראסל',
         radio: {
-            name: 'kolaps-bow',
+            name: 'kolapsBow',
             required: true,
             elements: [
                 {
@@ -123,7 +123,7 @@ const FORM_ELEMENTS: IFormElement[] = [
         title: 'טווחי תנועה',
         subtitle: 'יש הגבלה בתנועה',
         radio: {
-            name: 'movement-limitation',
+            name: 'movementLimitation',
             required: true,
             elements: [
                 {

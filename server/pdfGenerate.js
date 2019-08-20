@@ -25,7 +25,7 @@ module.exports = {
 				});
 				await browser.close();
 
-				// callbackFunc();
+				callbackFunc();
 			} catch (e) {
 				console.log('our error', e);
 			}
@@ -43,17 +43,11 @@ module.exports = {
 		form.parse(req, function(err, fields, files) {
 			let lessfiled = fields;
             fs.writeFile('server/assets/testMeText.json', JSON.stringify(fields));
-            console.log('???????????');
-			console.log(fields);
-			console.log('===========');
-			console.log(files);
-			// console.log(req);
 			if (err) {
 				// Check for and handle any errors here.
 				console.error('error parse: ',err.message);
 				return;
 			}
-			// generatPdf(()=>{});
 			generatPdf(googleApi.sendToDrive, fields);
 		}.bind(this));
 		

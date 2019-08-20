@@ -25,6 +25,8 @@ if (port === null || port === '') {
     port = 3000;
 }
 
+port = 3000;
+
 app.get('/some/:params', (req, res) => {
 	app.use(bodyParser);
 	console.log(req.params);
