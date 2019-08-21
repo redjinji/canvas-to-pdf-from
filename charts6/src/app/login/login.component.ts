@@ -13,6 +13,12 @@ export class LoginComponent {
     password;
     mouseoverLogin: boolean;
     constructor(private auth:UserAnthentityService,private router:Router){
+        const lastLogin = JSON.parse(localStorage.getItem('userAuth'));
+        if(lastLogin) {
+            this.userName = lastLogin.userName;
+            this.password = lastLogin.password;
+        }
+    
     }
     
     login(formValues){

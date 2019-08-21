@@ -35,7 +35,7 @@
   text-align: center;
   width: 100vw;
   overflow: hidden;
-  padding: 5rem 0 0;
+  padding: 0;
   @include respond-to(mobile){
     padding-top: 2.5rem;
   }
@@ -56,9 +56,15 @@ foot-image {
 
 .screen {
   width: 100vw;
-  height: calc(100vh - 28rem);
+  height: calc(100vh - 19rem);
+  @include respond-to(mobile) {
+    height: calc(100vh - 23rem);
+  }
   .ng-valid & {
-    height: calc(100vh - 35rem);
+    height: calc(100vh - 26rem);
+    @include respond-to(mobile) {
+      height: calc(100vh - 28rem);
+    }
   }
 }
 

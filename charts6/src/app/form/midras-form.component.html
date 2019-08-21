@@ -1,5 +1,4 @@
 <div class="midras-form__wrapper">
-	<img src="/assets/5-5.jpg" class="main-logo">
 	<form #midrasForm="ngForm" #screenContainer (ngSubmit)="sendForm()" id="main-form" class="midras-form" [formGroup]="parentForm">
 		<div *ngFor="let elem of formElements;let i =index" class="screen screen-{{i}}">
 			<h3 class="title">{{elem.title}}</h3>

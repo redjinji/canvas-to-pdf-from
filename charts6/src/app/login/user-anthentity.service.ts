@@ -37,8 +37,8 @@ export class UserAnthentityService {
     }
     
     isLogin() {
-        return true;
-        // return this.loginAlready;
+        // return true;
+        return this.loginAlready;
     }
     
     isAuthenticated() {
