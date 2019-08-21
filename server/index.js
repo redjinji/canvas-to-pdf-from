@@ -19,16 +19,8 @@ app.use(function(req, res, next) {
 });
 
 rout.rout(app);
-
 let port = process && process.env && process.env.PORT;
-if (port === null || port === '') {
+if (port === null || port === '' || port === undefined) {
     port = 3000;
 }
-
-app.get('/some/:params', (req, res) => {
-	app.use(bodyParser);
-	console.log(req.params);
-	res.send('Hello country!');
-});
-
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(port, () => console.log(`canvas listening on port ${port}!`));

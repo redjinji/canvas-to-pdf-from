@@ -2,10 +2,9 @@ const fs = require('fs-extra'),
 	readline = require('readline'),
 	{google} = require('googleapis');
 
-
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
-const TOKEN_PATH_DRIVE = 'server/assets/google/driveToken.json';
-const TOKEN_PATH_SHEETS = 'server/assets/google/sheetsToken.json';
+const TOKEN_PATH_DRIVE = process.cwd() + '/server/assets/google/driveToken.json';
+const TOKEN_PATH_SHEETS = process.cwd() + '/server/assets/google/sheetsToken.json';
 
 module.exports = {
 	driveAUTH: undefined,
@@ -13,7 +12,7 @@ module.exports = {
 	credentials: undefined,
 	a: undefined,
 	sendToDrive: function () {
-		fs.readFile('server/assets/google/driveCredentials.json', function (err, content) {
+		fs.readFile(process.cwd() + '/server/assets/google/driveCredentials.json', function (err, content) {
 			if (err) return console.log('Error loading client secret file:', err);
 			// Authorize a client with credentials, then call the Google Drive API.
 			// authorize(JSON.parse(content),()=>{});
@@ -115,7 +114,7 @@ module.exports = {
 // time.
 
 // Load client secrets from a local file.
-		fs.readFile('server/assets/google/sheetsCredentials.json', (err, content) => {
+		fs.readFile(process.cwd() + '/server/assets/google/sheetsCredentials.json', (err, content) => {
 			if (err) return console.log('Error loading client secret file:', err);
 			// Authorize a client with credentials, then call the Google Sheets API.
 			authorize(JSON.parse(content), listMajors);
