@@ -6,6 +6,7 @@ import {FormService} from "./form.service";
 import {VideoService} from "./form-elements-components/take-image-elements";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpClient} from "@angular/common/http";
+import {environment} from "../../environments/environment";
 
 @Component({
     selector:'midras-form',
@@ -20,7 +21,7 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     prevDisable = true;
     nextDisable = false;
     activeSpinner = false;
-    url: string = 'http://localhost:3000/sendForm';
+    url: string = `${environment.serverCall}/sendForm`;
     
     @ViewChild('screenContainer') screenContainer:ElementRef;
     @ViewChild('overlaySpinner') overlaySpinner:ElementRef;

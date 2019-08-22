@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {ActivatedRouteSnapshot, Router} from "@angular/router";
 import {IUser} from "./login.model";
+import {environment} from "../../environments/environment";
 
 @Injectable()
 export class UserAnthentityService {
@@ -48,7 +49,7 @@ export class UserAnthentityService {
             formData.append('password', this.currentUser.password);
             
             var xhr = new XMLHttpRequest;
-            xhr.open('POST', 'http://localhost:3000/get-user-sheets', true);
+            xhr.open('POST', `${environment.serverCall}/get-user-sheets`, true);
             xhr.onreadystatechange = function (data) {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     var res = JSON.parse(xhr.response);

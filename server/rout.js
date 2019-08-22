@@ -11,6 +11,12 @@ module.exports = {
 			res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
 			// res.sendFile(path.join(process.cwd() + '/client/index.html'));
 		});
+		
+		app.get('/login', (req, res) => {
+			console.log('login');
+			res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
+			// res.sendFile(path.join(process.cwd() + '/client/index.html'));
+		});
         
         app.get('/form', (req, res) => {
             console.log('form');
