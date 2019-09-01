@@ -10,7 +10,13 @@ module.exports = {
 		var reqBody = req.body;
 		async function generatPdf(callbackFunc, fields) {
 			try {
-				const browser = await puppet.launch();
+				const browser = await puppet.launch({
+						args: [
+							'--no-sandbox',
+							'--disable-setuid-sandbox',
+						]
+					}
+				);
 				const page = await browser.newPage();
 				
 				const htmlToParce = htmlTemplate(__dirname + '/final-form.html', fields);
