@@ -1,5 +1,4 @@
 /node_modules/
 /.idea
-/server/pdfs
 /server/temp_image
 token.json
