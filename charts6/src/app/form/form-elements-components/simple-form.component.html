@@ -4,5 +4,6 @@
 	</div>
 	<textarea-component [parentForm]="parentForm" *ngIf="elem.textarea" [ta]="elem.textarea"></textarea-component>
 	<input-component [parentForm]="parentForm" *ngIf="elem.input" [inputElem]="elem.input"></input-component>
+	<input-birthday [parentForm]="parentForm" *ngIf="elem.inputBirthday" [inputBirthday]="elem.inputBirthday"></input-birthday>
 	<select-component [parentForm]="parentForm" *ngIf="elem.select" [selectElem]="elem.select"></select-component>
 </div>

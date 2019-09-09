@@ -35,7 +35,6 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     
     ngAfterViewInit(){
         this.parentForm.removeControl('inValidForInit');
-        console.log(this.parentForm);
     }
     
     ngOnInit():void{
@@ -78,12 +77,10 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     
     sendForm(){
         if(this.parentForm.valid) {
-            console.log(this.parentForm);
             let formData = new FormData();
             for(let formItem in this.parentForm.value){
                 formData.append(formItem, this.parentForm.value[formItem])
             }
-            console.log(formData);
     
             this._http.post(this.url,formData).subscribe(
                 respone => console.log(respone),

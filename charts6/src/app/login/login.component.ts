@@ -12,7 +12,7 @@ export class LoginComponent {
     userName;
     password;
     mouseoverLogin: boolean;
-    constructor(private auth:UserAnthentityService,private router:Router){
+    constructor(private auth:UserAnthentityService, private router:Router){
         const lastLogin = JSON.parse(localStorage.getItem('userAuth'));
         if(lastLogin) {
             this.userName = lastLogin.userName;

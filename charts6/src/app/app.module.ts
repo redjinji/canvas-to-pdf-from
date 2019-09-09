@@ -13,7 +13,8 @@ import {
     TextAreaComponent,
     InputComponent,
     SimpleFormComponent,
-    SelectComponent
+    SelectComponent,
+    BirthdayInputComponent
 } from "./form";
 import {
     LoginComponent,
@@ -36,7 +37,8 @@ import {HttpClientModule} from "@angular/common/http";
         VideosComponent,
         InputComponent,
         SelectComponent,
-        SuccessPageComponent
+        SuccessPageComponent,
+        BirthdayInputComponent
     ],
     imports: [
         BrowserModule,

@@ -36,6 +36,11 @@ export interface IInput {
     class?: string
 }
 
+export interface IInputBirthday {
+    title: string,
+    required?: true
+}
+
 export interface ISelect {
     label?: string,
     id?: string,
@@ -56,6 +61,7 @@ export interface ISelectOption {
 
 export interface ICustomerDetails {
     input?: IInput,
+    inputBirthday?: IInputBirthday,
     textarea?: ITextArea,
     radio?: IRadio,
     select?: ISelect,

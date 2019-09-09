@@ -134,7 +134,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                     id: 'movement-limitation-no',
                     label: 'לא'
                 },
-    
+            
             ]
         }
     },
@@ -149,28 +149,28 @@ const FORM_ELEMENTS: IFormElement[] = [
                     id: 'footCollapse',
                     label: 'קריסה',
                     imgs: [
-                        {src:'../../../../assets/SoftwareIcons_FootCollapsed.png'}
+                        {src: '../../../../assets/SoftwareIcons_FootCollapsed.png'}
                     ]
                 },
                 {
                     id: 'footHigh',
                     label: 'גבוהה',
                     imgs: [
-                        {src:'../../../../assets/SoftwareIcons_FootHigh.png'}
+                        {src: '../../../../assets/SoftwareIcons_FootHigh.png'}
                     ]
                 },
                 {
                     id: 'footLow',
                     label: 'נמוכה',
                     imgs: [
-                        {src:'../../../../assets/SoftwareIcons_FootLow.png'}
+                        {src: '../../../../assets/SoftwareIcons_FootLow.png'}
                     ]
                 },
                 {
                     id: 'footNormal',
                     label: 'נורמאלית',
                     imgs: [
-                        {src:'../../../../assets/SoftwareIcons_FootNormal.png'}
+                        {src: '../../../../assets/SoftwareIcons_FootNormal.png'}
                     ]
                 }
             ]
@@ -221,13 +221,8 @@ const FORM_ELEMENTS: IFormElement[] = [
                 }
             },
             {
-                input: {
-                    required: true,
-                    id: 'birthday',
-                    name: 'birthday',
-                    type: 'date',
-                    maxDate: new Date(),
-                    label: 'תאריך לידה'
+                inputBirthday: {
+                    title: 'תאריך יומולדת'
                 }
             },
             {
