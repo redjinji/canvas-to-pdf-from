@@ -251,7 +251,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                     required: true,
                     id: 'shoes-size',
                     name: 'shoes',
-                    placeholder: 'מידת נעלים',
+                    placeholder: 'מידה',
                     type: 'number',
                     label: 'מידת נעלים'
                 },
@@ -260,7 +260,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                     required: true,
                     options: [
                         {
-                            text: 'בחר יחידת מידה',
+                            text: 'יחידת מידה',
                             defaultSelect: true,
                             disabled: true,
                             hidden: true

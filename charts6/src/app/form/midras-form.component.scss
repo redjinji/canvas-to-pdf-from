@@ -45,7 +45,7 @@
   display: flex;
   flex-wrap: nowrap;
   width: 100vw;
-  transform: translateX(800%);
+  transform: translateX(00%);
   transition: .5s;
 }
 
@@ -69,7 +69,7 @@ foot-image {
 }
 
 .form-elememt-component__container {
-  overflow: scroll;
+  overflow: auto;
   height: calc(100% - 5.6rem);
 }
 

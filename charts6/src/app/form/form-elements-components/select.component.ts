@@ -7,19 +7,21 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
     template: `
 <div [formGroup]="parentForm">
         <label *ngIf="selectElem.label" [attr.for]="selectElem.id ? selectElem.id : null">{{selectElem.label}}</label>
-        <span class="arrow"></span>
-        <select
-            [attr.id]="selectElem.id ? selectElem.id : null"
-            name="{{selectElem.name}}"
-            [attr.required]="selectElem.required ? '' : null"
-            formControlName="{{selectElem.name}}"
-            >
-        <option *ngFor="let option of selectElem.options"
-         [attr.selected]="option.defaultSelect? '': null"
-         [attr.disabled]="option.disabled? '': null"
-         [attr.hidden]="option.hidden? '': null"
-         [value]="checkDefaultValue(option.hidden, option.disabled, option.defaultSelect, option.value, option.text)">{{option.text}}</option>
-        </select>
+        <div class="select-container">
+            <span class="arrow"></span>
+            <select
+                [attr.id]="selectElem.id ? selectElem.id : null"
+                name="{{selectElem.name}}"
+                [attr.required]="selectElem.required ? '' : null"
+                formControlName="{{selectElem.name}}"
+                >
+                <option *ngFor="let option of selectElem.options"
+                 [attr.selected]="option.defaultSelect? '': null"
+                 [attr.disabled]="option.disabled? '': null"
+                 [attr.hidden]="option.hidden? '': null"
+                 [value]="checkDefaultValue(option.hidden, option.disabled, option.defaultSelect, option.value, option.text)">{{option.text}}</option>
+            </select>
+        </div>
         </div>
     `,
     styles:[`
@@ -32,6 +34,10 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
             -webkit-appearance: none;
             appearance: none;
             padding-right: .5rem;
+        }
+        .select-container {
+            position: relative;
+            width: fit-content;
         }
     `]
 })

@@ -1,9 +1,14 @@
 @import "../style/varible";
+@import "../style/mixin-mediaQuery";
 
 .customer-details__form {
-  max-width: 25rem;
+  max-width: 50rem;
   margin: auto;
   text-align: right;
+  @include respond-to(mobile) {
+    max-width: 39rem;
+  }
+
   .input__container {
     margin-bottom: 1rem;
   }
@@ -20,10 +25,23 @@
       font-size: 2rem;
     }
   }
+  simple-form {
+    display: flex;
+    flex-wrap: wrap;
+  }
 }
 
-.shoes select[name=shoes-measure-type] {
-  border-top: .5rem solid $color-main;
+.shoes {
+  display: flex;
+  align-items: flex-end;
+
+  select[name=shoesMeasureType] {
+    width: 10.5rem;
+  }
+
+  input {
+    max-width: 4.4rem;
+  }
 }
 select-component {
   position: relative;

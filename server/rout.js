@@ -8,22 +8,22 @@ module.exports = {
 	rout: (app) => {
 		app.get('/', (req, res) => {
 			console.log('home');
-			res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
-			// res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
+			// res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
+			res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
 			// res.sendFile(path.join(process.cwd() + '/client/index.html'));
 		});
 		
 		app.get('/login', (req, res) => {
 			console.log('login');
-			res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
-			// res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
+			// res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
+			res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
 			// res.sendFile(path.join(process.cwd() + '/client/index.html'));
 		});
         
         app.get('/form', (req, res) => {
             console.log('form');
-            res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
-            // res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
+            // res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
+            res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
             // res.sendFile(path.join(process.cwd() + '/client/index.html'));
         });
 		
@@ -32,7 +32,8 @@ module.exports = {
 		});
 		
 		app.get('/force-restart', (req, res) => {
-			res.redirect('http://localhost:4200/login');
+			// res.redirect('http://localhost:4200/login');
+			res.redirect('http://pro-active8.herokuapp.com/login');
 			
 			fs.writeFile('server/assets/forceUpdate.json', JSON.stringify({updateMe:Math.random()}), (err) => {
 				if (err) return console.error(err);

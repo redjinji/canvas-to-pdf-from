@@ -6,7 +6,7 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
     selector: 'input-birthday',
     template: `
 <div [formGroup]="parentForm">
-        <p>{{inputBirthday.title}}</p>
+        <label>{{inputBirthday.title}}</label>
         <div class="birthday--inputs">
         <input
          formControlName="birthdayDay"
