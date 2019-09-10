@@ -8,19 +8,22 @@ module.exports = {
 	rout: (app) => {
 		app.get('/', (req, res) => {
 			console.log('home');
-			res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
+			res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
+			// res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
 			// res.sendFile(path.join(process.cwd() + '/client/index.html'));
 		});
 		
 		app.get('/login', (req, res) => {
 			console.log('login');
-			res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
+			res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
+			// res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
 			// res.sendFile(path.join(process.cwd() + '/client/index.html'));
 		});
         
         app.get('/form', (req, res) => {
             console.log('form');
-            res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
+            res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
+            // res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
             // res.sendFile(path.join(process.cwd() + '/client/index.html'));
         });
 		
