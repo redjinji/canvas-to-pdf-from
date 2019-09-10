@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from "@angular/core";
-import {IInput} from "./form-interface";
+import {IInput, IInputBirthday} from "./form-interface";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 
 @Component({
@@ -38,7 +38,7 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
     `]
 })
 export class BirthdayInputComponent implements OnInit {
-    @Input() inputBirthday: IInput;
+    @Input() inputBirthday: IInputBirthday;
     @Input() parentForm: FormGroup;
     currentYear:number = new Date().getFullYear();
     
