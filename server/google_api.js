@@ -11,16 +11,22 @@ module.exports = {
 	drive: undefined,
 	credentials: undefined,
 	a: undefined,
-	sendToDrive: function () {
+	sendToDrive: function (formFields) {
+		// let date = new Date();
+		// fs.rename(process.cwd() + '/server/pdfs/mypdf.pdf', process.cwd() + `/server/pdfs/${formFields.filedAgent}.pdf`, function(err) {
+		// 	if ( err ) console.log('ERROR: ' + err);
+		// });
+		
+		
 		fs.readFile(process.cwd() + '/server/assets/google/driveCredentials.json', function (err, content) {
 			if (err) return console.log('Error loading client secret file:', err);
 			// Authorize a client with credentials, then call the Google Drive API.
 			// authorize(JSON.parse(content),()=>{});
 			this.credentials = content;
-			authorize(JSON.parse(content), uploadPdf);
+			authorize(JSON.parse(content), uploadPdf, formFields);
 		});
 		
-		function authorize(credentials, callback) {
+		function authorize(credentials, callback, formFields) {
 			const {client_secret, client_id, redirect_uris} = credentials.installed;
 			const oAuth2Client = new google.auth.OAuth2(
 				client_id, client_secret, redirect_uris[0]);
@@ -29,7 +35,7 @@ module.exports = {
 			fs.readFile(TOKEN_PATH_DRIVE, function (err, token) {
 				if (err) return getAccessToken(oAuth2Client, callback);
 				oAuth2Client.setCredentials(JSON.parse(token));
-				callback(oAuth2Client);
+				callback(oAuth2Client, formFields);
 			});
 		}
 		
@@ -79,11 +85,11 @@ module.exports = {
 			});*/
 		}
 		
-		function uploadPdf(auth) {
+		function uploadPdf(auth, formFields) {
 			const drive = google.drive({version: 'v3', auth});
 			
 			const fileMetadata = {
-				'name': 'mypdf.pdf',
+				'name': `${formFields.fieldAgent} - ${formFields.name}`,
 				parents: ['1jlag_Kq8VCH-MkD10whsaxacOxUPOECp']
 			};
 			const media = {

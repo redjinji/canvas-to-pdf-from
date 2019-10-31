@@ -78,6 +78,9 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     sendForm(){
         if(this.parentForm.valid) {
             let formData = new FormData();
+            let fieldAgent = JSON.parse(localStorage.getItem('userAuth'));
+            
+            formData.append('fieldAgent', fieldAgent.userName);
             for(let formItem in this.parentForm.value){
                 formData.append(formItem, this.parentForm.value[formItem])
             }

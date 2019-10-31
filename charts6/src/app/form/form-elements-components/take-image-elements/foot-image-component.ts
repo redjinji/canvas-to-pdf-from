@@ -16,7 +16,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     @ViewChildren('thumbnailGalleryItem') thumbnailGalleryItem: QueryList<any>;
     @Input() parentForm: FormGroup;
     
-    currentCameraInput: number;
+    currentCameraInput: number = 0;
     canvasContext;
     killVideo = true;
     cameraOn: boolean = false;
@@ -47,9 +47,9 @@ export class FootImageComponent implements OnInit, AfterViewInit {
             this.canvasContext = this.canvas.nativeElement.getContext('2d');
             // this.updateCanvasElements();
             setTimeout(this.updateCanvasElements.bind(this, this.currentCameraInput), 0); //wait for resize to finish
-            this.canvasParams.images = ['../../../../assets/SoftwareIcons_Type01.png',
-                '../../../../assets/SoftwareIcons_Type01.png',
-                '../../../../assets/SoftwareIcons_Type01.png'];
+            this.canvasParams.images = ['assets/SoftwareIcons_Type01.png',
+                'assets/SoftwareIcons_Type01.png',
+                'assets/SoftwareIcons_Type01.png'];
             this.thumbnailGalleryAmount[this.canvasParams.images.length - 1] = '';
             // this.initThumbnailPlaceHolder('../../../../assets/SoftwareIcons_Type01.png');
             this.initThumbnailPlaceHolder();
@@ -62,16 +62,16 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     ngOnInit() {
         this.videoService.change.subscribe(function (event) {
             this.updateImageFromVideo(event);
-            this.killVideo = true;
         }.bind(this));
-        // this.videoService.change.subscribe(.bind(this));
         this.videoService.cameraOn.subscribe(function () {
             this.killVideo = false
         }.bind(this));
     }
     
     activateCamera(event, index) {
-        this.currentCameraInput = index;
+        if(event !== 'continues'){
+            this.currentCameraInput = 0;
+        }
         this.cameraOn = true;
         this.videoService.activeCamera();
     }
@@ -105,6 +105,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
         this.canvasContext.setLineDash([5, 3]);
         this.canvasContext.moveTo(this.canvasParams.right, 0);
         this.canvasContext.lineTo(this.canvasParams.right, this.canvasParams.canvasHight);
+        this.canvasContext.lineWidth = 4;
         this.canvasContext.stroke();
         
         //left
@@ -113,31 +114,43 @@ export class FootImageComponent implements OnInit, AfterViewInit {
         this.canvasContext.setLineDash([5, 3]);
         this.canvasContext.moveTo(this.canvasParams.left, 0);
         this.canvasContext.lineTo(this.canvasParams.left, this.canvasParams.canvasHight);
+        this.canvasContext.lineWidth = 4;
         this.canvasContext.stroke();
     }
     
     updateImageFromVideo(videoElement) {
-        this.cameraOn = false;
         this.drew(videoElement, this.currentCameraInput);
+        this.cameraOn = false;
+        this.killVideo = true;
+        this.currentCameraInput++;
+        if(this.currentCameraInput === 3){
+            this.currentCameraInput = 0;
+        } else {
+            setTimeout(this.activateCamera.bind(this,'continues',''));
+        }
     }
     
     updateImageFromFile(event, index) {
-        var img = new Image();
-        img.onload = this.drew.bind(this, img, index);
-        img.onerror = this.failed;
-        img.src = URL.createObjectURL(event.target.files[0]);
+        for (let i = 0; i < event.target.files.length; i++) {
+            if (event.target.files[i] || i<3) {
+                let img = new Image();
+                img.onload = this.drew.bind(this, img, i);
+                img.onerror = this.failed;
+                img.src = URL.createObjectURL(event.target.files[i]);
+            } else {
+                break;
+            }
+        }
     }
     
     updateFormWithImage(image, index) {
-        this.canvas.nativeElement.toBlob(function(blob){
-            console.log(blob);
+        this.canvas.nativeElement.toBlob(function (blob) {
             let fileReader = new FileReader();
             fileReader.readAsDataURL(blob);
-            fileReader.onloadend = function() {
+            fileReader.onloadend = function () {
                 let base64data = fileReader.result;
                 this.parentForm.controls[`image${index}`].setValue(base64data);
             }.bind(this);
-            console.log(this.parentForm.controls[`image${index}`]);
         }.bind(this));
     }
     

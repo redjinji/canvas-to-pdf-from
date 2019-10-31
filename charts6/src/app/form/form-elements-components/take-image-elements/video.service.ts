@@ -8,7 +8,6 @@ export class VideoService {
     
     done(event){
         this.change.emit(event);
-    
     }
     activeCamera(){
         this.cameraOn.emit();

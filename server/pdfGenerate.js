@@ -31,7 +31,7 @@ module.exports = {
 				});
 				await browser.close();
 
-				callbackFunc();
+				callbackFunc(fields);
 			} catch (e) {
 				console.log('our error', e);
 			}
