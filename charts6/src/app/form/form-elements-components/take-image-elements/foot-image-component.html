@@ -55,7 +55,7 @@
 					הפעל מצלמה
 				</button>
 				<label *ngIf="isMobileDevice()" class="choose-file__btn take-image__item" for="cameraFile"> צלם
-					<input (change)="updateImageFromFile($event)" type="file" id="cameraFile" multiple accept="image/*"
+					<input (change)="updateImageFromFile($event, 'mobileCamera')" type="file" id="cameraFile" multiple accept="image/*"
 						   capture="camera">
 				</label>
 			</div>

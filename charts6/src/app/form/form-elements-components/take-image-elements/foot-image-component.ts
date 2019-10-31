@@ -69,7 +69,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     }
     
     activateCamera(event, index) {
-        if(event !== 'continues'){
+        if (event !== 'continues') {
             this.currentCameraInput = 0;
         }
         this.cameraOn = true;
@@ -123,16 +123,17 @@ export class FootImageComponent implements OnInit, AfterViewInit {
         this.cameraOn = false;
         this.killVideo = true;
         this.currentCameraInput++;
-        if(this.currentCameraInput === 3){
+        if (this.currentCameraInput === 3) {
             this.currentCameraInput = 0;
         } else {
-            setTimeout(this.activateCamera.bind(this,'continues',''));
+            setTimeout(this.activateCamera.bind(this, 'continues', ''));
         }
     }
     
     updateImageFromFile(event, index) {
-        for (let i = 0; i < event.target.files.length; i++) {
-            if (event.target.files[i] || i<3) {
+        const currentIndex = index === 'mobileCamera' ? this.currentCameraInput : 0;
+        for (let i = currentIndex; i < event.target.files.length; i++) {
+            if (event.target.files[i] || i < 3) {
                 let img = new Image();
                 img.onload = this.drew.bind(this, img, i);
                 img.onerror = this.failed;
@@ -140,6 +141,19 @@ export class FootImageComponent implements OnInit, AfterViewInit {
             } else {
                 break;
             }
+        }
+        if (index === 'mobileCamera') {
+            let img = new Image();
+            img.onload = this.drew.bind(this, img, this.currentCameraInput);
+            img.onerror = this.failed;
+            img.src = URL.createObjectURL(event.target.files[0]);
+            setTimeout(() => {
+                if (this.currentCameraInput === 2) {
+                    this.currentCameraInput = 0;
+                } else {
+                    this.currentCameraInput++
+                }
+            }, 1000);
         }
     }
     
