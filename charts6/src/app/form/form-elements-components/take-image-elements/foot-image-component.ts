@@ -45,14 +45,8 @@ export class FootImageComponent implements OnInit, AfterViewInit {
             this.canvasParams.right = this.canvasParams.canvasWidth * 0.8;
             this.canvasParams.left = this.canvasParams.canvasWidth * 0.2;
             this.canvasContext = this.canvas.nativeElement.getContext('2d');
-            // this.updateCanvasElements();
-            setTimeout(this.updateCanvasElements.bind(this, this.currentCameraInput), 0); //wait for resize to finish
-            this.canvasParams.images = ['assets/SoftwareIcons_Type01.png',
-                'assets/SoftwareIcons_Type01.png',
-                'assets/SoftwareIcons_Type01.png'];
-            this.thumbnailGalleryAmount[this.canvasParams.images.length - 1] = '';
-            // this.initThumbnailPlaceHolder('../../../../assets/SoftwareIcons_Type01.png');
-            this.initThumbnailPlaceHolder();
+            this.thumbnailGalleryAmount[2] = '';
+            this.initThumbnailPlaceHolder('assets/SoftwareIcons_Type01.png');
         }.bind(this));
         this.parentForm.addControl('image0', new FormControl());
         this.parentForm.addControl('image1', new FormControl());
@@ -197,9 +191,11 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     initThumbnailPlaceHolder(fileDir) {
         var img = new Image();
         img.onload = function (img) {
-            this.canvasParams.images.push(img);
-            this.canvasParams.images.push(img);
-            this.canvasParams.images.push(img);
+            for (let i = 0; i < 3; i++) {
+                this.canvasParams.images.push(img);
+                this.updateCanvasThumbnails(img, i);
+            }
+            this.updateCanvasElements(this.currentCameraInput, 0);
         }.bind(this, img);
         img.onerror = this.failed;
         img.src = fileDir;
