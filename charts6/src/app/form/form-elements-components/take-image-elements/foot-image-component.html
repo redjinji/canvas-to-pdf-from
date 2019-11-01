@@ -50,15 +50,15 @@
 		</div>-->
 
 		<div class="take-image__camera">
-			<div class="take-image__item--container">
-				<button *ngIf="!isMobileDevice()" class="choose-file__btn take-image__item" (click)="activateCamera($event)">
+			<div *ngIf="!isMobileDevice()" class="take-image__item--container">
+				<button class="choose-file__btn take-image__item" (click)="activateCamera($event)">
 					הפעל מצלמה
 				</button>
-				<label *ngIf="isMobileDevice()" class="choose-file__btn take-image__item" for="cameraFile"> צלם
-					<input (change)="updateImageFromFile($event, 'mobileCamera')" type="file" id="cameraFile" multiple accept="image/*"
-						   capture="camera">
-				</label>
 			</div>
+			<label *ngIf="isMobileDevice()" class="choose-file__btn take-image__item" for="cameraFile"> הפעל מצלמה
+				<input (change)="updateImageFromFile($event, 'mobileCamera')" type="file" id="cameraFile" multiple accept="image/*"
+					   capture="camera">
+			</label>
 		</div>
 	</div>
 </div>

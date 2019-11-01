@@ -46,7 +46,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
             this.canvasParams.left = this.canvasParams.canvasWidth * 0.2;
             this.canvasContext = this.canvas.nativeElement.getContext('2d');
             this.thumbnailGalleryAmount[2] = '';
-            this.initThumbnailPlaceHolder('assets/SoftwareIcons_Type01.png');
+            this.initThumbnailPlaceHolder();
         }.bind(this));
         this.parentForm.addControl('image0', new FormControl());
         this.parentForm.addControl('image1', new FormControl());
@@ -188,16 +188,16 @@ export class FootImageComponent implements OnInit, AfterViewInit {
         this.updateCanvasElements();
     }
     
-    initThumbnailPlaceHolder(fileDir) {
-        var img = new Image();
-        img.onload = function (img) {
-            for (let i = 0; i < 3; i++) {
+    initThumbnailPlaceHolder() {
+        for(let i=0;i<3;i++) {
+            let img = new Image();
+            img.onload = function (img) {
                 this.canvasParams.images.push(img);
                 this.updateCanvasThumbnails(img, i);
-            }
-            this.updateCanvasElements(this.currentCameraInput, 0);
-        }.bind(this, img);
-        img.onerror = this.failed;
-        img.src = fileDir;
+                this.updateCanvasElements(this.currentCameraInput, 0);
+            }.bind(this, img);
+            img.onerror = this.failed;
+            img.src = `assets/SoftwareIcons_S${i+1}.png`;
+        }
     }
 }

@@ -28,6 +28,10 @@
   simple-form {
     display: flex;
     flex-wrap: wrap;
+    @include respond-to(mobile) {
+      flex-direction: column;
+      align-items: center;
+    }
   }
 }
 

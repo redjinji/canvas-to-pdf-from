@@ -107,12 +107,16 @@ canvas {
   justify-content: space-evenly;
   @include respond-to(mobile) {
     justify-content: space-around;
+    flex-direction: column;
   }
 
   .take-image__file, .take-image__thumbnail, .take-image__camera {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    @include respond-to(mobile) {
+      flex-direction: row;
+    }
   }
 }
 
