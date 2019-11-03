@@ -291,23 +291,23 @@ const FORM_ELEMENTS: IFormElement[] = [
                             hidden: true
                         },
                         {
-                            text: 'Soft Step',
+                            text: 'אקטיבי',
                             defaultSelect: true
                         },
                         {
-                            text: 'Balance Step',
+                            text: 'פרו',
                         },
                         {
-                            text: 'Moonwalk',
+                            text: 'פרו פלוס',
                         },
                         {
-                            text: 'On Cloud',
+                            text: 'קשיח',
                         },
                         {
-                            text: 'Ortostep',
+                            text: 'רב שיכבתי',
                         },
                         {
-                            text: 'Other',
+                            text: 'אחר',
                         }
                     
                     ]
