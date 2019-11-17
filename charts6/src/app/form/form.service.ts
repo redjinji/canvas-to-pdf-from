@@ -13,7 +13,6 @@ const FORM_ELEMENTS: IFormElement[] = [
         title: 'קשת קשיחה?',
         radio: {
             name: 'keshet',
-            required: true,
             elements: [
                 {
                     id: 'keshet-yes',
@@ -30,7 +29,6 @@ const FORM_ELEMENTS: IFormElement[] = [
         title: 'מקור הגעה',
         radio: {
             name: 'referred',
-            required: true,
             elements: [
                 {
                     id: 'walkIn',
@@ -55,7 +53,6 @@ const FORM_ELEMENTS: IFormElement[] = [
         title: 'ביטוח בריאות',
         radio: {
             name: 'insurance',
-            required: true,
             elements: [
                 {
                     id: 'clalit',
@@ -86,7 +83,6 @@ const FORM_ELEMENTS: IFormElement[] = [
             id: 'patalog',
             length: 10000,
             placeHolder: 'שים פה את הטקסט',
-            required: true,
             rows: 5,
         }
     },
@@ -97,7 +93,6 @@ const FORM_ELEMENTS: IFormElement[] = [
             id: 'activity',
             length: 10000,
             placeHolder: 'שים פה את הטקסט',
-            required: true,
             rows: 5,
         }
     },
@@ -106,7 +101,6 @@ const FORM_ELEMENTS: IFormElement[] = [
         subtitle: 'יש צורך בהגבהה מטטראסל',
         radio: {
             name: 'kolapsBow',
-            required: true,
             elements: [
                 {
                     id: 'kolaps-bow-yes',
@@ -124,7 +118,6 @@ const FORM_ELEMENTS: IFormElement[] = [
         subtitle: 'יש הגבלה בתנועה',
         radio: {
             name: 'movementLimitation',
-            required: true,
             elements: [
                 {
                     id: 'movement-limitation-yes',
@@ -143,7 +136,6 @@ const FORM_ELEMENTS: IFormElement[] = [
         subtitle: 'סוג קשת פלנטארית',
         radio: {
             name: 'footPrint',
-            required: true,
             elements: [
                 {
                     id: 'footCollapse',
@@ -186,7 +178,6 @@ const FORM_ELEMENTS: IFormElement[] = [
         customerDetails: [
             {
                 radio: {
-                    required: true,
                     name: 'gender',
                     elements: [
                         {
@@ -202,7 +193,6 @@ const FORM_ELEMENTS: IFormElement[] = [
             },
             {
                 input: {
-                    required: true,
                     id: 'id-number',
                     name: 'idNumber',
                     placeholder: 'ת.ז',
@@ -227,7 +217,6 @@ const FORM_ELEMENTS: IFormElement[] = [
             },
             {
                 input: {
-                    required: true,
                     id: 'phone',
                     name: 'phone',
                     placeholder: 'מספר טלפון',
@@ -237,7 +226,6 @@ const FORM_ELEMENTS: IFormElement[] = [
             },
             {
                 input: {
-                    required: true,
                     id: 'email',
                     name: 'email',
                     placeholder: 'אימייל',
@@ -282,7 +270,6 @@ const FORM_ELEMENTS: IFormElement[] = [
                     label: 'סוג מדרס',
                     id: 'midras-type',
                     name: 'midras-type',
-                    required: true,
                     options: [
                         {
                             text: 'בחר סוג מדרס',
@@ -319,7 +306,6 @@ const FORM_ELEMENTS: IFormElement[] = [
                     name: 'weight',
                     placeholder: 'משקל',
                     type: 'number',
-                    required: true,
                     label: 'משקל'
                 }
             }

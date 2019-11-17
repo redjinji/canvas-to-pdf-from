@@ -20,6 +20,7 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     currentIndex = 0;
     prevDisable = true;
     nextDisable = false;
+    cameraDisable = false;
     activeSpinner = false;
     url: string = `${environment.serverCall}/sendForm`;
     
@@ -49,7 +50,8 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
         this.formElements = this.formService.getFormElements();
     }
     
-    nextStep(formElem, elemClick){
+    nextStep(formElem?, elemClick?){
+        this.cameraDisable = false;
         if((this.formElements.length-1) > this.currentIndex) {
             this.prevDisable = false;
             this.currentIndex++;
@@ -58,9 +60,11 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
         } else {
             this.nextDisable = true;
         }
+        if(this.currentIndex === 8) this.cameraDisable = true;
     }
     
     prevStep(){
+        this.cameraDisable = false;
         if(this.currentIndex > 0) {
             this.nextDisable = false;
             this.currentIndex--;
@@ -69,6 +73,12 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
         } else {
             this.prevDisable = true;
         }
+        if(this.currentIndex === 8) this.cameraDisable = true;
+    }
+    
+    jumpToCamera (){
+        this.currentIndex = 7;
+        this.nextStep();
     }
     
     captureImage(data){

@@ -25,6 +25,7 @@
 	<nav class="navigation">
 		<button class="btn " [ngClass]="{disable: prevDisable}" (click)="prevStep()">הקודם</button>
 		<button class="btn" [ngClass]="{disable: nextDisable}" (click)="nextStep(this, 'next')">הבא</button>
+		<button class="btn" [ngClass]="{disable: cameraDisable}" (click)="jumpToCamera()">צילום</button>
 	</nav>
 </div>
 <div class="send-from-overlay" [ngClass]="{'active':activeSpinner}">

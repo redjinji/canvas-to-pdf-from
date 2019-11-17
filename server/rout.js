@@ -37,7 +37,7 @@ module.exports = {
 			
 			fs.writeFile('server/assets/forceUpdate.json', JSON.stringify({updateMe:Math.random()}), (err) => {
 				if (err) return console.error(err);
-				console.log('update file');
+				console.log('update request for google sheets users');
 			});
 			
 			// res.sendFile(path.join(process.cwd() + '/client/js/' + req.params.filename));

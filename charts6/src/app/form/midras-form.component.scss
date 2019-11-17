@@ -17,6 +17,7 @@
   min-width: 8rem;
   &.disable {
     background-color: $color-unselected;
+    visibility: hidden;
   }
 }
 
@@ -145,3 +146,4 @@ foot-image {
     transform: translate(-50%, -50%);
   }
 }
+
