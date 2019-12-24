@@ -61,6 +61,7 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
             this.nextDisable = true;
         }
         if(this.currentIndex === 8) this.cameraDisable = true;
+        console.log(this.parentForm);
     }
     
     prevStep(){

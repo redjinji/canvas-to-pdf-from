@@ -6,7 +6,7 @@
 				   [attr.required]="radio.required ? '' : null"
 				   type="radio"
 				   id="{{radioElem.id}}"
-				   value="{{radioElem.label}}"
+				   value="{{radioElem.parserData || radioElem.label}}"
 				   class="radio-elem"
 			>
 			<img *ngIf="mainImageNeeded(radioElem)" src="{{radioElem.imgs[0].src}}" class="radio-image">

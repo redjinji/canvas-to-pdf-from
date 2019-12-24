@@ -90,7 +90,7 @@ module.exports = {
 			
 			const fileMetadata = {
 				'name': `${formFields.fieldAgent} - ${formFields.name}`,
-				parents: ['1jlag_Kq8VCH-MkD10whsaxacOxUPOECp']
+				parents: ['1W3sXBWrWIwRKwjH-hcVZCyJDZVGBKwCU']
 			};
 			const media = {
 				mimeType: 'application/pdf',
@@ -184,7 +184,7 @@ module.exports = {
 		function listMajors(auth) {
 			const sheets = google.sheets({version: 'v4', auth});
 			sheets.spreadsheets.values.get({
-				spreadsheetId: '1vCpaiEg8BFRvJ9u_ywKBhJbQGOdCD8-Gv6ABIrWKIiI',
+				spreadsheetId: '1FSERWuYpuGe3c8i0EGaVyOd_lXhfluGCEQUkrX7H_pI',
 				range: 'A:B',
 			}, (err, res) => {
 				if (err) return console.log('The API returned an error: ' + err);

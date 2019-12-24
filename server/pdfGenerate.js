@@ -11,6 +11,7 @@ module.exports = {
 		async function generatPdf(callbackFunc, fields) {
 			try {
 				const browser = await puppet.launch({
+					//remove security issue with chromium
 						args: [
 							'--no-sandbox',
 							'--disable-setuid-sandbox',

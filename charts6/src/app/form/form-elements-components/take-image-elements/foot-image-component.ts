@@ -60,6 +60,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
         this.videoService.cameraOn.subscribe(function () {
             this.killVideo = false
         }.bind(this));
+        this.parentForm.addControl('legLine', new FormControl());
     }
     
     activateCamera(event, index) {

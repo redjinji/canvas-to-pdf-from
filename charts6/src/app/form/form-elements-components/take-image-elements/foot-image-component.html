@@ -1,19 +1,19 @@
 <div class="foot-image__container" [formGroup]="parentForm">
 	<div class="leg-layout">
 		<label>
-			<input type="radio" name="legLine" id="legNormal" class="leg-layout__radio" checked>
+			<input formControlName="legLine" type="radio" value="legNormal" name="legLine" id="legNormal" class="leg-layout__radio" checked>
 			<img src="assets/SoftwareIcons_Natural02.png" class="leg-lyaout__selected">
 			<img src="assets/SoftwareIcons_Natural01.png" class="leg-lyaout__unselected">
 			<p>ניטראלית</p>
 		</label>
 		<label>
-			<input type="radio" name="legLine" id="legInside" class="leg-layout__radio">
+			<input formControlName="legLine" type="radio" value="legInside" name="legLine" id="legInside" class="leg-layout__radio">
 			<img src="assets/SoftwareIcons_Pronation02.png" class="leg-lyaout__selected">
 			<img src="assets/SoftwareIcons_Pronation01.png" class="leg-lyaout__unselected">
 			<p>נטיה פינמה</p>
 		</label>
 		<label>
-			<input type="radio" name="legLine" id="legOutside" class="leg-layout__radio">
+			<input formControlName="legLine" type="radio" value="legOutside" name="legLine" id="legOutside" class="leg-layout__radio">
 			<img src="assets/SoftwareIcons_Supination02.png" class="leg-lyaout__selected">
 			<img src="assets/SoftwareIcons_Supination01.png" class="leg-lyaout__unselected">
 			<p>נטיה החוצה</p>

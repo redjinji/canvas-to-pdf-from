@@ -138,28 +138,32 @@ const FORM_ELEMENTS: IFormElement[] = [
             name: 'footPrint',
             elements: [
                 {
-                    id: 'footCollapse',
+                    id: 'FootCollapsed',
+                    parserData: 'FootCollapsed',
                     label: 'קריסה',
                     imgs: [
                         {src: '../../../../assets/SoftwareIcons_FootCollapsed.png'}
                     ]
                 },
                 {
-                    id: 'footHigh',
+                    id: 'FootHigh',
+                    parserData: 'FootHigh',
                     label: 'גבוהה',
                     imgs: [
                         {src: '../../../../assets/SoftwareIcons_FootHigh.png'}
                     ]
                 },
                 {
-                    id: 'footLow',
+                    id: 'FootLow',
+                    parserData: 'FootLow',
                     label: 'נמוכה',
                     imgs: [
                         {src: '../../../../assets/SoftwareIcons_FootLow.png'}
                     ]
                 },
                 {
-                    id: 'footNormal',
+                    id: 'FootNormal',
+                    parserData: 'FootNormal',
                     label: 'נורמאלית',
                     imgs: [
                         {src: '../../../../assets/SoftwareIcons_FootNormal.png'}

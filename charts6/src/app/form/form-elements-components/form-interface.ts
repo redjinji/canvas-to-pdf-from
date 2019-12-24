@@ -7,6 +7,7 @@ export interface IRadio {
 
 export interface IRadioElement {
     label: string,
+    parserData?: string,
     id: string,
     imgs?:IImage[]
 }
@@ -28,6 +29,7 @@ export interface IInput {
     id: string,
     name: string,
     placeholder?: string,
+    parserData?: string,
     type: string,
     maxDate?: Date,
     maxDateParsed?: string,
