@@ -19,7 +19,7 @@ app.use(function(req, res, next) {
 });
 
 rout.rout(app);
-let port = process && process.env && process.env.PORT;
+let port = process.env.PORT;
 if (port === null || port === '' || port === undefined) {
     port = 3000;
 }
