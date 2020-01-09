@@ -29,7 +29,8 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
     styles: [`
     .birthday--inputs {
         display:flex;
-        justify-content: flex-start;
+        justify-content: flex-end;
+        flex-direction: row-reverse;
     }
     .birthday--inputs input {
         width: 5rem;
