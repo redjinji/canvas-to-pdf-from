@@ -16,7 +16,7 @@ if (process.env.PORT) {
 	TOKEN_PATH_DRIVE = `${BASE_FOLDER_LOCATION}prodDriveToken.json`;
 	TOKEN_PATH_SHEETS = `${BASE_FOLDER_LOCATION}prodSheetsToken.json`;
 	CREDENTIAL_PATH_DRIVE = `${BASE_FOLDER_LOCATION}prodDriveCredentials.json`;
-	CREDENTIAL_PATH_SHEETS = `${BASE_FOLDER_LOCATION}ProdSheetsCredentials.json`;
+	CREDENTIAL_PATH_SHEETS = `${BASE_FOLDER_LOCATION}prodSheetsCredentials.json`;
 	SPEADSHEET_ID = '1FSERWuYpuGe3c8i0EGaVyOd_lXhfluGCEQUkrX7H_pI';
 	DRIVE_UPLOAD_FOLDER = '1W3sXBWrWIwRKwjH-hcVZCyJDZVGBKwCU';
 } else {
