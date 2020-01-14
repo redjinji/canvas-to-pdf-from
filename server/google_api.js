@@ -91,32 +91,20 @@ module.exports = {
 		
 		function sendMail(oAuth2Client, dataForCallback, credentials) {
 			var smtpTransport = nodemailer.createTransport({
-				debug: true,
-				logger: true,
-				service: 'smtp.gmail.com',
+				// debug: true,
+				// logger: true,
+				service: 'gmail',
 				port: 465,
 				secure: true,
 				auth: {
-					user: 'redjinji@gmail.com',
-					// pass: 'tr1234569870',
-					
 					type: 'OAuth2',
-					clientId: credentials.client_id,
-					clientSecret: credentials.client_secret,
-					refreshToken: oAuth2Client.refresh_token,
-					accessToken: oAuth2Client.access_token,
-					expires: oAuth2Client.expiry_date
+					user: 'redjinji@gmail.com',
+					clientId: credentials.installed.client_id,
+					clientSecret: credentials.installed.client_secret,
+					refreshToken: oAuth2Client.credentials.refresh_token,
+					accessToken: oAuth2Client.credentials.access_token,
+					expires: oAuth2Client.credentials.expiry_date
 				}
-				/*service: 'gmail',
-				auth:{
-					xoauth2: xoauth2.createXOAuth2Generator({
-						user: 'redjinji@gmail.com',
-						clientId: credentials.client_id,
-						clientSecret: credentials.client_secret,
-						refreshToken: oAuth2Client.refresh_token,
-						accessToken: oAuth2Client.access_token
-					})
-				}*/
 			});
 			
 			let message = {
@@ -124,7 +112,13 @@ module.exports = {
 				to: 'redjinji@gmail.com',
 				subject: 'test mail subject',
 				text: 'test mail text',
-				html: '<p>test mail html</p>'
+				html: '<p>test mail html</p>',
+				attachments: [
+					{
+						filename: 'file  - name.pdf',
+						path: process.cwd() + '/server/pdfs/mypdf.pdf'
+					}
+				]
 			};
 			
 			smtpTransport.sendMail(message, (err, info)=>{
