@@ -19,7 +19,7 @@
 					</div>
 					<label *ngIf="isMobileDevice()" class="choose-file__btn take-image__item">
 						<image-component class="choose-file__btn--icon" [image]="svgCamera"></image-component>
-						<input (change)="updateImageFromFile($event, 'mobileCamera', i)" type="file" multiple
+						<input (change)="updateImageFromFile($event, i)" type="file"
 							   accept="image/*"
 							   capture="camera">
 					</label>

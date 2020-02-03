@@ -19,13 +19,13 @@ module.exports = {
 			res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
 			// res.sendFile(path.join(process.cwd() + '/client/index.html'));
 		});
-        
-        app.get('/form', (req, res) => {
-            console.log('form');
-            // res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
-            res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
-            // res.sendFile(path.join(process.cwd() + '/client/index.html'));
-        });
+    
+    app.get('/form', (req, res) => {
+        console.log('form');
+        // res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
+        res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
+        // res.sendFile(path.join(process.cwd() + '/client/index.html'));
+    });
 		
 		app.post('/get-user-sheets', (req, res) => {
 			sheetsHandle.getSheets(req, res);
@@ -42,11 +42,11 @@ module.exports = {
 			
 			// res.sendFile(path.join(process.cwd() + '/client/js/' + req.params.filename));
 		});
-        
-        app.post('/sendForm', (req, res) => {
-        	fs.writeFile('server/assets/testMeTextBody.json', JSON.stringify(req.body));
-        	pdfGenerate.init(req, res);
-        });
+    
+    app.post('/sendForm', (req, res) => {
+      fs.writeFile('server/assets/testMeTextBody.json', JSON.stringify(req.body));
+      pdfGenerate.init(req, res);
+    });
 		
 		app.get('/js/:filename', (req, res) => {
 			res.sendFile(path.join(process.cwd() + '/client/js/' + req.params.filename));
