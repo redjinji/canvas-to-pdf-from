@@ -18,6 +18,7 @@
 				   type="text"
 				   placeholder="{{radioElem.parserData || radioElem.label}}"
 				   class="radio-elem"
+				   onkeydown="return (event.keyCode!=13);"
 			>
 			<div *ngIf="!radioElem.other" class="visible-elements">
 				<image-component *ngIf="radioElem.imgs" [image]="radioElem.imgs"></image-component>
