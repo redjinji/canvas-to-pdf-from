@@ -6,6 +6,9 @@ export class FormService {
     getFormElements() {
         return FORM_ELEMENTS;
     }
+    getLength(){
+        return FORM_ELEMENTS.length;
+    }
 }
 
 const FORM_ELEMENTS: IFormElement[] = [
@@ -44,7 +47,8 @@ const FORM_ELEMENTS: IFormElement[] = [
                 },
                 {
                     id: 'other-referred',
-                    label: 'אחר'
+                    label: 'אחר',
+                    other: true
                 }
             ]
         }
@@ -72,7 +76,8 @@ const FORM_ELEMENTS: IFormElement[] = [
                 },
                 {
                     id: 'other-insurance',
-                    label: 'אחר'
+                    label: 'אחר',
+                    other: true
                 }
             ]
         }
@@ -136,6 +141,7 @@ const FORM_ELEMENTS: IFormElement[] = [
         subtitle: 'סוג קשת פלנטארית',
         radio: {
             name: 'footPrint',
+            theme: 'round',
             elements: [
                 {
                     id: 'FootCollapsed',
@@ -173,100 +179,79 @@ const FORM_ELEMENTS: IFormElement[] = [
         }
     },
     {
-        title: 'צלם תמונה',
+        title: '',
         footImage: true
+    },
+    {
+        title: 'בחירת זוית רגל',
+        radio: {
+            name: 'legLine',
+            theme: 'round',
+            elements: [
+                {
+                    id: 'legInside',
+                    parserData: 'legInside',
+                    label: 'פנימי',
+                    imgs: [
+                        {svg: 'inner-leg'}
+                    ]
+                },
+                {
+                    id: 'legNormal',
+                    parserData: 'legNormal',
+                    label: 'נורמאלי',
+                    imgs: [
+                        {svg: 'normal-leg'}
+                    ]
+                },
+                {
+                    id: 'legOutside',
+                    parserData: 'legOutside',
+                    label: 'חיצוני',
+                    imgs: [
+                        {svg: 'outer-leg'}
+                    ]
+                },
+            ]
+        }
     },
     {
         title: 'פרטי לקוח',
         class: 'customer-details',
         customerDetails: [
             {
-                radio: {
-                    name: 'gender',
-                    elements: [
-                        {
-                            id: 'male',
-                            label: 'זכר',
-                        },
-                        {
-                            id: 'female',
-                            label: 'נקבה',
-                        }
-                    ]
-                }
-            },
-            {
-                input: {
-                    id: 'id-number',
-                    name: 'idNumber',
-                    placeholder: 'ת.ז',
-                    type: 'number',
-                    label: 'ת.ז'
-                }
-            },
-            {
                 input: {
                     required: true,
                     id: 'client-name',
                     name: 'name',
-                    placeholder: 'שם פרטי ומשפחה',
                     type: 'text',
-                    label: 'שם פרטי ומשפחה'
+                    label: 'שם מלא'
                 }
             },
             {
-                inputBirthday: {
-                    title: 'תאריך יומולדת'
+                radio: {
+                    name: 'gender',
+                    label: 'מין',
+                    elements: [
+                        {
+                            id: 'male',
+                            label: 'זכר',
+                            imgs: [{svg: 'male'}]
+                        },
+                        {
+                            id: 'female',
+                            label: 'נקבה',
+                            imgs: [{svg: 'female'}]
+                        }
+                    ]
                 }
             },
             {
                 input: {
                     id: 'phone',
                     name: 'phone',
-                    placeholder: 'מספר טלפון',
                     type: 'number',
                     label: 'מספר טלפון'
-                }
-            },
-            {
-                input: {
-                    id: 'email',
-                    name: 'email',
-                    placeholder: 'אימייל',
-                    type: 'email',
-                    label: 'אימייל'
-                }
-            },
-            {
-                class: 'shoes',
-                input: {
-                    required: true,
-                    id: 'shoes-size',
-                    name: 'shoes',
-                    placeholder: 'מידה',
-                    type: 'number',
-                    label: 'מידת נעלים'
-                },
-                select: {
-                    name: 'shoesMeasureType',
-                    required: true,
-                    options: [
-                        {
-                            text: 'יחידת מידה',
-                            defaultSelect: true,
-                            disabled: true,
-                            hidden: true
-                        },
-                        {
-                            text: 'EUR',
-                        },
-                        {
-                            text: 'US'
-                        },
-                        {
-                            text: 'CM'
-                        }
-                    ]
                 }
             },
             {
@@ -275,12 +260,6 @@ const FORM_ELEMENTS: IFormElement[] = [
                     id: 'midras-type',
                     name: 'midras-type',
                     options: [
-                        {
-                            text: 'בחר סוג מדרס',
-                            defaultSelect: true,
-                            disabled: true,
-                            hidden: true
-                        },
                         {
                             text: 'אקטיבי',
                             defaultSelect: true
@@ -300,15 +279,62 @@ const FORM_ELEMENTS: IFormElement[] = [
                         {
                             text: 'אחר',
                         }
-                    
+            
                     ]
+                }
+            },
+            {
+                input: {
+                    id: 'id-number',
+                    name: 'idNumber',
+                    type: 'number',
+                    label: 'ת.ז'
+                }
+            },
+            {
+                input: {
+                    required: true,
+                    id: 'shoes-size',
+                    name: 'shoes',
+                    type: 'number',
+                    label: 'מידת נעלים'
+                }
+            },
+            {
+                inputBirthday: {
+                    title: 'תאריך לידה'
+                }
+            },
+            {
+                select: {
+                    label: 'יחידת מידה',
+                    name: 'shoesMeasureType',
+                    required: true,
+                    options: [
+                        {
+                            text: 'EUR',
+                        },
+                        {
+                            text: 'US'
+                        },
+                        {
+                            text: 'CM'
+                        }
+                    ]
+                }
+            },
+            {
+                input: {
+                    id: 'email',
+                    name: 'email',
+                    type: 'email',
+                    label: 'אימייל'
                 }
             },
             {
                 input: {
                     id: 'weight',
                     name: 'weight',
-                    placeholder: 'משקל',
                     type: 'number',
                     label: 'משקל'
                 }

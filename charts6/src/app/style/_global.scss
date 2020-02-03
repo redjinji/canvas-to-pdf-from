@@ -1,6 +1,10 @@
+@import "mixin-mediaQuery";
+@import "varible";
+
 body {
   background-color: $color-main;
 }
+
 .btn-primary {
   background-color: green;
 }
@@ -8,10 +12,13 @@ body {
 input.ng-invalid.ng-touched {
   background-color: $color-error;
 }
+
 textarea {
   width: 85%;
   max-width: 50rem;
+  border: .1rem solid $color-blue;
 }
+
 .btn-primary {
   font-size: 2rem;
   font-weight: bold;
@@ -22,17 +29,23 @@ textarea {
   margin: 1rem 0;
 }
 
-
-
 body::-webkit-scrollbar {
   width: 1em;
 }
 
 body::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
 }
 
 body::-webkit-scrollbar-thumb {
   background-color: darkgrey;
   outline: 1px solid slategrey;
+}
+
+.customer-details__form {
+  .radios__container {
+    .radios-container {
+      justify-content: flex-start;
+    }
+  }
 }

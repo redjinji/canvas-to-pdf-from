@@ -13,32 +13,47 @@
   font-size: 2rem;
   color: $color-white;
   margin: 0 1rem;
-  background-color: $color-green;
   min-width: 8rem;
   &.disable {
     background-color: $color-unselected;
     visibility: hidden;
   }
-}
-
-.main-logo {
-  max-width: 25rem;
-  width: 90%;
-  margin-bottom: 5rem;
-  @include respond-to(mobile){
-    margin-bottom: 2rem;
+  svg {
+    width: 3rem;
+    height: 3rem;
+    color: $color-orange;
+  }
+  &-next {
+    svg {
+      transform: rotate(180deg);
+    }
   }
 }
 
 .midras-form__wrapper {
+  position: relative;
   font-size: 1.5rem;
-  color: $color-white;
+  color: $color-dark-blue;
   text-align: center;
   width: 100vw;
   overflow: hidden;
   padding: 0;
   @include respond-to(mobile){
     padding-top: 2.5rem;
+  }
+
+  &:after {
+    content: '';
+    background-image: url("/assets/SoftwareIcons_BG.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: .5;
+    z-index: -1;
   }
 }
 
@@ -55,31 +70,58 @@ foot-image {
   margin-bottom: 3rem;
 }
 
+.foot-image {
+  margin-top: -3rem;
+}
+
 .screen {
-  width: 100vw;
+  display: flex;
   height: calc(100vh - 19rem);
   @include respond-to(mobile) {
-    height: calc(100vh - 23rem);
+    height: calc(100vh - 29rem);
   }
   .ng-valid & {
     height: calc(100vh - 26rem);
     @include respond-to(mobile) {
-      height: calc(100vh - 28rem);
+      height: calc(100vh - 36rem);
     }
   }
 }
 
+.screen-section {
+  //to keep each section for full screen
+}
+
+.screen-container {
+  width: 100vw;
+  height: 100%;
+}
+
+.screen-bg {
+  width: 80%;
+  max-height: 95%;
+  min-height: 50%;
+  overflow-y: auto;
+  padding: 3rem;
+  margin: auto;
+  border-radius: 4rem;
+  background-color: $color-white;
+  @include respond-to(mobile) {
+    width: 90%;
+  }
+}
+
 .form-elememt-component__container {
-  overflow: auto;
+  //overflow: auto;
   height: calc(100% - 5.6rem);
 }
 
 .title {
-  width: 100vw;
-  font-size: 4rem;
-  margin-bottom: 2rem;
+  font-size: 3rem;
+  margin-bottom: 3rem;
   padding: 0 3rem;
   font-weight: bold;
+  color: $color-dark-blue;
   @include respond-to(mobile) {
     font-size: 3rem;
   }
@@ -87,6 +129,7 @@ foot-image {
 
 .subTitle {
   padding: 0 3rem;
+  margin: -2rem auto 3rem;
 }
 
 .radio-container {
@@ -146,4 +189,3 @@ foot-image {
     transform: translate(-50%, -50%);
   }
 }
-

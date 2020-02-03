@@ -1,7 +1,9 @@
 export interface IRadio {
     name: string,
+    label?: string,
     class?: string,
     required?: true,
+    theme?: string,
     elements: IRadioElement[]
 }
 
@@ -9,11 +11,13 @@ export interface IRadioElement {
     label: string,
     parserData?: string,
     id: string,
-    imgs?:IImage[]
+    imgs?:IImage[],
+    other?: boolean
 }
 
 export interface IImage {
-    src: string
+    src?: string,
+    svg?: string
 }
 
 export interface ITextArea {

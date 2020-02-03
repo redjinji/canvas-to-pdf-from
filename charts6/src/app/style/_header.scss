@@ -1,0 +1,91 @@
+header {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem;
+
+  @include respond-to(mobile) {
+    flex-direction: column;
+  }
+}
+
+.main-logo {
+  margin: .5rem;
+  display: block;
+  height: 8.6rem;
+}
+
+.nav-elements {
+  display: flex;
+  position: relative;
+  justify-content: space-between;
+  width: 40rem;
+
+  &:before {
+    content: '';
+    width: 80%;
+    position: absolute;
+    border-top: .2rem solid $color-orange;
+    top: 3rem;
+    z-index: -1;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  @include respond-to(mobile) {
+    width: initial;
+  }
+}
+
+.nav-item {
+  min-width: 10.5rem;
+  text-align: center;
+  font-size: 1.9rem;
+  color: $color-white;
+  padding: 0;
+
+  @include respond-to(mobile) {
+    min-width: auto;
+  }
+
+  figure {
+    margin: auto;
+    border: .2rem solid $color-orange;
+    background-color: $color-main;
+    border-radius: 5rem;
+    padding: 1.6rem 0;
+    width: 6rem;
+    height: 6rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  svg {
+    height: 3rem;
+    width: 3rem;
+    margin: auto;
+    fill: $color-white;
+    margin-top: -.3rem;
+  }
+  &--leg svg{
+    width: 5rem;
+    height: 5rem;
+    margin-top: -2rem;
+  }
+}
+
+.nav-item.active {
+  color: $color-orange;
+
+  figure {
+    background-color: $color-orange;
+  }
+
+  svg {
+    color: $color-blue;
+    fill: $color-blue;
+  }
+}

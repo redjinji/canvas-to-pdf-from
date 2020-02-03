@@ -1,0 +1,40 @@
+<header>
+<!--	<img src="/assets/5-5.jpg" class="main-logo">-->
+	<svg class="main-logo">
+		<use xlink:href="assets/visuals.svg#main-logo"></use>
+	</svg>
+	<nav class="nav-elements">
+		<button [ngClass]="{'active':start}" class="nav-item" (click)="goto(0)">
+			<figure>
+				<svg>
+					<use xlink:href="assets/visuals.svg#home"></use>
+				</svg>
+			</figure>
+			<span>שאלות</span>
+		</button>
+		<button [ngClass]="{'active':camera}" class="nav-item nav-item--camera" (click)="goto(8)">
+			<figure>
+				<svg>
+					<use xlink:href="assets/visuals.svg#camera"></use>
+				</svg>
+			</figure>
+			<span>צילום</span>
+		</button>
+		<button [ngClass]="{'active':angel}" class="nav-item nav-item--leg" (click)="goto(9)">
+			<figure>
+				<svg>
+					<use xlink:href="assets/visuals.svg#menu-leg"></use>
+				</svg>
+			</figure>
+			<span>זווית</span>
+		</button>
+		<button  [ngClass]="{'active':details}" class="nav-item" (click)="goto(10)">
+			<figure>
+				<svg>
+					<use xlink:href="assets/visuals.svg#file"></use>
+				</svg>
+			</figure>
+			<span>פרטים אישיים</span>
+		</button>
+	</nav>
+</header>

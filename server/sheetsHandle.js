@@ -15,7 +15,6 @@ module.exports = {
 	},
 	
 	getSheets: function (req, res) {
-		//googleApi.sendMail();
 		var form = new formidable.IncomingForm();
 		form.parse(req, function (err, fields, files) {
 			var userToAuth = fields;

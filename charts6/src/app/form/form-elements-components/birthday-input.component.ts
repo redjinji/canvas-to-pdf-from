@@ -5,7 +5,7 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 @Component({
     selector: 'input-birthday',
     template: `
-<div [formGroup]="parentForm">
+<div [formGroup]="parentForm" class="birthday__container">
         <label>{{inputBirthday.title}}</label>
         <div class="birthday--inputs">
         <input
@@ -27,6 +27,10 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
          </div>
     `,
     styles: [`
+    .birthday__container {
+        display: flex;
+        flex-direction: column;
+    }
     .birthday--inputs {
         display:flex;
         justify-content: flex-end;

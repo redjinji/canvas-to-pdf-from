@@ -7,100 +7,86 @@ import {VideoService} from "./form-elements-components/take-image-elements";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
+import {FormNavigationService} from "./form-navigation.service";
 
 @Component({
-    selector:'midras-form',
+    selector: 'midras-form',
     templateUrl: './midras-form.component.html',
     styleUrls: ['./midras-form.component.scss']
 })
 
 export class MidrasFormComponent implements OnInit, AfterViewInit {
     parentForm: FormGroup;
-    formElements:IFormElement[];
-    currentIndex = 0;
+    formElements: IFormElement[];
     prevDisable = true;
     nextDisable = false;
-    cameraDisable = false;
     activeSpinner = false;
     url: string = `${environment.serverCall}/sendForm`;
     
-    @ViewChild('screenContainer') screenContainer:ElementRef;
-    @ViewChild('overlaySpinner') overlaySpinner:ElementRef;
+    @ViewChild('screenContainer') screenContainer: ElementRef;
+    @ViewChild('overlaySpinner') overlaySpinner: ElementRef;
     
-    constructor(private router:Router, private auth:UserAnthentityService,
-                private formService:FormService,
-                private videoService:VideoService,
-                private formBuilder:FormBuilder,
-                private _http: HttpClient){
+    constructor(private router: Router, private auth: UserAnthentityService,
+                private formService: FormService,
+                private videoService: VideoService,
+                private formBuilder: FormBuilder,
+                private fromNavigationService: FormNavigationService,
+                private _http: HttpClient) {
+        
+        fromNavigationService.navigate.subscribe(this.formMoveTo.bind(this))
     }
     
-    ngAfterViewInit(){
+    ngAfterViewInit() {
         this.parentForm.removeControl('inValidForInit');
     }
     
-    ngOnInit():void{
+    ngOnInit(): void {
         const isUserLogin = this.auth.isLogin();
-        if(!isUserLogin) this.router.navigate(['/login']);
-
+        if (!isUserLogin) this.router.navigate(['/login']);
+        
         this.getElement();
-        this.parentForm = this.formBuilder.group({inValidForInit:new FormControl('',Validators.required)});
+        this.parentForm = this.formBuilder.group({inValidForInit: new FormControl('', Validators.required)});
+        window['activeForm'] = this.parentForm;
     }
     
-    getElement(){
+    getElement() {
         this.formElements = this.formService.getFormElements();
     }
     
-    nextStep(formElem?, elemClick?){
-        this.cameraDisable = false;
-        if((this.formElements.length-1) > this.currentIndex) {
-            this.prevDisable = false;
-            this.currentIndex++;
-            this.screenContainer.nativeElement.style = `transform: translateX(${this.currentIndex}00%)`;
-            this.nextDisable = !((this.formElements.length-1) > this.currentIndex);
-        } else {
-            this.nextDisable = true;
-        }
-        if(this.currentIndex === 8) this.cameraDisable = true;
-        console.log(this.parentForm);
+    formMoveTo(params) {
+        const {position, start, end} = params;
+        this.screenContainer.nativeElement.style = `transform: translateX(${position}00%)`;
+        this.nextDisable = end;
+        this.prevDisable = start;
     }
     
-    prevStep(){
-        this.cameraDisable = false;
-        if(this.currentIndex > 0) {
-            this.nextDisable = false;
-            this.currentIndex--;
-            this.screenContainer.nativeElement.style = `transform: translateX(${this.currentIndex}00%)`;
-            this.prevDisable = !(this.currentIndex > 0);
-        } else {
-            this.prevDisable = true;
-        }
-        if(this.currentIndex === 8) this.cameraDisable = true;
+    nextStep() {
+        this.fromNavigationService.next();
     }
     
-    jumpToCamera (){
-        this.currentIndex = 7;
-        this.nextStep();
+    prevStep() {
+        this.fromNavigationService.prev();
     }
     
-    captureImage(data){
-        console.log('parent video:',data);
+    captureImage(data) {
+        console.log('parent video:', data);
     }
     
-    sendForm(){
-        if(this.parentForm.valid) {
+    sendForm() {
+        if (this.parentForm.valid) {
             let formData = new FormData();
             let fieldAgent = JSON.parse(localStorage.getItem('userAuth'));
             
             formData.append('fieldAgent', fieldAgent.userName);
-            for(let formItem in this.parentForm.value){
-                formData.append(formItem, this.parentForm.value[formItem])
+            for (let formItem in this.parentForm.value) {
+                formData.append(formItem, this.parentForm.value[formItem] || '')
             }
-    
-            this._http.post(this.url,formData).subscribe(
+            
+            this._http.post(this.url, formData).subscribe(
                 respone => console.log(respone),
                 error => console.log(error)
             );
-            this.activeSpinner= true;
+            this.activeSpinner = true;
             setTimeout(() => this.router.navigate(['/success-form']), 3000)
         }
     }

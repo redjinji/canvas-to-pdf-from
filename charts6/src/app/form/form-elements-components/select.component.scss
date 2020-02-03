@@ -1,0 +1,48 @@
+@import "../../style/varible";
+
+.select-component {
+  position: relative;
+}
+
+select {
+  background-color: #fff;
+  border: 0;
+  border-radius: 0;
+  height: 2.8rem;
+  width: 17.3rem;
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: .5rem;
+  border-bottom: .1rem solid $color-blue;
+  margin-bottom: .4rem;
+}
+
+.select-container {
+  position: relative;
+  width: fit-content;
+}
+
+.selected {
+  &--label {
+    position: absolute;
+    right: .2rem;
+    top: -.7rem;
+    z-index: 1;
+    transition: .3s;
+    pointer-events: none;
+    font-size: 1.8rem;
+  }
+
+  &--false {
+  }
+
+  &--true {
+    top: -2rem;
+    right: 0;
+    font-size: 1.3rem;
+  }
+}
+
+.select-container:focus ~ label {
+  background-color: red;
+}

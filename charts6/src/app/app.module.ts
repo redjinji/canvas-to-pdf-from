@@ -24,6 +24,9 @@ import {
 import {VideoService} from "./form/form-elements-components/take-image-elements";
 import {SuccessPageComponent} from "./final-page/success-page-component";
 import {HttpClientModule} from "@angular/common/http";
+import {Header} from "./header/header";
+import {ImageComponent} from "./helper-component/image-component";
+import {FormNavigationService} from "./form/form-navigation.service";
 
 @NgModule({
     declarations: [
@@ -38,7 +41,9 @@ import {HttpClientModule} from "@angular/common/http";
         InputComponent,
         SelectComponent,
         SuccessPageComponent,
-        BirthdayInputComponent
+        BirthdayInputComponent,
+        Header,
+        ImageComponent
     ],
     imports: [
         BrowserModule,
@@ -51,6 +56,7 @@ import {HttpClientModule} from "@angular/common/http";
         UserAnthentityService,
         LoginRouteActivatorService,
         FormService,
+        FormNavigationService,
         VideoService
     ],
     bootstrap: [AppComponent]

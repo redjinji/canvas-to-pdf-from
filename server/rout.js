@@ -69,7 +69,7 @@ module.exports = {
 		});
 		
 		app.get('/assets/:fileName', (req, res) => {
-			console.log(req.params.fileName);
+			// console.log(req.params.fileName);
 			if(req.params.fileName !== 'undefined') {
 				res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/assets/' + req.params.fileName));
 			} else {
@@ -78,7 +78,7 @@ module.exports = {
 		});
 		
 		app.get('/:fileName', (req, res) => {
-			console.log(req.params);
+			// console.log(req.params);
 			if(req.params.fileName !== 'undefined') {
 				res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/' + req.params.fileName));
 			} else {

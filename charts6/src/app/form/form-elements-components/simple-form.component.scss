@@ -1,10 +1,28 @@
 @import "../../style/mixin-mediaQuery";
+@import "../../style/varible";
+
+simple-form{
+  margin: 2rem;
+}
 
 .input__container {
-  overflow: hidden;
   flex: 0 0 50%;
+  display: flex;
+  align-items: flex-end;
+  min-height: 3rem;
 
-  &:first-child {
-    flex: 0 0 100%;
+  label.checked {
+    background-color: initial;
+    color: $color-blue;
+    font-weight: bold;
+
+    svg {
+      fill: $color-blue;
+      stroke: $color-white;
+    }
+  }
+  svg {
+    fill: $color-white;
+    stroke: $color-blue;
   }
 }

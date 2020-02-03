@@ -93,38 +93,20 @@ module.exports = {
 			var smtpTransport = nodemailer.createTransport({
 				debug: true,
 				logger: true,
-				service: 'smtp.gmail.com',
+				service: 'gmail',
 				port: 465,
 				secure: true,
 				auth: {
 					user: 'redjinji@gmail.com',
-					// pass: 'tr1234569870',
-					
-					type: 'OAuth2',
-					clientId: credentials.client_id,
-					clientSecret: credentials.client_secret,
-					refreshToken: oAuth2Client.refresh_token,
-					accessToken: oAuth2Client.access_token,
-					expires: oAuth2Client.expiry_date
+					pass: 'tr1234569870',
 				}
-				/*service: 'gmail',
-				auth:{
-					xoauth2: xoauth2.createXOAuth2Generator({
-						user: 'redjinji@gmail.com',
-						clientId: credentials.client_id,
-						clientSecret: credentials.client_secret,
-						refreshToken: oAuth2Client.refresh_token,
-						accessToken: oAuth2Client.access_token
-					})
-				}*/
 			});
 			
 			let message = {
 				from: 'redjinji@gmail.com',
 				to: 'redjinji@gmail.com',
 				subject: 'test mail subject',
-				text: 'test mail text',
-				html: '<p>test mail html</p>'
+				text: 'test mail text'
 			};
 			
 			smtpTransport.sendMail(message, (err, info)=>{

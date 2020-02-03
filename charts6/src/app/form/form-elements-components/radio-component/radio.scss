@@ -4,13 +4,13 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
+  &.label-container{
+    flex-wrap: wrap;
+  }
 }
 
 label {
-  background-color: $color-unselected;
-  padding: .5rem;
-  width: 10rem;
-  height: 10rem;
   display: table-cell;
   vertical-align: middle;
   transition: .4s;
@@ -18,9 +18,19 @@ label {
   margin: 0 1rem 1rem;
   position: relative;
   text-align: center;
-  border-radius: 1.5rem;
-  &.checked {
-    background-color: $color-green;
+  color: var(--dark-blue);
+  padding: 3rem 7rem;
+  border-radius: 1rem;
+  border: .1rem solid var(--dark-blue);
+  &.checked, &.checked-other {
+    color: var(--white);
+    background-color: var(--dark-blue);
+  }
+
+  &.radio-other {
+    padding: 1.6rem 3rem;
+    font-size: 1.5rem;
+    color: var(--blue);
   }
 
   .customer-details__form .radios__container & {
@@ -30,15 +40,56 @@ label {
     display: inline-block;
     font-size: 2rem;
   }
+
+  .theme-round & {
+    border: 0;
+    padding: 2rem 0;
+
+    .visible-elements {
+      width: 15rem;
+      height: 15rem;
+    }
+
+    image-component {
+      border: .1rem solid var(--blue);
+      border-radius: 10rem;
+      overflow: visible;
+      padding: 0 4rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    }
+    &.checked, &.checked-other {
+      background-color: var(--white);
+      color: var(--blue);
+      font-weight: bold;
+      image-component {
+        background-color: var(--blue);
+      }
+    }
+  }
 }
 
 input {
   position: absolute;
   visibility: hidden;
+  width: 0;
+  .radio-other & {
+    position: static;
+    visibility: visible;
+    width: 8rem;
+  }
+  .radio-other.checked &, .radio-other.checked-other & {
+    color: var(--white);
+    background-color: var(--dark-blue);
+    border-bottom: .1rem solid var(--white);
+  }
 }
 
 input:checked ~ label {
-  background-color: $color-green;
+  background-color: var(--green);
 }
 
 .radio-text {
@@ -58,10 +109,11 @@ input:checked ~ label {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
+  //justify-content: space-around;
   .radio-text {
     font-size: 2rem;
     position: static;
     transform: none;
+    width: initial;
   }
 }

@@ -11,19 +11,25 @@
 
   .input__container {
     margin-bottom: 1rem;
-  }
-  label {
-    display: block;
-    justify-content: space-between;
+    min-height: 6rem;
   }
   .radios__container {
     label {
-      height: 4rem;
-      width: 6rem;
-      margin: 1rem 0 1rem 1rem;
+      margin: 0 0 0 1rem;
       display: inline-block;
       font-size: 2rem;
+      border: 0;
+      padding: 0;
     }
+  }
+  image-component {
+    width: 4.5rem;
+    height: 3.5rem;
+  }
+  .visible-elements {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
   }
   simple-form {
     display: flex;
@@ -35,18 +41,10 @@
   }
 }
 
-.shoes {
-  display: flex;
-  align-items: flex-end;
-
-  select[name=shoesMeasureType] {
-    width: 10.5rem;
-  }
-
-  input {
-    max-width: 4.4rem;
-  }
+.main-label {
+  width: 100%;
 }
+
 select-component {
   position: relative;
   .arrow {
@@ -59,6 +57,7 @@ select-component {
     z-index: 1;
     transform: translateY(-50%);
     pointer-events: none;
+    padding-bottom: .3rem; //aligning a bit
   }
 }
 input {
@@ -66,4 +65,5 @@ input {
   width: 17.3rem;
   height: 2.8rem;
   text-align: right;
+  border-bottom: .1rem solid $color-unselected;
 }

@@ -1,19 +1,30 @@
-<div class="radios-container" [formGroup]="parentForm" >
+<div [ngClass]="{'label-container':radio.label}" class="radios-container theme-{{radio.theme}}" [formGroup]="parentForm">
+	<div class="main-label" *ngIf="radio.label">{{radio.label}}</div>
 	<ng-template let-isRequired="radios.required" ngFor let-radioElem [ngForOf]="radio.elements">
-		<label for="{{radioElem.id}}" [ngClass]="{'checked': parentForm.controls[radio.name].value == radioElem.label,'radio__image-include':radioElem.imgs}">
-			<input (change)="handleChange($event)"
+		<label [ngClass]="{
+		'checked': parentForm.controls[radio.name].value === radioElem.label || parentForm.controls[radio.name].value === radioElem.parserData,
+		'radio__image-include':radioElem.imgs,
+		'radio-other': radioElem.other}">
+			<input *ngIf="!radioElem.other" (change)="handleChange($event)"
 				   formControlName="{{radio.name}}"
 				   [attr.required]="radio.required ? '' : null"
 				   type="radio"
-				   id="{{radioElem.id}}"
 				   value="{{radioElem.parserData || radioElem.label}}"
 				   class="radio-elem"
 			>
-			<img *ngIf="mainImageNeeded(radioElem)" src="{{radioElem.imgs[0].src}}" class="radio-image">
-			<img *ngIf="radioElem.imgs && radioElem.imgs[1]  && parentForm.controls[radio.name].value == radioElem.label" src="{{radioElem.imgs[1].src}}" class="radio-image">
-			<span class="radio-text">
-            {{radioElem.label}}
-            </span>
+			<input *ngIf="radioElem.other" (change)="handleChange($event)"
+				   formControlName="{{radio.name}}"
+				   [attr.required]="radio.required ? '' : null"
+				   type="text"
+				   placeholder="{{radioElem.parserData || radioElem.label}}"
+				   class="radio-elem"
+			>
+			<div *ngIf="!radioElem.other" class="visible-elements">
+				<image-component *ngIf="radioElem.imgs" [image]="radioElem.imgs"></image-component>
+				<span class="radio-text">
+            	{{radioElem.label}}
+            	</span>
+			</div>
 		</label>
 	</ng-template>
 </div>

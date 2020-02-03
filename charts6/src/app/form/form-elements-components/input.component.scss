@@ -1,0 +1,24 @@
+.input__text--label {
+  position: relative;
+}
+
+.input__text--elem {
+  position: absolute;
+  bottom: 1rem;
+  right: .2rem;
+  font-size: 1.8rem;
+  transition: .3s;
+  .input__text--input:focus ~ & ,
+  .ng-dirty ~ & ,
+  .ng-invalid ~ & {
+    bottom: 100%;
+    right: 0;
+    font-size: 1.3rem;
+  }
+  .ng-untouched ~ & {
+    bottom: 1rem;
+    right: .2rem;
+    font-size: 1.8rem;
+  }
+}
+

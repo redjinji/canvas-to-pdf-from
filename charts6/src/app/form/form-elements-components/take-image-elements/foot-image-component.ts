@@ -28,6 +28,8 @@ export class FootImageComponent implements OnInit, AfterViewInit {
         canvasHight: 0
     };
     thumbnailGalleryAmount = [];
+    svgFile = [{svg: 'attached'}];
+    svgCamera = [{svg: 'camera'}];
     
     @HostListener('window:resize', ['$event'])
     onResize(event) {
@@ -45,7 +47,11 @@ export class FootImageComponent implements OnInit, AfterViewInit {
             this.canvasParams.right = this.canvasParams.canvasWidth * 0.8;
             this.canvasParams.left = this.canvasParams.canvasWidth * 0.2;
             this.canvasContext = this.canvas.nativeElement.getContext('2d');
-            this.thumbnailGalleryAmount[2] = '';
+            this.thumbnailGalleryAmount = [
+                [{svg: 'stand-regular', imageTaken: false}],
+                [{svg: 'stand-knee', imageTaken: false}],
+                [{svg: 'stand-toe', imageTaken: false}]
+            ];
             this.initThumbnailPlaceHolder();
         }.bind(this));
         this.parentForm.addControl('image0', new FormControl());
@@ -64,9 +70,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     }
     
     activateCamera(event, index) {
-        if (event !== 'continues') {
-            this.currentCameraInput = 0;
-        }
+        this.currentCameraInput = index;
         this.cameraOn = true;
         this.videoService.activeCamera();
     }
@@ -117,39 +121,13 @@ export class FootImageComponent implements OnInit, AfterViewInit {
         this.drew(videoElement, this.currentCameraInput);
         this.cameraOn = false;
         this.killVideo = true;
-        this.currentCameraInput++;
-        if (this.currentCameraInput === 3) {
-            this.currentCameraInput = 0;
-        } else {
-            setTimeout(this.activateCamera.bind(this, 'continues', ''));
-        }
     }
     
     updateImageFromFile(event, index) {
-        const currentIndex = index === 'mobileCamera' ? this.currentCameraInput : 0;
-        for (let i = currentIndex; i < event.target.files.length; i++) {
-            if (event.target.files[i] || i < 3) {
-                let img = new Image();
-                img.onload = this.drew.bind(this, img, i);
-                img.onerror = this.failed;
-                img.src = URL.createObjectURL(event.target.files[i]);
-            } else {
-                break;
-            }
-        }
-        if (index === 'mobileCamera') {
-            let img = new Image();
-            img.onload = this.drew.bind(this, img, this.currentCameraInput);
-            img.onerror = this.failed;
-            img.src = URL.createObjectURL(event.target.files[0]);
-            setTimeout(() => {
-                if (this.currentCameraInput === 2) {
-                    this.currentCameraInput = 0;
-                } else {
-                    this.currentCameraInput++
-                }
-            }, 1000);
-        }
+        let img = new Image();
+        img.onload = this.drew.bind(this, img, index);
+        img.onerror = this.failed;
+        img.src = URL.createObjectURL(event.target.files[0]);
     }
     
     updateFormWithImage(image, index) {
@@ -169,6 +147,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     }
     
     drew(image, index) {
+        this.thumbnailGalleryAmount[index].imageTaken=true;
         this.currentCameraInput = index;
         this.canvasParams.images[this.currentCameraInput] = image;
         this.updateCanvasThumbnails(image, index);
@@ -190,7 +169,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     }
     
     initThumbnailPlaceHolder() {
-        for(let i=0;i<3;i++) {
+        for (let i = 0; i < 3; i++) {
             let img = new Image();
             img.onload = function (img) {
                 this.canvasParams.images.push(img);
@@ -198,7 +177,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
                 this.updateCanvasElements(this.currentCameraInput, 0);
             }.bind(this, img);
             img.onerror = this.failed;
-            img.src = `assets/SoftwareIcons_S${i+1}.png`;
+            img.src = `assets/SoftwareIcons_S${i + 1}.png`;
         }
     }
 }

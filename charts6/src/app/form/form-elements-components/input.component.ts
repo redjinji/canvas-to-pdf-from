@@ -1,22 +1,28 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, OnInit, ViewEncapsulation} from "@angular/core";
 import {IInput} from "./form-interface";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 
 @Component({
     selector: 'input-component',
     template: `
-<div [formGroup]="parentForm">
-        <label for="{{inputElem.id}}"> {{inputElem.label}}
+    <div class="input__text--container" [formGroup]="parentForm">
+        <label class="input__text--label">
+            <input
+                class="input__text--input"
+                formControlName="{{inputElem.name}}"
+                [attr.max]="inputElem.maxDate ? inputElem.maxDateParsed : null"
+                [attr.min]="inputElem.maxDate ? '1900-01-01' : null"
+                type="{{inputElem.type}}" name="{{inputElem.name}}"
+                [attr.required]="inputElem.required ? '' : null"
+                [attr.placeholder]="inputElem.placeholder ? inputElem.placeholder : null"/>
+                            <span class="input__text--elem">{{inputElem.label}}</span>
+
         </label>
-        <input
-         formControlName="{{inputElem.name}}"
-         [attr.max]="inputElem.maxDate ? inputElem.maxDateParsed : null"
-         [attr.min]="inputElem.maxDate ? '1900-01-01' : null"
-         id="{{inputElem.id}}" type="{{inputElem.type}}" name="{{inputElem.name}}"
-         [attr.required]="inputElem.required ? '' : null"
-         [attr.placeholder]="inputElem.placeholder ? inputElem.placeholder : null"/>
+        
          </div>
-    `
+    `,
+    styleUrls: ['input.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 export class InputComponent implements OnInit{
     @Input() inputElem: IInput;
