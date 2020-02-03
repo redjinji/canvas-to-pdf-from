@@ -1,5 +1,6 @@
 import {Component} from "@angular/core";
 import {FormNavigationService} from "../form/form-navigation.service";
+import {UserAnthentityService} from "../login";
 
 @Component({
     selector: 'Header-component',
@@ -10,7 +11,7 @@ export class Header {
     camera:boolean=false;
     angel:boolean=false;
     details:boolean=false;
-    constructor(private formNavigationService: FormNavigationService) {
+    constructor(private formNavigationService: FormNavigationService, public auth:UserAnthentityService) {
         formNavigationService.navigate.subscribe(this.activeIcon.bind(this));
     }
     

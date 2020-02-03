@@ -1,9 +1,8 @@
 <header>
-<!--	<img src="/assets/5-5.jpg" class="main-logo">-->
 	<svg class="main-logo">
 		<use xlink:href="assets/visuals.svg#main-logo"></use>
 	</svg>
-	<nav class="nav-elements">
+	<nav *ngIf="auth.isLogin()" class="nav-elements">
 		<button [ngClass]="{'active':start}" class="nav-item" (click)="goto(0)">
 			<figure>
 				<svg>
