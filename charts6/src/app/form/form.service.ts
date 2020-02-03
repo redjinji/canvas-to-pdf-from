@@ -146,7 +146,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                 {
                     id: 'FootCollapsed',
                     parserData: 'FootCollapsed',
-                    label: 'קריסה',
+                    label: 'השטחה',
                     imgs: [
                         {src: '../../../../assets/SoftwareIcons_FootCollapsed.png'}
                     ]
