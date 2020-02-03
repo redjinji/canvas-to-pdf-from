@@ -91,14 +91,19 @@ module.exports = {
 		
 		function sendMail(oAuth2Client, dataForCallback, credentials) {
 			var smtpTransport = nodemailer.createTransport({
-				debug: true,
-				logger: true,
+				// debug: true,
+				// logger: true,
 				service: 'gmail',
 				port: 465,
 				secure: true,
 				auth: {
+					type: 'OAuth2',
 					user: 'redjinji@gmail.com',
-					pass: 'tr1234569870',
+					clientId: credentials.installed.client_id,
+					clientSecret: credentials.installed.client_secret,
+					refreshToken: oAuth2Client.credentials.refresh_token,
+					accessToken: oAuth2Client.credentials.access_token,
+					expires: oAuth2Client.credentials.expiry_date
 				}
 			});
 			
@@ -106,7 +111,14 @@ module.exports = {
 				from: 'redjinji@gmail.com',
 				to: 'redjinji@gmail.com',
 				subject: 'test mail subject',
-				text: 'test mail text'
+				text: 'test mail text',
+				html: '<p>test mail html</p>',
+				attachments: [
+					{
+						filename: 'file  - name.pdf',
+						path: process.cwd() + '/server/pdfs/mypdf.pdf'
+					}
+				]
 			};
 			
 			smtpTransport.sendMail(message, (err, info)=>{
