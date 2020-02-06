@@ -8,6 +8,12 @@ const app = express();
 
 console.log('process', process.cwd());
 console.log('dir', __dirname);
+console.log('env variable SHEET_CREDENTIALS: ', process.env.SHEET_CREDENTIALS);
+try{
+	console.log('env variable SHEET_CREDENTIALS: ', JSON.parse(process.env.SHEET_CREDENTIALS));
+} catch (e) {
+
+}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
