@@ -31,6 +31,8 @@ module.exports = {
 					res.json({user: 'incorrect'})
 				}
 				
+			}).catch(err=>{
+				res.json({user: 'error', error: err})
 			});
 		});
 	}

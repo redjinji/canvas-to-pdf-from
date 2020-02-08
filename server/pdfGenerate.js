@@ -8,7 +8,7 @@ const formidable = require('formidable'),
 module.exports = {
 	init:function (req, res) {
 		var reqBody = req.body;
-		async function generatPdf(callbackFunc, fields) {
+``		async function generatPdf(callbackFunc, fields, res) {
 			try {
 				const browser = await puppet.launch({
 					//remove security issue with chromium
@@ -32,7 +32,8 @@ module.exports = {
 				});
 				await browser.close();
 
-				callbackFunc(fields);
+				await callbackFunc(fields, res);
+				googleApi.sendMail();
 			} catch (e) {
 				console.log('our error', e);
 			}
@@ -55,7 +56,7 @@ module.exports = {
 				console.error('error parse: ',err.message);
 				return;
 			}
-			generatPdf(googleApi.sendToDrive, fields);
+			generatPdf(googleApi.sendToDrive, fields, res);
 		}.bind(this));
 		
 		// res.sendFile(path.join(process.cwd() + '/client/index.html'));

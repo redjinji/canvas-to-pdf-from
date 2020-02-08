@@ -2,3 +2,4 @@
 /.idea
 /server/temp_image
 token.json
+nodemon-dev.json

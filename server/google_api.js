@@ -1,36 +1,15 @@
 const fs = require('fs-extra'),
 	readline = require('readline'),
 	nodemailer = require('nodemailer'),
-	xoauth2 = require('xoauth2'),
 	{google} = require('googleapis');
 
 const SCOPES = ['https://www.googleapis.com/auth/'];
 
-//configure environment variable
-var BASE_FOLDER_LOCATION = process.cwd() + '/server/assets/google/';
-var TOKEN_PATH_DRIVE = '';
-var CREDENTIAL_PATH_DRIVE = '';
-var TOKEN_PATH_SHEETS = '';
-var TOKEN_PATH_GMAIL = '';
-var CREDENTIAL_PATH_SHEETS = '';
-var SPEADSHEET_ID = '';
-var DRIVE_UPLOAD_FOLDER = '';
-if (process.env.PORT) {
-	TOKEN_PATH_DRIVE = `${BASE_FOLDER_LOCATION}prodDriveToken.json`;
-	TOKEN_PATH_SHEETS = `${BASE_FOLDER_LOCATION}prodSheetsToken.json`;
-	CREDENTIAL_PATH_DRIVE = `${BASE_FOLDER_LOCATION}prodDriveCredentials.json`;
-	CREDENTIAL_PATH_SHEETS = `${BASE_FOLDER_LOCATION}prodSheetsCredentials.json`;
-	SPEADSHEET_ID = '1FSERWuYpuGe3c8i0EGaVyOd_lXhfluGCEQUkrX7H_pI';
-	DRIVE_UPLOAD_FOLDER = '1W3sXBWrWIwRKwjH-hcVZCyJDZVGBKwCU';
-} else {
-	TOKEN_PATH_GMAIL = `${BASE_FOLDER_LOCATION}stgGmailToken.json`;
-	TOKEN_PATH_DRIVE = `${BASE_FOLDER_LOCATION}stgDriveToken.json`;
-	TOKEN_PATH_SHEETS = `${BASE_FOLDER_LOCATION}stgSheetsToken.json`;
-	CREDENTIAL_PATH_DRIVE = `${BASE_FOLDER_LOCATION}stgDriveCredentials.json`;
-	CREDENTIAL_PATH_SHEETS = `${BASE_FOLDER_LOCATION}stgSheetsCredentials.json`;
-	SPEADSHEET_ID = '1vCpaiEg8BFRvJ9u_ywKBhJbQGOdCD8-Gv6ABIrWKIiI';
-	DRIVE_UPLOAD_FOLDER = '1jlag_Kq8VCH-MkD10whsaxacOxUPOECp';
-}
+const GMAIL = 'GMAIL',
+	SHEET = 'SHEET',
+	DRIVE = 'DRIVE',
+	_TOKEN = '_TOKEN',
+	_CREDENTIALS = '_CREDENTIALS';
 
 //end of configure environment
 
@@ -67,27 +46,28 @@ function getAccessToken(oAuth2Client, callback, service, tokenPath) {
 	});
 }
 
-function authorize(credentials, callback, dataForCallback, service, tokenPath) {
+function authorize(credentials, callback, dataForCallback, service, tokenName) {
 	const {client_secret, client_id, redirect_uris} = credentials.installed;
-	const oAuth2Client = new google.auth.OAuth2(
-		client_id, client_secret, redirect_uris[0]);
+	const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 	
 	// Check if we have previously stored a token.
-	fs.readFile(tokenPath, function (err, token) {
-		if (err) return getAccessToken(oAuth2Client, callback, service, tokenPath);
-		let parsedToken = JSON.parse(token);
+	if(process.env[`${tokenName}${_TOKEN}`]) {
+		let parsedToken = JSON.parse(process.env[`${tokenName}${_TOKEN}`]);
 		oAuth2Client.setCredentials(parsedToken);
 		callback(oAuth2Client, dataForCallback, credentials);
-	});
+	} else {
+		return getAccessToken(oAuth2Client, callback, service, tokenName);
+	}
 }
 
 module.exports = {
 	sendMail: function () {
-		fs.readFile(CREDENTIAL_PATH_DRIVE, function (err, content) {
-			// console.log(JSON.parse(content));
-			if (err) return console.log('Error loading client secret file:', err);
-			authorize(JSON.parse(content), sendMail, '', 'gmail', TOKEN_PATH_GMAIL);
-		});
+		if(process.env.GMAIL_CREDENTIALS) {
+			authorize(JSON.parse(process.env.GMAIL_CREDENTIALS), sendMail, '', 'gmail', GMAIL);
+		} else {
+			let error = 'Gmail credentials didn\'t found';
+			console.log(error);
+		}
 		
 		function sendMail(oAuth2Client, dataForCallback, credentials) {
 			var smtpTransport = nodemailer.createTransport({
@@ -132,18 +112,13 @@ module.exports = {
 		}
 	},
 	
-	sendToDrive: function (formFields) {
-		fs.readFile(CREDENTIAL_PATH_DRIVE, function (err, content) {
-			if (err) return console.log('Error loading client secret file:', err);
-			authorize(JSON.parse(content), uploadPdf, formFields, 'drive', TOKEN_PATH_DRIVE);
-		});
-		
+	sendToDrive: async function (formFields, res) {
 		function uploadPdf(auth, formFields) {
 			const drive = google.drive({version: 'v3', auth});
 			
 			const fileMetadata = {
 				'name': `${formFields.fieldAgent} - ${formFields.name}`,
-				parents: [DRIVE_UPLOAD_FOLDER]
+				parents: [process.env.DRIVE_UPLOAD_FOLDER]
 			};
 			const media = {
 				mimeType: 'application/pdf',
@@ -157,23 +132,36 @@ module.exports = {
 			}, function (err, file) {
 				if (err) {
 					console.error('error uploding', err);
+					res.json({status:'fail to drive'})
 				} else {
 					console.log('File Id: ', file.id);
+					res.json({status:'success'})
 				}
 			});
+		};
+		if(process.env.DRIVE_CREDENTIALS) {
+			authorize(JSON.parse(process.env.DRIVE_CREDENTIALS), uploadPdf, formFields, 'drive', DRIVE);
+		} else {
+			let error = 'drive credentials didn\'t found';
+			console.log(error);
+			res.json({status:error});
 		}
 	},
 	
 	getUserSheets: new Promise(function (resolve, reject) {
-		fs.readFile(CREDENTIAL_PATH_SHEETS, (err, content) => {
-			if (err) return console.log('Error loading client secret file:', err);
-			authorize(JSON.parse(content), listMajors, '', 'spreadsheets', TOKEN_PATH_SHEETS);
-		});
+		
+		if(process.env.SHEET_CREDENTIALS) {
+			authorize(JSON.parse(process.env.SHEET_CREDENTIALS), listMajors, '', 'spreadsheets', SHEET);
+		} else {
+			let error = 'sheets credentials didn\'t found';
+			console.log(error);
+			reject(error);
+		}
 		
 		function listMajors(auth) {
 			const sheets = google.sheets({version: 'v4', auth});
 			sheets.spreadsheets.values.get({
-				spreadsheetId: SPEADSHEET_ID,
+				spreadsheetId: process.env.SPEADSHEET_ID,
 				range: 'A:B',
 			}, (err, res) => {
 				if (err) return console.log('The API returned an error: ' + err);
