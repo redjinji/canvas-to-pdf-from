@@ -8,7 +8,7 @@ const formidable = require('formidable'),
 module.exports = {
 	init:function (req, res) {
 		var reqBody = req.body;
-``		async function generatPdf(callbackFunc, fields, res) {
+		async function generatPdf(callbackFunc, fields, res) {
 			try {
 				const browser = await puppet.launch({
 					//remove security issue with chromium
