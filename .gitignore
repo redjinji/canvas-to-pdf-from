@@ -3,3 +3,6 @@
 /server/temp_image
 token.json
 nodemon-dev.json
+.env
+/server/assets/testMeText.html
+/server/assets/testMeText.json

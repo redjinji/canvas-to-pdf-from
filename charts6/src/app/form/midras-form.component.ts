@@ -22,66 +22,67 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     nextDisable = false;
     activeSpinner = false;
     url: string = `${environment.serverCall}/sendForm`;
-    
+
     @ViewChild('screenContainer') screenContainer: ElementRef;
     @ViewChild('overlaySpinner') overlaySpinner: ElementRef;
-    
+
     constructor(private router: Router, private auth: UserAnthentityService,
                 private formService: FormService,
                 private videoService: VideoService,
                 private formBuilder: FormBuilder,
                 private fromNavigationService: FormNavigationService,
                 private _http: HttpClient) {
-        
+
         fromNavigationService.navigate.subscribe(this.formMoveTo.bind(this))
     }
-    
+
     ngAfterViewInit() {
         this.parentForm.removeControl('inValidForInit');
     }
-    
+
     ngOnInit(): void {
         const isUserLogin = this.auth.isLogin();
         if (!isUserLogin) this.router.navigate(['/login']);
-        
+
         this.getElement();
         this.parentForm = this.formBuilder.group({inValidForInit: new FormControl('', Validators.required)});
         window['activeForm'] = this.parentForm;
     }
-    
+
     getElement() {
         this.formElements = this.formService.getFormElements();
     }
-    
+
     formMoveTo(params) {
         const {position, start, end} = params;
         this.screenContainer.nativeElement.style = `transform: translateX(${position}00%)`;
         this.nextDisable = end;
         this.prevDisable = start;
     }
-    
+
     nextStep() {
         this.fromNavigationService.next();
     }
-    
+
     prevStep() {
         this.fromNavigationService.prev();
     }
-    
+
     captureImage(data) {
         console.log('parent video:', data);
     }
-    
+
     sendForm() {
         if (this.parentForm.valid) {
             let formData = new FormData();
             let fieldAgent = JSON.parse(localStorage.getItem('userAuth'));
-            
-            formData.append('fieldAgent', fieldAgent.userName);
+
+            formData.append('fieldAgentName', fieldAgent.userName);
+            formData.append('fieldAgentMail', fieldAgent.mail);
             for (let formItem in this.parentForm.value) {
                 formData.append(formItem, this.parentForm.value[formItem] || '')
             }
-            
+
             this._http.post(this.url, formData).subscribe(
                 respone => console.log(respone),
                 error => console.log(error)

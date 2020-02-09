@@ -37,10 +37,12 @@ function getAccessToken(oAuth2Client, callback, service, tokenPath) {
 			if (err) return console.error('Error retrieving access token', err);
 			oAuth2Client.setCredentials(token);
 			// Store the token to disk for later program executions
-			fs.writeFile(tokenPath, JSON.stringify(token), function (err) {
-				if (err) return console.error(err);
-				console.log('Token stored to', tokenPath);
-			});
+			console.log();
+			console.log();
+			console.log(token);
+			console.log();
+			console.log();
+
 			callback(oAuth2Client);
 		});
 	});
@@ -61,7 +63,7 @@ function authorize(credentials, callback, dataForCallback, service, tokenName) {
 }
 
 module.exports = {
-	sendMail: function () {
+	sendMail: function (fields) {
 		if(process.env.GMAIL_CREDENTIALS) {
 			authorize(JSON.parse(process.env.GMAIL_CREDENTIALS), sendMail, '', 'gmail', GMAIL);
 		} else {
@@ -88,26 +90,27 @@ module.exports = {
 			});
 			
 			let message = {
-				from: 'redjinji@gmail.com',
-				to: 'redjinji@gmail.com',
-				subject: 'test mail subject',
-				text: 'test mail text',
-				html: '<p>test mail html</p>',
+				from: process.env.senderMail,
+				to: fields.email,
+				cc: fields.fieldAgentMail,
+				subject: 'הבדיקה שלך באקטיב8',
+				// text: 'תודה שבחרת בנו, אקטיב 8',
+				html: '<p>תודה שבחרת בנו<br/>אקטיב8</p>',
 				attachments: [
 					{
-						filename: 'file  - name.pdf',
+						filename: `${fields.fieldAgentName} - ${fields.name}.pdf`,
 						path: process.cwd() + '/server/pdfs/mypdf.pdf'
 					}
 				]
 			};
 			
 			smtpTransport.sendMail(message, (err, info)=>{
-				console.log();
-				console.log();
-				console.log();
-				console.log('err: ', err);
-				console.log('info: ', info);
-				smtpTransport.close();
+				// console.log();
+				// console.log();
+				// console.log();
+				// console.log('err: ', err);
+				// console.log('info: ', info);
+				// smtpTransport.close();
 			});
 		}
 	},
@@ -117,7 +120,7 @@ module.exports = {
 			const drive = google.drive({version: 'v3', auth});
 			
 			const fileMetadata = {
-				'name': `${formFields.fieldAgent} - ${formFields.name}`,
+				'name': `${formFields.fieldAgentName} - ${formFields.name}`,
 				parents: [process.env.DRIVE_UPLOAD_FOLDER]
 			};
 			const media = {
@@ -134,16 +137,16 @@ module.exports = {
 					console.error('error uploding', err);
 					res.json({status:'fail to drive'})
 				} else {
-					console.log('File Id: ', file.id);
+					// console.log('File Id: ', file.id);
 					res.json({status:'success'})
 				}
 			});
-		};
+		}
 		if(process.env.DRIVE_CREDENTIALS) {
 			authorize(JSON.parse(process.env.DRIVE_CREDENTIALS), uploadPdf, formFields, 'drive', DRIVE);
 		} else {
 			let error = 'drive credentials didn\'t found';
-			console.log(error);
+			console.log('error drive: ',error);
 			res.json({status:error});
 		}
 	},
@@ -154,7 +157,7 @@ module.exports = {
 			authorize(JSON.parse(process.env.SHEET_CREDENTIALS), listMajors, '', 'spreadsheets', SHEET);
 		} else {
 			let error = 'sheets credentials didn\'t found';
-			console.log(error);
+			console.log('error sheets: ',error);
 			reject(error);
 		}
 		
@@ -162,7 +165,7 @@ module.exports = {
 			const sheets = google.sheets({version: 'v4', auth});
 			sheets.spreadsheets.values.get({
 				spreadsheetId: process.env.SPEADSHEET_ID,
-				range: 'A:B',
+				range: 'A:C',
 			}, (err, res) => {
 				if (err) return console.log('The API returned an error: ' + err);
 				const rows = res.data.values;

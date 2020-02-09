@@ -33,7 +33,7 @@ module.exports = {
 				await browser.close();
 
 				await callbackFunc(fields, res);
-				googleApi.sendMail();
+				googleApi.sendMail(fields);
 			} catch (e) {
 				console.log('our error', e);
 			}
