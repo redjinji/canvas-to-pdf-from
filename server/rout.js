@@ -44,7 +44,6 @@ module.exports = {
 		});
     
     app.post('/sendForm', (req, res) => {
-      fs.writeFile('server/assets/testMeTextBody.json', JSON.stringify(req.body));
       pdfGenerate.init(req, res);
     });
 		
