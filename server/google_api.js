@@ -15,7 +15,7 @@ const GMAIL = 'GMAIL',
 
 function getAccessToken(oAuth2Client, callback, service, tokenPath) {
 	let authUrl;
-	if(service === 'gmail'){
+	if (service === 'gmail') {
 		authUrl = oAuth2Client.generateAuthUrl({
 			access_type: 'offline',
 			scope: 'https://mail.google.com/',
@@ -42,7 +42,7 @@ function getAccessToken(oAuth2Client, callback, service, tokenPath) {
 			console.log(token);
 			console.log();
 			console.log();
-
+			
 			callback(oAuth2Client);
 		});
 	});
@@ -53,7 +53,7 @@ function authorize(credentials, callback, dataForCallback, service, tokenName) {
 	const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 	
 	// Check if we have previously stored a token.
-	if(process.env[`${tokenName}${_TOKEN}`]) {
+	if (process.env[`${tokenName}${_TOKEN}`]) {
 		let parsedToken = JSON.parse(process.env[`${tokenName}${_TOKEN}`]);
 		oAuth2Client.setCredentials(parsedToken);
 		callback(oAuth2Client, dataForCallback, credentials);
@@ -64,100 +64,111 @@ function authorize(credentials, callback, dataForCallback, service, tokenName) {
 
 module.exports = {
 	sendMail: function (fields) {
-		if(process.env.GMAIL_CREDENTIALS) {
-			authorize(JSON.parse(process.env.GMAIL_CREDENTIALS), sendMail, '', 'gmail', GMAIL);
-		} else {
-			let error = 'Gmail credentials didn\'t found';
-			console.log(error);
-		}
-		
-		function sendMail(oAuth2Client, dataForCallback, credentials) {
-			var smtpTransport = nodemailer.createTransport({
-				// debug: true,
-				// logger: true,
-				service: 'gmail',
-				port: 465,
-				secure: true,
-				auth: {
-					type: 'OAuth2',
-					user: 'redjinji@gmail.com',
-					clientId: credentials.installed.client_id,
-					clientSecret: credentials.installed.client_secret,
-					refreshToken: oAuth2Client.credentials.refresh_token,
-					accessToken: oAuth2Client.credentials.access_token,
-					expires: oAuth2Client.credentials.expiry_date
-				}
-			});
+		return new Promise(function (resolve, reject) {
 			
-			let message = {
-				from: process.env.senderMail,
-				to: fields.email,
-				cc: fields.fieldAgentMail,
-				subject: 'הבדיקה שלך באקטיב8',
-				// text: 'תודה שבחרת בנו, אקטיב 8',
-				html: '<p>תודה שבחרת בנו<br/>אקטיב8</p>',
-				attachments: [
-					{
-						filename: `${fields.fieldAgentName} - ${fields.name}.pdf`,
-						path: process.cwd() + '/server/pdfs/mypdf.pdf'
+			if (process.env.MAIN_CREDENTIALS) {
+				authorize(JSON.parse(process.env.MAIN_CREDENTIALS), sendMail, '', 'gmail', GMAIL);
+			} else {
+				let error = 'Gmail credentials didn\'t found';
+				console.log(error);
+			}
+			
+			function sendMail(oAuth2Client, dataForCallback, credentials) {
+				var smtpTransport = nodemailer.createTransport({
+					// debug: true,
+					// logger: true,
+					service: 'gmail',
+					port: 465,
+					secure: true,
+					auth: {
+						type: 'OAuth2',
+						user: 'redjinji@gmail.com',
+						clientId: credentials.installed.client_id,
+						clientSecret: credentials.installed.client_secret,
+						refreshToken: oAuth2Client.credentials.refresh_token,
+						accessToken: oAuth2Client.credentials.access_token,
+						expires: oAuth2Client.credentials.expiry_date
 					}
-				]
-			};
-			
-			smtpTransport.sendMail(message, (err, info)=>{
-				// console.log();
-				// console.log();
-				// console.log();
-				// console.log('err: ', err);
-				// console.log('info: ', info);
-				// smtpTransport.close();
-			});
-		}
+				});
+				
+				let message = {
+					from: process.env.senderMail,
+					to: fields.email,
+					cc: fields.fieldAgentMail,
+					subject: 'הבדיקה שלך באקטיב8',
+					// text: 'תודה שבחרת בנו, אקטיב 8',
+					html: '<p>תודה שבחרת בנו<br/>אקטיב8</p>',
+					attachments: [
+						{
+							filename: `${fields.fieldAgentName} - ${fields.name}.pdf`,
+							path: process.cwd() + '/server/pdfs/mypdf.pdf'
+						}
+					]
+				};
+				
+				smtpTransport.sendMail(message, (err, info) => {
+					// console.log();
+					// console.log();
+					// console.log();
+					if(err){
+					console.log('err: ', err);
+						reject(err);
+					} else {
+						console.log('info: ', info);
+						resolve(info);
+					}
+					smtpTransport.close();
+				});
+			}
+		});
 	},
 	
-	sendToDrive: async function (formFields, res) {
-		function uploadPdf(auth, formFields) {
-			const drive = google.drive({version: 'v3', auth});
+	sendToDrive: async function (formFields) {
+		return new Promise(function (resolve, reject) {
+			function uploadPdf(auth, formFields) {
+				const drive = google.drive({version: 'v3', auth});
+				
+				const fileMetadata = {
+					'name': `${formFields.fieldAgentName} - ${formFields.name}`,
+					parents: [process.env.DRIVE_UPLOAD_FOLDER]
+				};
+				const media = {
+					mimeType: 'application/pdf',
+					body: fs.createReadStream(process.cwd() + '/server/pdfs/mypdf.pdf')
+				};
+				
+				drive.files.create({
+					resource: fileMetadata,
+					media: media,
+					fields: 'id'
+				}, function (err, file) {
+					if (!err) {
+						console.error('error uploding', err);
+						reject({status: 'fail', error: err})
+					} else {
+						// console.log('File Id: ', file.id);
+						resolve({status: 'success'});
+					}
+				});
+			}
 			
-			const fileMetadata = {
-				'name': `${formFields.fieldAgentName} - ${formFields.name}`,
-				parents: [process.env.DRIVE_UPLOAD_FOLDER]
-			};
-			const media = {
-				mimeType: 'application/pdf',
-				body: fs.createReadStream(process.cwd() + '/server/pdfs/mypdf.pdf')
-			};
-			
-			drive.files.create({
-				resource: fileMetadata,
-				media: media,
-				fields: 'id'
-			}, function (err, file) {
-				if (err) {
-					console.error('error uploding', err);
-					res.json({status:'fail to drive'})
-				} else {
-					// console.log('File Id: ', file.id);
-					res.json({status:'success'})
-				}
-			});
-		}
-		if(process.env.DRIVE_CREDENTIALS) {
-			authorize(JSON.parse(process.env.DRIVE_CREDENTIALS), uploadPdf, formFields, 'drive', DRIVE);
-		} else {
-			let error = 'drive credentials didn\'t found';
-			console.log('error drive: ',error);
-			res.json({status:error});
-		}
+			if (process.env.MAIN_CREDENTIALS) {
+				authorize(JSON.parse(process.env.MAIN_CREDENTIALS), uploadPdf, formFields, 'drive', DRIVE);
+			} else {
+				let error = 'drive credentials didn\'t found';
+				console.log('error drive: ', error);
+				reject({status: 'fail',error: error});
+			}
+		})
 	},
 	
 	getUserSheets: new Promise(function (resolve, reject) {
 		
-		if(process.env.SHEET_CREDENTIALS) {
-			authorize(JSON.parse(process.env.SHEET_CREDENTIALS), listMajors, '', 'spreadsheets', SHEET);
+		if (process.env.MAIN_CREDENTIALS) {
+			authorize(JSON.parse(process.env.MAIN_CREDENTIALS), listMajors, '', 'spreadsheets', SHEET);
 		} else {
 			let error = 'sheets credentials didn\'t found';
-			console.log('error sheets: ',error);
+			console.log('error sheets: ', error);
 			reject(error);
 		}
 		
@@ -178,3 +189,12 @@ module.exports = {
 		}
 	})
 };
+
+
+/*
+*
+* "drive id": "138purUUAT9t8gFbqlPGkaXRKbxr5Umd5",
+	"sheet id": "1IQEqaOw-O-cl7pnhhjU1O_3eUvLxj8qNXT7y2_2y0is",
+	"office credential": "{"installed":{"client_id":"796973856661-143nqpduu34oohf5cso0idlqkmi6a4mm.apps.googleusercontent.com","project_id":"active8-webapp-1581258413103","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"lhDLGgHmqkSjpU4_XkNCvpNg","redirect_uris":["urn:ietf:wg:oauth:2.0:oob","http://localhost"]}}"
+*
+* */

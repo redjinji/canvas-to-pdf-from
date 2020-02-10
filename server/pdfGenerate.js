@@ -7,8 +7,11 @@ const formidable = require('formidable'),
 
 module.exports = {
 	init:function (req, res) {
-		var reqBody = req.body;
 		async function generatPdf(callbackFunc, fields, res) {
+			
+			function sendResolve(status) {
+				res.json(status);
+			}
 			try {
 				const browser = await puppet.launch({
 					//remove security issue with chromium
@@ -31,13 +34,14 @@ module.exports = {
 					printBackground: true
 				});
 				await browser.close();
-
-				await callbackFunc(fields, res);
-				googleApi.sendMail(fields);
+				
+				let generatePdfPromise = callbackFunc(fields);
+				await googleApi.sendMail(fields);
+				await generatePdfPromise.then(sendResolve, sendResolve);
 			} catch (e) {
 				console.log('our error', e);
 			}
-		};
+		}
 		var form = new formidable.IncomingForm({
 			uploadDir: process.cwd() + '/server/temp_image',
 			keepExtensions: true,
