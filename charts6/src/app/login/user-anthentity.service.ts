@@ -30,7 +30,7 @@ export class UserAnthentityService {
 
         this.isAuthenticated().then(value => {
             if(value.isAuthentic){
-                this.currentUser.mail = value.mail;
+                this.currentUser.mail = value.mail.replace(/\s/g, '');
                 localStorage.setItem('userAuth', JSON.stringify(this.currentUser));
                 this.router.navigate(['form'])
             } else {
