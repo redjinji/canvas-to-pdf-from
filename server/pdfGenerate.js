@@ -1,17 +1,21 @@
 const formidable = require('formidable'),
 	googleApi = require('./google_api'),
-    fs = require('fs-extra'),
+	fs = require('fs-extra'),
 	puppet = require('puppeteer'),
 	htmlTemplate = require('angular-template'),
 	process = require('process');
 
 module.exports = {
-	init:function (req, res) {
-		var reqBody = req.body;
-		async function generatPdf(callbackFunc, fields) {
+	init: function (req, res) {
+		async function generatPdf(callbackFunc, fields, res) {
+			
+			function sendResolve(status) {
+				res.json(status);
+			}
+			
 			try {
 				const browser = await puppet.launch({
-					//remove security issue with chromium
+						//remove security issue with chromium
 						args: [
 							'--no-sandbox',
 							'--disable-setuid-sandbox',
@@ -21,9 +25,9 @@ module.exports = {
 				const page = await browser.newPage();
 				
 				const htmlToParce = htmlTemplate(__dirname + '/final-form.html', fields);
-                fs.writeFile('server/assets/testMeText.html', htmlToParce);
-                await page.setContent(htmlToParce);
-
+				fs.writeFile('server/assets/testMeText.html', htmlToParce);
+				await page.setContent(htmlToParce);
+				
 				await page.emulateMedia('screen');
 				await page.pdf({
 					path: 'server/pdfs/mypdf.pdf',
@@ -31,12 +35,18 @@ module.exports = {
 					printBackground: true
 				});
 				await browser.close();
-
-				callbackFunc(fields);
+				
+				let generatePdfPromise = callbackFunc(fields);
+				if (fields.email.indexOf('@') > -1 || fields.fieldAgentMail.indexOf('@') > -1) {
+					await googleApi.sendMail(fields);
+				}
+				
+				await generatePdfPromise.then(sendResolve, sendResolve);
 			} catch (e) {
 				console.log('our error', e);
 			}
-		};
+		}
+		
 		var form = new formidable.IncomingForm({
 			uploadDir: process.cwd() + '/server/temp_image',
 			keepExtensions: true,
@@ -47,15 +57,14 @@ module.exports = {
 		
 		form.addListener('file', function (name, file) {
 		});
-		form.parse(req, function(err, fields, files) {
-			let lessfiled = fields;
-            fs.writeFile('server/assets/testMeText.json', JSON.stringify(fields));
+		form.parse(req, function (err, fields, files) {
+			fs.writeFile('server/assets/testMeText.json', JSON.stringify(fields));
 			if (err) {
 				// Check for and handle any errors here.
-				console.error('error parse: ',err.message);
+				console.error('error parse: ', err.message);
 				return;
 			}
-			generatPdf(googleApi.sendToDrive, fields);
+			generatPdf(googleApi.sendToDrive, fields, res);
 		}.bind(this));
 		
 		// res.sendFile(path.join(process.cwd() + '/client/index.html'));
@@ -64,5 +73,5 @@ module.exports = {
 	},
 	getTemplate: function () {
 		return fs.readFileSync('final-form.html');
-    }
+	}
 };

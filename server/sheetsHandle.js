@@ -21,16 +21,18 @@ module.exports = {
 			const users = googleApi.getUserSheets;
 			users.then(function (usersData) {
 				console.log(usersData);
-				const isUserAuth = usersData.filter(function (user) {
+				const user = usersData.filter(function (user) {
 					return user[0] === userToAuth.userName && user[1] === userToAuth.password;
 				}.bind(this));
-				if (isUserAuth.length > 0) {
-					res.json({user: 'authentic'})
+				if (user.length > 0) {
+					res.json({isAuthentic: true, mail: user[0][2] })
 					// res.redirect('/form');
 				} else {
-					res.json({user: 'incorrect'})
+					res.json({isAuthentic: false})
 				}
 				
+			}).catch(err=>{
+				res.json({user: 'error', error: err})
 			});
 		});
 	}
