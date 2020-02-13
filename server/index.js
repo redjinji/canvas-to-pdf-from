@@ -7,8 +7,8 @@ const express = require('express'),
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 const app = express();
 
-console.log('process', process.cwd());
-console.log('dir', __dirname);
+// console.log('process', process.cwd());
+// console.log('dir', __dirname);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

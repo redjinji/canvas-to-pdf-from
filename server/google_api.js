@@ -82,7 +82,7 @@ module.exports = {
 					secure: true,
 					auth: {
 						type: 'OAuth2',
-						user: 'redjinji@gmail.com',
+						user: process.env.senderMail,
 						clientId: credentials.installed.client_id,
 						clientSecret: credentials.installed.client_secret,
 						refreshToken: oAuth2Client.credentials.refresh_token,
@@ -142,7 +142,7 @@ module.exports = {
 					media: media,
 					fields: 'id'
 				}, function (err, file) {
-					if (!err) {
+					if (err) {
 						console.error('error uploding', err);
 						reject({status: 'fail', error: err})
 					} else {
@@ -189,12 +189,3 @@ module.exports = {
 		}
 	})
 };
-
-
-/*
-*
-* "drive id": "138purUUAT9t8gFbqlPGkaXRKbxr5Umd5",
-	"sheet id": "1IQEqaOw-O-cl7pnhhjU1O_3eUvLxj8qNXT7y2_2y0is",
-	"office credential": "{"installed":{"client_id":"796973856661-143nqpduu34oohf5cso0idlqkmi6a4mm.apps.googleusercontent.com","project_id":"active8-webapp-1581258413103","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"lhDLGgHmqkSjpU4_XkNCvpNg","redirect_uris":["urn:ietf:wg:oauth:2.0:oob","http://localhost"]}}"
-*
-* */

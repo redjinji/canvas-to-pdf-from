@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon",
-    "start:dev": "nodemon --config nodemon-dev.json"
+    "start:dev": "nodemon --config nodemon-dev.json",
+    "start:alekProd": "nodemon --config nodemon-prod.json"
   },
   "repository": {
     "type": "git",
