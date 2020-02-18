@@ -7,7 +7,7 @@
   width: 100%;
   padding: 1.5rem;
   z-index: 2;
-  background: linear-gradient(90deg, var(--bg-dark) 0%, var(--bg-light) 100%);
+  background: var(--bg-gradiant);
 }
 
 .btn {
@@ -102,7 +102,6 @@ foot-image {
   padding: 3rem;
   margin: auto;
   border-radius: 4rem;
-  background-color: $color-white;
   @include respond-to(mobile) {
     width: 100vw;
     margin-bottom: 4.1rem;
@@ -144,11 +143,12 @@ foot-image {
   position: fixed;
   left: 0;
   width: 100%;
-  background-color: $color-dark-blue;
+  background: var(--bg-gradiant);
   padding: 1.5rem;
   transition: 1s;
   animation: slide-down 2.5s;
   bottom: 6.9rem;
+  z-index: 2;
 }
 
 @keyframes slide-down {
