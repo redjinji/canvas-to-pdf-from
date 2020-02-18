@@ -26,27 +26,13 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
         </div>
          </div>
     `,
-    styles: [`
-    .birthday__container {
-        display: flex;
-        flex-direction: column;
-    }
-    .birthday--inputs {
-        display:flex;
-        justify-content: flex-end;
-        flex-direction: row-reverse;
-    }
-    .birthday--inputs input {
-        width: 5rem;
-        margin: 0 .25rem;
-    }
-    `]
+    styleUrls: ['./birthday-input.scss']
 })
 export class BirthdayInputComponent implements OnInit {
     @Input() inputBirthday: IInputBirthday;
     @Input() parentForm: FormGroup;
     currentYear:number = new Date().getFullYear();
-    
+
     ngOnInit() {
         const formControlValidationNeededDay = this.inputBirthday.required ? new FormControl('', Validators.required) : new FormControl();
         const formControlValidationNeededMounth = this.inputBirthday.required ? new FormControl('', Validators.required) : new FormControl();
@@ -55,5 +41,5 @@ export class BirthdayInputComponent implements OnInit {
         this.parentForm.addControl('birthdayMonth', formControlValidationNeededMounth);
         this.parentForm.addControl('birthdayYear', formControlValidationNeededYear);
     }
-    
+
 }

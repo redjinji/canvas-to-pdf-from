@@ -1,8 +1,10 @@
+@import url(//fonts.googleapis.com/earlyaccess/opensanshebrew.css);
 @import "mixin-mediaQuery";
 @import "varible";
 
 body {
-  background-color: $color-main;
+  background-color: var(--body);
+  font-family: 'Open Sans Hebrew', sans-serif;
 }
 
 .btn-primary {
@@ -47,5 +49,12 @@ body::-webkit-scrollbar-thumb {
     .radios-container {
       justify-content: flex-start;
     }
+  }
+}
+
+select-component {
+  width: 90%;
+  @include respond-to(mobile) {
+    width: 100%;
   }
 }

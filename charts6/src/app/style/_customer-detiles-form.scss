@@ -2,7 +2,7 @@
 @import "../style/mixin-mediaQuery";
 
 .customer-details__form {
-  max-width: 50rem;
+  max-width: 80rem;
   margin: auto;
   text-align: right;
   @include respond-to(mobile) {
@@ -12,7 +12,9 @@
   .input__container {
     margin-bottom: 1rem;
     min-height: 6rem;
+    width: 100%;
   }
+
   .radios__container {
     label {
       margin: 0 0 0 1rem;
@@ -22,21 +24,39 @@
       padding: 0;
     }
   }
+
   image-component {
     width: 4.5rem;
     height: 3.5rem;
   }
+
   .visible-elements {
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
   }
+
   simple-form {
     display: flex;
     flex-wrap: wrap;
     @include respond-to(mobile) {
       flex-direction: column;
       align-items: center;
+    }
+  }
+
+  input-component {
+    flex-basis: 100%;
+
+    label {
+      width: 90%;
+      @include respond-to(mobile) {
+        width: 100%;
+      }
+    }
+
+    input {
+      width: 100%;
     }
   }
 }
@@ -47,6 +67,7 @@
 
 select-component {
   position: relative;
+
   .arrow {
     border-right: .5rem solid transparent;
     border-left: .5rem solid transparent;
@@ -60,6 +81,7 @@ select-component {
     padding-bottom: .3rem; //aligning a bit
   }
 }
+
 input {
   border: 0;
   width: 17.3rem;

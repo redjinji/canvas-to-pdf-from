@@ -1,4 +1,4 @@
-<img *ngIf="image[0].src" src="{{image[0].src}}">
+<img *ngIf="image[0].src" src="{{checked ? image[1].src : image[0].src}}">
 <svg *ngIf="image[0].svg">
 	<use attr.xlink:href="assets/visuals.svg#{{image[0].svg}}"></use>
 </svg>

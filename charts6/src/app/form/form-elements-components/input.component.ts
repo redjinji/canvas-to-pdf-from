@@ -18,8 +18,7 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
                             <span class="input__text--elem">{{inputElem.label}}</span>
 
         </label>
-        
-         </div>
+     </div>
     `,
     styleUrls: ['input.component.scss'],
     encapsulation: ViewEncapsulation.None
@@ -27,16 +26,16 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 export class InputComponent implements OnInit{
     @Input() inputElem: IInput;
     @Input() parentForm:FormGroup;
-    
+
     ngOnInit(){
         if(this.inputElem.maxDate) {
             let day:any;
             let mounth:any;
-            
+
             day = this.inputElem.maxDate.getDate();
             mounth = this.inputElem.maxDate.getMonth()+1;
             const year = this.inputElem.maxDate.getFullYear();
-            
+
             day = day < 10 ? '0'+day : day;
             mounth = mounth < 10 ? '0'+mounth : mounth;
             const date = `${year}-${mounth}-${day}`;
@@ -45,5 +44,5 @@ export class InputComponent implements OnInit{
         const formControlValidationNeeded = this.inputElem.required ? new FormControl('',Validators.required) : new FormControl();
         this.parentForm.addControl(this.inputElem.name, formControlValidationNeeded);
     }
-    
+
 }

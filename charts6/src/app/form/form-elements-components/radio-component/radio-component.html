@@ -21,7 +21,7 @@
 				   onkeydown="return (event.keyCode!=13);"
 			>
 			<div *ngIf="!radioElem.other" class="visible-elements">
-				<image-component *ngIf="radioElem.imgs" [image]="radioElem.imgs"></image-component>
+				<image-component *ngIf="radioElem.imgs" [checked]="parentForm.controls[radio.name].value === radioElem.label || parentForm.controls[radio.name].value === radioElem.parserData" [image]="radioElem.imgs"></image-component>
 				<span class="radio-text">
             	{{radioElem.label}}
             	</span>

@@ -2,8 +2,8 @@
 	<form (keydown.enter)="$event.preventDefault()" #midrasForm="ngForm" #screenContainer (ngSubmit)="sendForm()" id="main-form" class="midras-form"
 		  [formGroup]="parentForm">
 		<div *ngFor="let elem of formElements;let i =index" class="screen screen-{{i}}">
-			<div class="screen-section">
-				<div class="screen-container">
+<!--			<div class="screen-section">-->
+<!--				<div class="screen-container">-->
 					<div class="screen-bg">
 						<h3 class="title">{{elem.title}}</h3>
 						<p class="subTitle" *ngIf="elem.subtitle">{{elem.subtitle}}</p>
@@ -16,7 +16,7 @@
 							<textarea-component class="textarea-component" [parentForm]="parentForm"
 												[ta]="elem.textarea"></textarea-component>
 						</div>
-						
+
 						<div *ngIf="elem.footImage" class="form-elememt-component__container foot-image">
 							<foot-image [parentForm]="parentForm"></foot-image>
 						</div>
@@ -26,8 +26,8 @@
 						</div>
 					</div>
 				</div>
-			</div>
-		</div>
+<!--			</div>-->
+<!--		</div>-->
 	</form>
 	<div class="form-submit" [ngClass]="{'valid':midrasForm.valid}" *ngIf="midrasForm.valid">
 		<button form="main-form" class="btn" type="submit">שלח טופס</button>
@@ -48,32 +48,32 @@
 	</nav>
 </div>
 <div class="send-from-overlay" [ngClass]="{'active':activeSpinner}">
-	
+
 	<svg class="spinner" width="135" height="135" viewBox="0 0 135 135" xmlns="http://www.w3.org/2000/svg">
 		<style type="text/css">
 			path {
 				fill: #94c11f;
 			}
-			
+
 			.outer {
 				fill: #58c2df;
 			}
-			
+
 			path {
 				transform-origin: center;
 				animation: dotRoll1 2.5s linear infinite;
 			}
-			
+
 			path:last-child {
 				animation: dotRoll2 8s linear infinite;
 			}
-			
+
 			@keyframes dotRoll1 {
 				to {
 					transform: rotate(-360deg)
 				}
 			}
-			
+
 			@keyframes dotRoll2 {
 				to {
 					transform: rotate(360deg)

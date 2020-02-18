@@ -1,0 +1,54 @@
+{
+  "name": "Pro-Active8",
+  "short_name": "Pro-Active8",
+  "description": "Interactive form for shoe insert",
+  "version": "0.0.0.1",
+  "manifest_version": 1,
+  "dir": "rtl",
+  "lang": "he",
+  "default_locale": "en-GB",
+  "author": "Tzafrir Raveh",
+  "start_url": "/login",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#17325D",
+  "background_color": "#17325D",
+  "icons": [
+    {
+      "src": "assets/favicons/favicon128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/favicons/favicon32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/favicons/favicon192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/favicons/favicon512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "app": {
+    "urls": [
+      "http://localhost:4200/"
+    ],
+    "launch": {
+      "web_url": "http://localhost:4200/"
+    },
+    "background": {
+      "scripts": [ "runtime.js", "polyfills.js", "styles.js", "vendor.js" , "main.js"]
+    },
+    "permissions": [
+      "unlimitedStorage",
+      "notifications",
+      "fullscreen"
+    ]
+  }
+}

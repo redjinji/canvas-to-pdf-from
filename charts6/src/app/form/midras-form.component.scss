@@ -5,13 +5,14 @@
   position: fixed;
   bottom: 0;
   width: 100%;
-  background: $color-dark-blue;
   padding: 1.5rem;
+  z-index: 2;
+  background: linear-gradient(90deg, var(--bg-dark) 0%, var(--bg-light) 100%);
 }
 
 .btn {
   font-size: 2rem;
-  color: $color-white;
+  color: var(--white);
   margin: 0 1rem;
   min-width: 8rem;
   &.disable {
@@ -21,7 +22,7 @@
   svg {
     width: 3rem;
     height: 3rem;
-    color: $color-orange;
+    color: var(--orange);
   }
   &-next {
     svg {
@@ -35,17 +36,20 @@
   font-size: 1.5rem;
   color: $color-dark-blue;
   text-align: center;
-  width: 100vw;
+  width: 100%;
+  height: fit-content;
+  padding: 2rem 0 7rem;
+  background: var(--white);
   overflow: hidden;
-  padding: 0;
+
   @include respond-to(mobile){
-    padding-top: 2.5rem;
+    padding-top: 0;
   }
 
   &:after {
-    content: '';
+    //content: '';
     background-image: url("/assets/SoftwareIcons_BG.png");
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
     position: absolute;
     left: 0;
@@ -53,7 +57,6 @@
     width: 100%;
     height: 100%;
     opacity: .5;
-    z-index: -1;
   }
 }
 
@@ -63,6 +66,8 @@
   width: 100vw;
   transform: translateX(00%);
   transition: .5s;
+  position: relative;
+  z-index: 2;
 }
 
 foot-image {
@@ -76,16 +81,8 @@ foot-image {
 
 .screen {
   display: flex;
-  height: calc(100vh - 19rem);
-  @include respond-to(mobile) {
-    height: calc(100vh - 29rem);
-  }
-  .ng-valid & {
-    height: calc(100vh - 26rem);
-    @include respond-to(mobile) {
-      height: calc(100vh - 36rem);
-    }
-  }
+  height: fit-content;
+  flex: 0 0 100vw;
 }
 
 .screen-section {
@@ -94,7 +91,7 @@ foot-image {
 
 .screen-container {
   width: 100vw;
-  height: 100%;
+  //height: 100%;
 }
 
 .screen-bg {
@@ -107,7 +104,8 @@ foot-image {
   border-radius: 4rem;
   background-color: $color-white;
   @include respond-to(mobile) {
-    width: 90%;
+    width: 100vw;
+    margin-bottom: 4.1rem;
   }
 }
 

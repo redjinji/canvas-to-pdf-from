@@ -14,14 +14,14 @@ module.exports = {
 		});
 		
 		app.get('/login', (req, res) => {
-			console.log('login');
+			// console.log('login');
 			// res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
 			res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
 			// res.sendFile(path.join(process.cwd() + '/client/index.html'));
 		});
 		
 		app.get('/form', (req, res) => {
-			console.log('form');
+			// console.log('form');
 			// res.sendFile(path.join(process.cwd() + '/charts6/src/index.html'));
 			res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/index.html'));
 			// res.sendFile(path.join(process.cwd() + '/client/index.html'));
@@ -55,6 +55,11 @@ module.exports = {
 			res.sendFile(path.join(process.cwd() + '/client/css/' + req.params.filename));
 		});
 		
+		app.get('/manifest.json', (req, res) => {
+			// console.log('manifest');
+			res.sendFile(path.join(process.cwd() + '/server/assets/manifest.json'));
+		});
+		
 		app.get('/temp_image/:filename', (req, res) => {
 			res.sendFile(path.join(process.cwd() + '/server/temp_image/' + req.params.filename));
 		});
@@ -77,7 +82,7 @@ module.exports = {
 		});
 		
 		app.get('/assets/favicons/:fileName', (req, res) => {
-			// console.log(req.params.fileName);
+			// console.log('assets favicon: ',req.params.fileName);
 			if (req.params.fileName !== 'undefined') {
 				res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/assets/favicons/' + req.params.fileName));
 			} else {
@@ -86,7 +91,7 @@ module.exports = {
 		});
 		
 		app.get('/:fileName', (req, res) => {
-			// console.log(req.params);
+			// console.log('file name: ',req.params);
 			if (req.params.fileName !== 'undefined') {
 				res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/' + req.params.fileName));
 			} else {

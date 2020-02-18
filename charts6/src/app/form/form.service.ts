@@ -132,7 +132,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                     id: 'movement-limitation-no',
                     label: 'לא'
                 },
-            
+
             ]
         }
     },
@@ -148,7 +148,8 @@ const FORM_ELEMENTS: IFormElement[] = [
                     parserData: 'FootCollapsed',
                     label: 'השטחה',
                     imgs: [
-                        {src: '../../../../assets/SoftwareIcons_FootCollapsed.png'}
+                        {src: '../../../../assets/footPrint/collapsed01.png'},
+                        {src: '../../../../assets/footPrint/collapsed02.png'}
                     ]
                 },
                 {
@@ -156,7 +157,8 @@ const FORM_ELEMENTS: IFormElement[] = [
                     parserData: 'FootHigh',
                     label: 'גבוהה',
                     imgs: [
-                        {src: '../../../../assets/SoftwareIcons_FootHigh.png'}
+                        {src: '../../../../assets/footPrint/high01.png'},
+                        {src: '../../../../assets/footPrint/high02.png'}
                     ]
                 },
                 {
@@ -164,7 +166,8 @@ const FORM_ELEMENTS: IFormElement[] = [
                     parserData: 'FootLow',
                     label: 'נמוכה',
                     imgs: [
-                        {src: '../../../../assets/SoftwareIcons_FootLow.png'}
+                        {src: '../../../../assets/footPrint/low01.png'},
+                        {src: '../../../../assets/footPrint/low02.png'}
                     ]
                 },
                 {
@@ -172,7 +175,8 @@ const FORM_ELEMENTS: IFormElement[] = [
                     parserData: 'FootNormal',
                     label: 'נורמאלית',
                     imgs: [
-                        {src: '../../../../assets/SoftwareIcons_FootNormal.png'}
+                        {src: '../../../../assets/footPrint/normal01.png'},
+                        {src: '../../../../assets/footPrint/normal02.png'}
                     ]
                 }
             ]
@@ -279,7 +283,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                         {
                             text: 'אחר',
                         }
-            
+
                     ]
                 }
             },

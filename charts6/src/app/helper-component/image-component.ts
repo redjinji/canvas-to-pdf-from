@@ -17,4 +17,5 @@ import {IImage} from "../form/form-elements-components";
 
 export class ImageComponent{
     @Input() image: IImage;
+    @Input() checked: boolean = false;
 }
