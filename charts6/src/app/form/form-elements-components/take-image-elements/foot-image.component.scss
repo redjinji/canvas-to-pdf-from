@@ -24,7 +24,8 @@ canvas {
   margin: 0 auto 1rem;
   display: none;
   @include respond-to(mobile) {
-    height: calc(95vw * 0.5625);
+    height: calc(95vw / 0.5625);
+    max-height: calc(100vh - 20rem);
   }
   @include respond-to(desktop) {
     margin: 0;
