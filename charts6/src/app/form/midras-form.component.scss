@@ -8,22 +8,34 @@
   padding: 1.5rem;
   z-index: 2;
   background: var(--bg-gradiant);
+  @include respond-to(mobile) {
+    display: flex;
+    justify-content: space-between;
+  }
 }
 
 .btn {
-  font-size: 2rem;
+  font-size: 1.9rem;
   color: var(--white);
   margin: 0 1rem;
   min-width: 8rem;
+
+  @include respond-to(mobile){
+    font-size: 1.6rem;
+  }
+
   &.disable {
     background-color: $color-unselected;
     visibility: hidden;
   }
+
   svg {
     width: 3rem;
     height: 3rem;
     color: var(--orange);
+    margin: 0 1rem;
   }
+
   &-next {
     svg {
       transform: rotate(180deg);
@@ -39,15 +51,15 @@
   width: 100%;
   height: fit-content;
   padding: 2rem 0 7rem;
-  background: var(--white);
   overflow: hidden;
 
-  @include respond-to(mobile){
+  @include respond-to(mobile) {
     padding-top: 0;
+    background-color: var(--white);
   }
 
   &:after {
-    //content: '';
+    content: '';
     background-image: url("/assets/SoftwareIcons_BG.png");
     background-size: cover;
     background-repeat: no-repeat;
@@ -57,6 +69,9 @@
     width: 100%;
     height: 100%;
     opacity: .5;
+    @include respond-to(mobile) {
+      content: initial;
+    }
   }
 }
 
@@ -68,6 +83,10 @@
   transition: .5s;
   position: relative;
   z-index: 2;
+
+  @include respond-to(mobile) {
+    background-color: var(--white);
+  }
 }
 
 foot-image {
@@ -102,6 +121,8 @@ foot-image {
   padding: 3rem;
   margin: auto;
   border-radius: 4rem;
+  background: var(--white);
+
   @include respond-to(mobile) {
     width: 100vw;
     margin-bottom: 4.1rem;
@@ -114,14 +135,11 @@ foot-image {
 }
 
 .title {
-  font-size: 3rem;
+  font-size: 2.6rem;
   margin-bottom: 3rem;
   padding: 0 3rem;
   font-weight: bold;
   color: $color-dark-blue;
-  @include respond-to(mobile) {
-    font-size: 3rem;
-  }
 }
 
 .subTitle {
@@ -135,6 +153,7 @@ foot-image {
   justify-content: center;
   flex-wrap: wrap;
 }
+
 .input-radio {
   margin: .5rem;
 }
@@ -149,6 +168,11 @@ foot-image {
   animation: slide-down 2.5s;
   bottom: 6.9rem;
   z-index: 2;
+
+  button {
+    border: .1rem solid;
+    border-radius: .6rem;
+  }
 }
 
 @keyframes slide-down {
@@ -156,7 +180,7 @@ foot-image {
     bottom: 50%;
     opacity: 0;
   }
-  30%{
+  30% {
     bottom: 50%;
     opacity: 1;
   }
@@ -180,6 +204,7 @@ foot-image {
     z-index: 5;
     opacity: 1;
   }
+
   .spinner {
     position: fixed;
     top: 50%;

@@ -2,22 +2,28 @@ header {
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;
-  width: 100%;
-  padding: 1rem;
-  position: sticky;
-  top: 0;
-  z-index: 5;
+  width: 80%;
+  padding: 1rem 0;
   background-color: var(--blue);
+  margin: auto;
 
   @include respond-to(mobile) {
-    flex-direction: column;
+    flex-direction: row-reverse;
+    width: 100%;
   }
 }
 
 .main-logo {
-  margin: .5rem;
+  margin: .5rem 0;
   display: block;
-  height: 8.6rem;
+  height: 8.7rem;
+  width: 16.6rem;
+
+  @include respond-to(mobile){
+    height: 6rem;
+    width: 11.4rem;
+    margin: .5rem 1rem;
+  }
 }
 
 .nav-elements {
@@ -26,15 +32,22 @@ header {
   justify-content: space-between;
   width: 40rem;
 
+  @include respond-to(desktop) {
+    margin-right: -2rem;
+  }
+
   &:before {
     content: '';
     width: 80%;
     position: absolute;
     border-top: .2rem solid $color-orange;
-    top: 3rem;
-    z-index: -1;
+    top: 3.3rem;
     left: 50%;
     transform: translateX(-50%);
+
+    @include respond-to(mobile){
+      width: 70%;
+    }
   }
 
   @include respond-to(mobile) {
@@ -48,15 +61,18 @@ header {
   font-size: 1.9rem;
   color: $color-white;
   padding: 0;
+  position: relative;
 
   @include respond-to(mobile) {
     min-width: auto;
+    font-size: 1.6rem;
+    margin: 0 1rem;
   }
 
   figure {
     margin: auto;
-    border: .2rem solid $color-orange;
-    background-color: $color-main;
+    border: .2rem solid var(--yellow);
+    background-color: var(--blue);
     border-radius: 5rem;
     padding: 1.6rem 0;
     width: 6rem;
@@ -65,6 +81,11 @@ header {
     justify-content: center;
     align-items: center;
     overflow: hidden;
+
+    @include respond-to(mobile){
+      width: 3.8rem;
+      height: 3.8rem;
+    }
   }
 
   svg {
@@ -73,11 +94,22 @@ header {
     margin: auto;
     fill: $color-white;
     margin-top: -.3rem;
+
+    @include respond-to(mobile){
+      height: 2rem;
+      width: 2rem;
+      margin-top: -.9rem;
+    }
   }
   &--leg svg{
     width: 5rem;
     height: 5rem;
     margin-top: -2rem;
+
+    @include respond-to(mobile){
+      height: 3.2rem;
+      width: 3.2rem;
+    }
   }
 }
 
@@ -91,5 +123,11 @@ header {
   svg {
     color: $color-blue;
     fill: $color-blue;
+  }
+}
+
+.nav-element__description {
+  @include respond-to(mobile){
+    display: none;
   }
 }

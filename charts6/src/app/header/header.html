@@ -9,7 +9,7 @@
 					<use xlink:href="assets/visuals.svg#home"></use>
 				</svg>
 			</figure>
-			<span>שאלות</span>
+			<span class="nav-element__description">שאלות</span>
 		</button>
 		<button [ngClass]="{'active':camera}" class="nav-item nav-item--camera" (click)="goto(8)">
 			<figure>
@@ -17,7 +17,7 @@
 					<use xlink:href="assets/visuals.svg#camera"></use>
 				</svg>
 			</figure>
-			<span>צילום</span>
+			<span class="nav-element__description">צילום</span>
 		</button>
 		<button [ngClass]="{'active':angel}" class="nav-item nav-item--leg" (click)="goto(9)">
 			<figure>
@@ -25,7 +25,7 @@
 					<use xlink:href="assets/visuals.svg#menu-leg"></use>
 				</svg>
 			</figure>
-			<span>זווית</span>
+			<span class="nav-element__description">זווית</span>
 		</button>
 		<button  [ngClass]="{'active':details}" class="nav-item" (click)="goto(10)">
 			<figure>
@@ -33,7 +33,7 @@
 					<use xlink:href="assets/visuals.svg#file"></use>
 				</svg>
 			</figure>
-			<span>פרטים אישיים</span>
+			<span class="nav-element__description">פרטים אישיים</span>
 		</button>
 	</nav>
 </header>
