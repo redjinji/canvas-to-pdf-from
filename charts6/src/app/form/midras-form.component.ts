@@ -29,7 +29,7 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
   url: string = `${environment.serverCall}/sendForm`;
 
   @ViewChild('screenContainer', { static: true }) screenContainer: ElementRef;
-  @ViewChild('overlaySpinner', { static: false }) overlaySpinner: ElementRef;
+  @ViewChild('overlaySpinner') overlaySpinner: ElementRef;
 
   constructor(private router: Router, private auth: UserAnthentityService,
               private formService: FormService,
