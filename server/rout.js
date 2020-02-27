@@ -60,6 +60,11 @@ module.exports = {
 			res.sendFile(path.join(process.cwd() + '/server/assets/manifest.json'));
 		});
 		
+		app.get('/latestpdf', (req, res) => {
+			// console.log('manifest');
+			res.sendFile(path.join(process.cwd() + '/server/assets/testMeText.html'));
+		});
+		
 		app.get('/temp_image/:filename', (req, res) => {
 			res.sendFile(path.join(process.cwd() + '/server/temp_image/' + req.params.filename));
 		});
