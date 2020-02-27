@@ -12,7 +12,7 @@ import {VideoService} from "./video.service";
 })
 
 export class VideosComponent implements OnInit{
-    @ViewChild('videoElement') video:ElementRef;
+    @ViewChild('videoElement', { static: true }) video:ElementRef;
     @Output() takePhoto = new EventEmitter();
     
     constructor(private videoService:VideoService){}

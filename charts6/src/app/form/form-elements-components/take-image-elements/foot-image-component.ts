@@ -12,7 +12,7 @@ import {FormControl, FormGroup} from "@angular/forms";
 })
 
 export class FootImageComponent implements OnInit, AfterViewInit {
-    @ViewChild('canvas') canvas: ElementRef;
+    @ViewChild('canvas', { static: true }) canvas: ElementRef;
     @ViewChildren('thumbnailGalleryItem') thumbnailGalleryItem: QueryList<any>;
     @Input() parentForm: FormGroup;
     
