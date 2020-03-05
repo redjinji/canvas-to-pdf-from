@@ -110,7 +110,9 @@ export class FootImageComponent implements OnInit, AfterViewInit {
           let canvasWidth = this.canvasParams.canvasWidth;
           let canvasHeight = this.canvasParams.canvasHeight;
           let currentImage = this.canvasParams.images[this.currentCameraInput];
-          if(this.isSamsungDevice && !isPlaceHolder) {
+          if(this.isSamsungDevice && !isPlaceHolder && false) {
+            console.log('draw rotate');
+
             // Samsung devices rotate images for browser. their bad my fix
             let x = this.canvasParams.canvasWidth / 2;
             let y = this.canvasParams.canvasHeight / 2;
@@ -118,6 +120,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
 
             this.rotateImage(this.canvasContext, x, y, rotateAngel, currentImage, canvasWidth, canvasHeight);
           } else {
+            console.log('draw regular');
             this.canvasContext.drawImage(currentImage, 0,0, canvasWidth, canvasHeight);
           }
         }
@@ -148,10 +151,12 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     }
 
     updateImageFromFile(event, index) {
-        let img = new Image();
-        img.onload = this.drew.bind(this, img, index);
-        img.onerror = this.failed;
-        img.src = URL.createObjectURL(event.target.files[0]);
+      window['loadImage'](event.target.files[0], img => {
+        this.drew(img, index)
+      }, {
+        maxWidth: this.canvasParams.canvasWidth,
+        orientation: true
+      });
     }
 
     updateFormWithImage(image, index) {

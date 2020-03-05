@@ -95,6 +95,15 @@ module.exports = {
 			}
 		});
 		
+		app.get('/assets/external-helpers/:fileName', (req, res) => {
+			// console.log('assets favicon: ',req.params.fileName);
+			if (req.params.fileName !== 'undefined') {
+				res.sendFile(path.join(process.cwd() + '/charts6/dist/charts6/assets/external-helpers/' + req.params.fileName));
+			} else {
+				res.sendStatus(404);
+			}
+		});
+		
 		app.get('/assets/favicons/:fileName', (req, res) => {
 			// console.log('assets favicon: ',req.params.fileName);
 			if (req.params.fileName !== 'undefined') {
