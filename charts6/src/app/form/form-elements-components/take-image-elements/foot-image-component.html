@@ -3,14 +3,14 @@
 	<div class="take-image__container">
 		<div class="take-image__thumbnail">
 			<div class="take-image__template"  *ngFor="let img of thumbnailGalleryAmount;let i = index">
-				
+
 				<div class="take-image__file">
 					<label class="choose-file__btn take-image__item">
 						<image-component class="choose-file__btn--icon" [image]="svgFile"></image-component>
 						<input (change)="updateImageFromFile($event,i)" type="file" accept="image/*">
 					</label>
 				</div>
-				
+
 				<div class="take-image__camera">
 					<div *ngIf="!isMobileDevice()" class="take-image__item--container">
 						<button class="choose-file__btn take-image__item" (click)="activateCamera($event,i)">
@@ -24,15 +24,15 @@
 							   capture="camera">
 					</label>
 				</div>
-				
+
 				<canvas width="100" #thumbnailGalleryItem height="100" (click)="updateMainImage(i)"	class="foot__image__thumbnail"></canvas>
 				<image-component *ngIf="thumbnailGalleryAmount[i].imageTaken" class="description-icon" [image]="thumbnailGalleryAmount[i]" ></image-component>
 			</div>
 		</div>
 	</div>
-	
+
 	<canvas #canvas [ngClass]="{'video-camera--on':!cameraOn}" (click)="updateLine($event)"
-			[width]="canvasParams.canvasWidth" [height]="canvasParams.canvasHight"></canvas>
-	
-	<video-capture *ngIf="!killVideo" (takePhoto)="captureImage($event)"></video-capture>
+			[width]="canvasParams.canvasWidth" [height]="canvasParams.canvasHeight"></canvas>
+
+	<video-capture *ngIf="!killVideo"></video-capture>
 </div>

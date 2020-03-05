@@ -4,9 +4,7 @@ import {VideoService} from "./video.service";
 @Component({
     selector: 'video-capture',
     template: `
-        <!--<div class="videoCroping">-->
-            <video (click)="captureImage()" autoplay="true" id="videoElement" #videoElement></video>
-        <!--</div>-->
+          <video (click)="captureImage()" autoplay="true" id="videoElement" #videoElement></video>
     `,
     styleUrls: ['./video.component.scss']
 })
@@ -14,13 +12,13 @@ import {VideoService} from "./video.service";
 export class VideosComponent implements OnInit{
     @ViewChild('videoElement', { static: true }) video:ElementRef;
     @Output() takePhoto = new EventEmitter();
-    
+
     constructor(private videoService:VideoService){}
-    
+
     ngOnInit(){
         this.activeVideo();
     }
-    
+
     activeVideo(){
         if (window.navigator.mediaDevices.getUserMedia) {
             var that = this;
@@ -36,10 +34,8 @@ export class VideosComponent implements OnInit{
             });
         }
     }
-    
+
     captureImage(){
-        // this.takePhoto.emit(this.video);
-        
         this.videoService.done(this.video.nativeElement);
     }
 }
