@@ -30,7 +30,6 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     thumbnailGalleryAmount = [];
     svgFile = [{svg: 'attached'}];
     svgCamera = [{svg: 'camera'}];
-    isSamsungDevice:boolean = navigator.userAgent.indexOf(' SM-') > -1;
 
     @HostListener('window:resize', ['$event'])
     onResize(event) {
@@ -93,16 +92,6 @@ export class FootImageComponent implements OnInit, AfterViewInit {
         this.updateCanvasElements();
     }
 
-    rotateImage(canvasContext, x, y, rotateAngel, currentImage, canvasWidth, canvasHeight){
-      canvasContext.translate(x, y);
-      canvasContext.rotate(rotateAngel); // clockwise
-      //x and y as width and height replaced because the core image is rotated so we need to compensate for it
-      canvasContext.drawImage(currentImage, -y, -x, canvasHeight, canvasWidth);
-      // reset rotation for next image
-      canvasContext.rotate(-rotateAngel); // counter clockwise
-      canvasContext.translate(-x, -y);
-    }
-
     updateCanvasElements(isPlaceHolder?) {
       this.canvasContext.clearRect(0,0,this.canvasParams.canvasWidth, this.canvasParams.canvasHeight);
         //image
@@ -110,19 +99,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
           let canvasWidth = this.canvasParams.canvasWidth;
           let canvasHeight = this.canvasParams.canvasHeight;
           let currentImage = this.canvasParams.images[this.currentCameraInput];
-          if(this.isSamsungDevice && !isPlaceHolder && false) {
-            console.log('draw rotate');
-
-            // Samsung devices rotate images for browser. their bad my fix
-            let x = this.canvasParams.canvasWidth / 2;
-            let y = this.canvasParams.canvasHeight / 2;
-            let rotateAngel = 90 * Math.PI / 180;
-
-            this.rotateImage(this.canvasContext, x, y, rotateAngel, currentImage, canvasWidth, canvasHeight);
-          } else {
-            console.log('draw regular');
-            this.canvasContext.drawImage(currentImage, 0,0, canvasWidth, canvasHeight);
-          }
+          this.canvasContext.drawImage(currentImage, 0,0, canvasWidth, canvasHeight);
         }
 
         //right
@@ -172,12 +149,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
 
     updateCanvasThumbnails(image, index, isPlaceHolders?) {
         let thumbContext = this.thumbnailGalleryItem.toArray()[index].nativeElement.getContext('2d');
-
-        if(this.isSamsungDevice && !isPlaceHolders){
-          this.rotateImage(thumbContext, 50, 50 , 90 * Math.PI / 180 ,image, 100, 100);
-        } else {
-          thumbContext.drawImage(image, 0, 0, 100, 100);
-        }
+        thumbContext.drawImage(image, 0, 0, 100, 100);
     }
 
     drew(image, index) {
