@@ -10,8 +10,8 @@ import {environment} from "../../environments/environment";
 import {FormNavigationService} from "./form-navigation.service";
 
 interface FormResponse {
-  status: string,
-  error?: any
+  status: string;
+  error?: any;
 }
 
 @Component({
@@ -79,13 +79,14 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
 
   sendForm() {
     if (this.parentForm.valid) {
-      let formData = new FormData();
-      let fieldAgent = JSON.parse(localStorage.getItem('userAuth'));
+      const formData = new FormData();
+      const fieldAgent = JSON.parse(localStorage.getItem('userAuth'));
 
       formData.append('fieldAgentName', fieldAgent.userName);
       formData.append('fieldAgentMail', fieldAgent.mail);
-      for (let formItem in this.parentForm.value) {
-        formData.append(formItem, this.parentForm.value[formItem] || '')
+      formData.append('submitTime', new Date().toLocaleString('he-il'));
+      for (const formItem in this.parentForm.value) {
+        formData.append(formItem, this.parentForm.value[formItem] || '');
       }
 
       this._http.post(this.url, formData).subscribe(
