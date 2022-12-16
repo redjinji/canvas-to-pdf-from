@@ -69,7 +69,7 @@ module.exports = {
 		}
 		
 		try {
-			this.puppetPdf(fields)
+			await this.puppetPdf(fields)
 			
 			const generatePdfPromise = callbackFunc(fields);
 			if (fields.email.indexOf('@') > -1 || fields.fieldAgentMail.indexOf('@') > -1) {
