@@ -34,6 +34,7 @@ module.exports = {
 	},
 	regeneratePdf: async function(req, res) {
 		await fs.readJson('server/assets/testMeText.json').then(async (json) => {
+			console.log('json from regenerate:',json)
 			await this.puppetPdf(json)
 			res('done')
 		})
@@ -41,6 +42,7 @@ module.exports = {
 	puppetPdf: async function (fields) {
 		const browser = await puppet.launch({
 				//remove security issue with chromium
+				headless: true,
 				args: [
 					'--no-sandbox',
 					'--disable-setuid-sandbox',
@@ -69,6 +71,7 @@ module.exports = {
 		}
 		
 		try {
+			console.log('fields from browser:',fields)
 			await this.puppetPdf(fields)
 			
 			const generatePdfPromise = callbackFunc(fields);

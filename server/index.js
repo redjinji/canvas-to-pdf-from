@@ -20,5 +20,8 @@ app.use(function(req, res, next) {
 });
 
 rout.rout(app);
-
-app.listen(port, () => console.log(`canvas listening on port ${port}!`));
+try {
+	app.listen(port, () => console.log(`canvas listening on port ${port}!`));
+} catch (e) {
+	console.log('cant listen',e)
+}
