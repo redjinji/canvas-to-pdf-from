@@ -34,7 +34,6 @@ module.exports = {
 	},
 	regeneratePdf: async function(req, res) {
 		await fs.readJson('server/assets/testMeText.json').then(async (json) => {
-			console.log('json from regenerate:',json)
 			await this.puppetPdf(json)
 			res('done')
 		})
@@ -55,7 +54,7 @@ module.exports = {
 		fs.writeFile('server/assets/testMeText.html', htmlToParce);
 		await page.setContent(htmlToParce);
 		
-		await page.emulateMedia('screen');
+		await page.emulateMediaType('screen');
 		await page.pdf({
 			path: 'server/pdfs/mypdf.pdf',
 			format: 'A4',
@@ -71,7 +70,6 @@ module.exports = {
 		}
 		
 		try {
-			console.log('fields from browser:',fields)
 			await this.puppetPdf(fields)
 			
 			const generatePdfPromise = callbackFunc(fields);
