@@ -13,9 +13,6 @@
     "type": "git",
     "url": "git+https://github.com/redjinji/canvas-to-pdf-from.git"
   },
-  "engines": {
-    "node": "12.16.2"
-  },
   "author": "tzafrir raveh",
   "license": "ISC",
   "bugs": {
