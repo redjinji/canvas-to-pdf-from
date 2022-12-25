@@ -96,7 +96,6 @@ module.exports = {
 					to: fields.email,
 					cc: fields.fieldAgentMail,
 					subject: 'הבדיקה שלך באקטיב8',
-					// text: 'תודה שבחרת בנו, אקטיב 8',
 					html: '<p>תודה שבחרת בנו<br/>אקטיב8</p>',
 					attachments: [
 						{
@@ -107,11 +106,8 @@ module.exports = {
 				};
 				
 				smtpTransport.sendMail(message, (err, info) => {
-					// console.log();
-					// console.log();
-					// console.log();
 					if(err){
-					console.log('err: ', err);
+						console.log('err: ', err);
 						reject(err);
 					} else {
 						console.log('info: ', info);
@@ -154,6 +150,7 @@ module.exports = {
 			
 			if (process.env.MAIN_CREDENTIALS) {
 				authorize(JSON.parse(process.env.MAIN_CREDENTIALS), uploadPdf, formFields, 'drive', DRIVE);
+				resolve({status: 'success'});
 			} else {
 				let error = 'drive credentials didn\'t found';
 				console.log('error drive: ', error);
@@ -180,6 +177,7 @@ module.exports = {
 			}, (err, res) => {
 				if (err) return console.log('The API returned an error: ' + err);
 				const rows = res.data.values;
+				console.log(rows)
 				if (rows.length) {
 					resolve(rows);
 				} else {

@@ -47,6 +47,10 @@ module.exports = {
 			pdfGenerate.init(req, res);
 		});
 		
+		app.get('/regenerateLastPdf', (req, res) => {
+			pdfGenerate.regeneratePdf(req, res);
+		});
+		
 		app.get('/js/:filename', (req, res) => {
 			res.sendFile(path.join(process.cwd() + '/client/js/' + req.params.filename));
 		});

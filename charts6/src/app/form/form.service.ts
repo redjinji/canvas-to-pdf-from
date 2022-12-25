@@ -29,60 +29,6 @@ const FORM_ELEMENTS: IFormElement[] = [
         }
     },
     {
-        title: 'מקור הגעה',
-        radio: {
-            name: 'referred',
-            elements: [
-                {
-                    id: 'walkIn',
-                    label: 'מזדמן'
-                },
-                {
-                    id: 'advertising',
-                    label: 'פרסום'
-                },
-                {
-                    id: 'myPatient',
-                    label: 'מטופל שלי'
-                },
-                {
-                    id: 'other-referred',
-                    label: 'אחר',
-                    other: true
-                }
-            ]
-        }
-    },
-    {
-        title: 'ביטוח בריאות',
-        radio: {
-            name: 'insurance',
-            elements: [
-                {
-                    id: 'clalit',
-                    label: 'כללית',
-                },
-                {
-                    id: 'macabi',
-                    label: 'מכבי'
-                },
-                {
-                    id: 'meuhedet',
-                    label: 'מאוחדת'
-                },
-                {
-                    id: 'leumit',
-                    label: 'לאומית'
-                },
-                {
-                    id: 'other-insurance',
-                    label: 'אחר',
-                    other: true
-                }
-            ]
-        }
-    },
-    {
         title: 'האם קיימת פתולוגיה או תלונות כאב',
         textarea: {
             id: 'patalog',
@@ -260,6 +206,51 @@ const FORM_ELEMENTS: IFormElement[] = [
             },
             {
                 select: {
+                    label: 'מקור הגעה',
+                    name: 'referred',
+                    id: 'referred',
+                    options: [
+                        {
+                            text: 'מזדמן'
+                        },
+                        {
+                            text: 'פרסום'
+                        },
+                        {
+                            text: 'מטופל שלי'
+                        },
+                        {
+                            text: 'אחר',
+                        }
+                    ]
+                }
+            },
+            {
+                select: {
+                    label: 'ביטוח',
+                    name: 'insurance',
+                    id: 'insurance',
+                    options: [
+                        {
+                            text: 'כללית',
+                        },
+                        {
+                            text: 'מכבי'
+                        },
+                        {
+                            text: 'מאוחדת'
+                        },
+                        {
+                            text: 'לאומית'
+                        },
+                        {
+                            text: 'אחר',
+                        }
+                    ]
+                }
+            },
+            {
+                select: {
                     label: 'סוג מדרס',
                     id: 'midras-type',
                     name: 'midras-type',
@@ -341,6 +332,14 @@ const FORM_ELEMENTS: IFormElement[] = [
                     name: 'weight',
                     type: 'number',
                     label: 'משקל'
+                }
+            },
+            {
+                textarea: {
+                    id: 'comments',
+                    length: 10000,
+                    placeHolder: 'הערות כלליות',
+                    rows: 5,
                 }
             }
         ]
