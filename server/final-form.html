@@ -17,13 +17,23 @@
 		html {
 			font-size: 10px;
 			font-family: 'Alef', sans-serif;
-			/* Explicit line-height: Chromium's default ('normal') line-height for the Alef
-			   webfont grew slightly between Chromium 106 (Puppeteer 17) and Chromium 151
-			   (Puppeteer 25), which compounds across every stacked text block on the page
+			/* Explicit line-height: `pdffonts` on the Task 1 baseline PDF (Puppeteer 17 /
+			   Chromium 106) shows every glyph embedded as Arial - the Alef webfont requested
+			   above never actually applied; the baseline shipped in a silent font-fallback
+			   state. Under Puppeteer 25 / Chromium 151, Alef DOES load and apply (confirmed via
+			   `pdffonts` on a fresh render), and Alef's normal line box is taller than Arial's.
+			   That per-line growth compounds across every stacked text block on the page
 			   (header details, form-selections list, diagnosis text, figcaptions) and was
 			   enough to push the footer business-card onto a second page that pageRanges
-			   silently drops. Pinning it removes the browser-version dependency and restores
-			   single-page fit; value chosen empirically to match the pre-upgrade layout.
+			   silently drops. This is a font-substitution change (Arial fallback -> real Alef),
+			   not Alef's own line-height changing between browser versions. Pinning line-height
+			   compensates for Alef's taller line box and restores single-page fit for the
+			   fixture; value chosen empirically to match the pre-upgrade layout. Note: the
+			   resulting Alef rendering (visible in e.g. old-style figures in digits) vs the
+			   baseline's accidental Arial rendering is an intentional, accepted difference -
+			   Alef is what this template actually requests, and production never had Arial.
+			   See server/pdfGenerate.js (puppetPdf) for the accompanying dynamic scale-to-fit
+			   safety net that covers longer real-world submissions beyond this fixture.
 			*/
 			line-height: 1.03;
 		}

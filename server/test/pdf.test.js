@@ -1,45 +1,105 @@
 // server/test/pdf.test.js
-// Regression guard for the Task 7 (Puppeteer 25 upgrade) A4-overflow bug: Chromium's default
-// line-height for the Alef webfont grew slightly across the Puppeteer 17 -> 25 (Chromium 106 ->
-// 151) upgrade, which - compounded across every stacked text block on the page - was enough to
-// push the footer (business contact bar: active8.il / phone numbers / active8.co.il) onto a
-// second PDF page that `pageRanges: '1'` then silently discarded. Fixed via an explicit
-// `line-height` in server/final-form.html. This test renders the same fixture used for the
-// Task 1 baseline and asserts the output still looks like a complete, single-page PDF.
+// Regression guard for the Task 7 (Puppeteer 25 upgrade) A4-overflow bug: `pdffonts` on the Task 1
+// baseline PDF (Puppeteer 17 / Chromium 106) shows every glyph embedded as Arial - the `Alef`
+// webfont requested by server/final-form.html never actually applied, i.e. the baseline shipped in
+// a silent font-fallback state. Under Puppeteer 25 / Chromium 151, Alef DOES load and apply
+// (confirmed via `pdffonts` on a fresh render), and Alef's normal line box is taller than Arial's.
+// That per-line growth, compounded across every stacked text block on the page, was enough to push
+// the footer (business contact bar: active8.il / phone numbers / active8.co.il) onto a second PDF
+// page that `pageRanges: '1'` then silently discarded. This is a font-substitution change (Arial
+// fallback -> real Alef), not "Alef's own line-height changing between browser versions."
 //
-// Threshold rationale: `contentHeightMm` (returned by puppetPdf, see the comment above its
-// computation in server/pdfGenerate.js) is a *pre-print* proxy measured in 'screen' media before
-// Chrome's printToPDF pipeline scales the page down to fit the A4 width - it runs well above the
-// true ~292-297mm printed height, so it cannot be compared directly to 297. It is, however, a
-// stable, deterministic value for this fixture: it measured ~326mm after the line-height fix and
-// ~340mm before it (the broken state that lost the footer). 333mm sits roughly halfway between
-// those two measured points, giving headroom in both directions to absorb minor environment
-// variance while still catching a real regression before it silently reoccurs.
+// Fixed two ways in server/pdfGenerate.js#puppetPdf:
+//  1. An explicit `line-height: 1.03` on `html` in final-form.html compensates for Alef's taller
+//     line box, restoring single-page fit for the fixture (see that file for its own derivation
+//     comment).
+//  2. A dynamic scale-to-fit safety net (see the NO_SCALE_MM / SCALE_TARGET_MM / SCALE_POWER
+//     derivation comment in pdfGenerate.js) shrinks the printed page whenever measured content
+//     exceeds the true single-page boundary, so longer real-world submissions (extra lines in
+//     patalog/comments) degrade to a slightly smaller single page instead of silently losing the
+//     footer - which a code reviewer found still happened with only the line-height fix and a
+//     static content-height *assertion* (no correction), since realistic submissions have only
+//     ~3.3mm of headroom past the fixture.
+//
+// This file exercises both: the fixture case proves typical submissions are unaffected (scale 1,
+// footer comfortably within the boundary), and the long-text case reproduces the reviewer's
+// 3-line-patalog scenario and proves the safety net actually engages and keeps the footer on the
+// page.
 const { test, after } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const pdfGenerate = require('../pdfGenerate');
-const fields = require('./fixtures/sample-fields.json');
+const fixtureFields = require('./fixtures/sample-fields.json');
 
-const CONTENT_HEIGHT_MM_MAX = 333;
-const outPath = path.join('server', 'pdfs', '_pdf.test.tmp.pdf');
+const fixtureOutPath = path.join(os.tmpdir(), 'canvas-to-pdf-test-fixture.pdf');
+const longTextOutPath = path.join(os.tmpdir(), 'canvas-to-pdf-test-longtext.pdf');
 
 after(() => {
-    fs.rm(outPath, { force: true }, () => {});
+    fs.rmSync(fixtureOutPath, { force: true });
+    fs.rmSync(longTextOutPath, { force: true });
 });
 
-test('puppetPdf renders a single-page PDF with the footer intact (no A4 overflow regression)', async () => {
-    const { contentHeightMm } = await pdfGenerate.puppetPdf(fields, outPath);
+test('puppetPdf renders the fixture at scale 1 with the footer within the single-page boundary', async () => {
+    const { contentHeightMm, scale, footerBottomMm } = await pdfGenerate.puppetPdf(fixtureFields, fixtureOutPath);
 
-    assert.ok(fs.existsSync(outPath), 'PDF file should have been written');
-    const { size } = fs.statSync(outPath);
+    assert.ok(fs.existsSync(fixtureOutPath), 'PDF file should have been written');
+    const { size } = fs.statSync(fixtureOutPath);
+    assert.ok(size > 50 * 1024, `PDF should be a real render, not empty/broken (got ${size} bytes)`);
+
+    assert.strictEqual(
+        scale, 1,
+        `expected the fixture (contentHeightMm=${contentHeightMm}) to print unscaled - it is a ` +
+        'typical submission and should look identical to the pre-safety-net render'
+    );
+    assert.ok(
+        footerBottomMm <= pdfGenerate.NO_SCALE_MM,
+        `footer bottom (${footerBottomMm}mm) should fit within the empirically-measured single-page ` +
+        `boundary (${pdfGenerate.NO_SCALE_MM}mm) at scale 1 - see the derivation comment in ` +
+        'pdfGenerate.js for how that boundary was found'
+    );
+});
+
+test('puppetPdf scales down a long pathology description so the footer still fits', async () => {
+    // Reproduces the reviewer's finding: a realistic multi-line patalog ("describe pain location /
+    // pathology") field alone, with no other change, pushes content well past the single-page
+    // boundary. This ~200-character Hebrew description wraps to 3 lines in the form's answer
+    // column, matching the reviewer's "3-line patalog field" repro.
+    const longTextFields = Object.assign({}, fixtureFields, {
+        patalog: 'דלקת בגיד אכילס בעקב שמאל עם הגבלה בטווח התנועה של הקרסול, כאבים משמעותיים ' +
+            'בהליכה ובעמידה ממושכת, נפיחות קלה באזור העקב, רגישות במישוש, היסטוריה של פציעות ' +
+            'חוזרות באזור זה בשנתיים האחרונות הדורשות מעקב',
+    });
+
+    const { contentHeightMm, scale, footerBottomMm } = await pdfGenerate.puppetPdf(longTextFields, longTextOutPath);
+
+    assert.ok(fs.existsSync(longTextOutPath), 'PDF file should have been written');
+    const { size } = fs.statSync(longTextOutPath);
     assert.ok(size > 50 * 1024, `PDF should be a real render, not empty/broken (got ${size} bytes)`);
 
     assert.ok(
-        contentHeightMm <= CONTENT_HEIGHT_MM_MAX,
-        `content height grew to ${contentHeightMm}mm (max ${CONTENT_HEIGHT_MM_MAX}mm) - ` +
-        `this is the same failure mode that pushed the footer off the printed page; ` +
-        `see the comment at the top of this file`
+        contentHeightMm > pdfGenerate.NO_SCALE_MM,
+        `expected this long-text fixture (contentHeightMm=${contentHeightMm}) to exceed the ` +
+        `single-page boundary (${pdfGenerate.NO_SCALE_MM}mm) - otherwise it isn't exercising the ` +
+        'safety net at all'
+    );
+    assert.ok(
+        scale < 1,
+        `expected the safety net to engage (scale < 1) for contentHeightMm=${contentHeightMm}, got scale=${scale}`
+    );
+    // footerBottomMm is measured pre-scale (same proxy units as contentHeightMm/NO_SCALE_MM); the
+    // print-time `scale` passed to page.pdf() shrinks the whole page proportionally, so
+    // footerBottomMm * scale is the same proxy's estimate of where the footer lands after
+    // shrinking. Asserting it against NO_SCALE_MM - the same boundary a scale-1 page must stay
+    // under to keep its footer on page 1 - reasons about the scaled page the same way an unscaled
+    // one is judged. (This scale was also independently verified against real, unrestricted
+    // Puppeteer renders bisected on page.pdf()'s `scale` option - see the derivation comment in
+    // pdfGenerate.js - and against a real render of this exact scenario read back visually.)
+    assert.ok(
+        footerBottomMm * scale <= pdfGenerate.NO_SCALE_MM,
+        `scaled footer position (${footerBottomMm} * ${scale} = ${footerBottomMm * scale}mm) should ` +
+        `fit within the single-page boundary (${pdfGenerate.NO_SCALE_MM}mm) - the safety net should ` +
+        'leave enough margin that the footer survives, not just barely graze the edge'
     );
 });
