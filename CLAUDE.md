@@ -89,7 +89,7 @@ stdin** to complete the OAuth flow and prints the token to the console for you t
   agent's name/mail from `localStorage.userAuth` and a Hebrew-locale timestamp) and POSTs to
   `${environment.serverCall}/sendForm`.
 - Auth: `login/user-anthentity.service.ts` POSTs credentials to `/get-user-sheets`;
-  `LoginRouteActivatorService` guards the `/form` route. Login state is the in-memory
+  the functional `loginGuard` (exported from `charts6/src/app/login/login-route-activator.ts`) guards the `/form` route. Login state is the in-memory
   `loginAlready` flag (lost on refresh) plus `localStorage.userAuth`.
 - `environment.serverCall` is `http://localhost:3000` in dev and `''` (same-origin) in prod
   (`environment.prod.ts`, swapped in via `fileReplacements` in the `production` build configuration,
