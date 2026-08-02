@@ -1,4 +1,4 @@
-import {Component} from "@angular/core";
+import {ChangeDetectorRef, Component} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {FormNavigationService} from "../form/form-navigation.service";
 import {UserAnthentityService} from "../login";
@@ -14,8 +14,12 @@ export class Header {
   angel: boolean = false;
   details: boolean = false;
 
-  constructor(private formNavigationService: FormNavigationService, public auth: UserAnthentityService) {
+  constructor(private formNavigationService: FormNavigationService, public auth: UserAnthentityService, private cdr: ChangeDetectorRef) {
     formNavigationService.navigate.subscribe(this.activeIcon.bind(this));
+  }
+
+  ngDoCheck() {
+    this.cdr.detectChanges();
   }
 
   activeIcon(param) {

@@ -1,0 +1,9 @@
+<div *ngFor="let elem of customerForm" [ngClass]="elem.class" [formGroup]="parentForm" class="input__container">
+	<div class="radios__container" *ngIf="elem.radio">
+		<input-radio [parentForm]="parentForm" [radio]="elem.radio"></input-radio>
+	</div>
+	<textarea-component [parentForm]="parentForm" *ngIf="elem.textarea" [ta]="elem.textarea"></textarea-component>
+	<input-component [parentForm]="parentForm" *ngIf="elem.input" [inputElem]="elem.input"></input-component>
+	<input-birthday [parentForm]="parentForm" *ngIf="elem.inputBirthday" [inputBirthday]="elem.inputBirthday"></input-birthday>
+	<select-component [parentForm]="parentForm" *ngIf="elem.select" [selectElem]="elem.select"></select-component>
+</div>

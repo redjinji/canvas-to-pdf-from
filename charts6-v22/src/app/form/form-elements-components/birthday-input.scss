@@ -1,0 +1,19 @@
+@import "../../style/varible";
+@import "../../style/mixin-mediaQuery";
+
+.birthday__container {
+  display: flex;
+  flex-direction: column;
+}
+.birthday--inputs {
+  display:flex;
+  justify-content: flex-end;
+  flex-direction: row-reverse;
+}
+.birthday--inputs input {
+  width: 28%;
+  margin: 0 .25rem;
+  @include respond-to(mobile) {
+    width: 40%;
+  }
+}
