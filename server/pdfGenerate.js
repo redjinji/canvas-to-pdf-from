@@ -33,7 +33,7 @@ const { formidable } = require('formidable'),
 // lands on printed page 1"; a second, empty trailing page is fine. Judged against that corrected
 // criterion, fix round 2's power-of-5 curve was badly over-corrected - independently re-bisected
 // here (via real, unrestricted `page.pdf({scale})` renders, checking with `pdftotext -bbox-layout`
-// + `pdfinfo` which physical page the footer's ".business-card" text lands on) at three magnitudes:
+// which physical page the footer's ".business-card" text lands on) at three magnitudes:
 //   contentHeightMm=329.66 -> footer-on-page-1 needs scale <= ~1.00   (old ^5 curve applied 0.9629)
 //   contentHeightMm=336.05 -> footer-on-page-1 needs scale <= ~0.978  (old ^5 curve applied 0.8724)
 //   contentHeightMm=381.84 -> footer-on-page-1 needs scale <= ~0.850  (old ^5 curve applied 0.4606,
@@ -46,16 +46,41 @@ const { formidable } = require('formidable'),
 // fixture untouched, so anchoring the ratio's target *above* the fixture height was never
 // necessary. A plain linear ratio is sufficient once anchored correctly:
 //   scale = Math.min(1, TARGET_MM / contentHeightMm)
-// With TARGET_MM=324 this gives scale ~0.983 / ~0.964 / ~0.849 at the three points above -
-// comfortably inside the empirically-measured safe region at each (re-verified directly against
-// real renders, not just the arithmetic). Note this is a local calibration: spot-checked well
-// beyond these points (a ~473mm synthetic case) the plain ratio's margin shrinks and can invert -
-// this formula is tuned for the realistic long-submission range demonstrated above, not proven
-// safe at arbitrary overflow. See task-7-report.md, "Fix round 3" for the full data.
+//
+// Derivation (fix round 4) - choosing TARGET_MM. Fix round 3 picked 324 from three calibration
+// points that all sat at or below ~382mm, and a spot-check further out suggested the margin
+// shrank. Re-review pushed on that, and a full bisection sweep (this round, and independently by
+// the reviewer, in agreement) shows 324 is in fact *unsafe* just past ~388mm. For each content
+// height the true maximum scale that still puts the footer on printed page 1 was bisected (16
+// iterations, real `page.pdf({scale})` renders with pageRanges disabled, footer page read back
+// with `pdftotext -bbox-layout`); multiplying that by the content height gives the largest
+// TARGET_MM that would have been safe at that point ("implied-safe TARGET_MM"), which declines
+// monotonically as content grows:
+//   contentHeightMm=388.375 -> max safe scale 0.83500 -> implied-safe TARGET_MM 324.29
+//   contentHeightMm=401.456 -> max safe scale 0.80508 -> implied-safe TARGET_MM 323.20
+//   contentHeightMm=414.536 -> max safe scale 0.77773 -> implied-safe TARGET_MM 322.40
+//   contentHeightMm=437.427 -> max safe scale 0.73349 -> implied-safe TARGET_MM 320.85
+//   contentHeightMm=463.587 -> max safe scale 0.68892 -> implied-safe TARGET_MM 319.38
+//   contentHeightMm=476.668 -> max safe scale 0.66884 -> implied-safe TARGET_MM 318.82
+// So TARGET_MM=324 crosses into "footer lost on page 2" at roughly 388-390mm of content - well
+// inside reach, since the frontend's free-text fields accept up to 10,000 characters each and the
+// ~1,000-character pathology description used by the new regression test already measures 401mm.
+// TARGET_MM=318 sits below every implied-safe value measured above, so it is verified safe across
+// the whole sweep. Its cost on realistic submissions is negligible: at the 336mm long-text point
+// it prints at scale 0.946 instead of 0.964.
+//
+// Honest statement of what is and isn't verified: safety is empirically demonstrated from the
+// NO_SCALE_MM gate through ~477mm of measured content. Beyond that the implied-safe series is
+// still declining, so 318 is expected to go unsafe somewhere past ~480mm; that region is NOT
+// verified. Reaching it requires several thousand characters of free text, which the UI permits
+// (maxLength 10000 per textarea) and the server does not cap. Capping submitted free-text length
+// server-side is the right hardening for that tail and is deliberately left as future work rather
+// than smuggled into this task. See task-7-report.md, "Fix round 4" for the full data.
 const NO_SCALE_MM = 329.5; // below this, content already fits at scale 1 - no correction applied
-const TARGET_MM = 324; // linear ratio target; empirically verified (see derivation above) to give
-                        // enough correction at realistic overflow magnitudes while the NO_SCALE_MM
-                        // gate (not this constant) is what keeps the fixture untouched
+const TARGET_MM = 318; // linear ratio target; empirically verified (see derivation above) to stay
+                        // inside the measured safe region across the whole 330-477mm overflow
+                        // sweep, while the NO_SCALE_MM gate (not this constant) is what keeps
+                        // typical/fixture submissions untouched at scale 1
 
 module.exports = {
 	init: function (req, res) {
@@ -92,10 +117,13 @@ module.exports = {
 	NO_SCALE_MM,
 	TARGET_MM,
 	puppetPdf: async function (fields, outPath = 'server/pdfs/mypdf.pdf', options = {}) {
-		// pageRanges defaults to '1' (existing behavior: print only physical page 1). Callers can
-		// pass { pageRanges: '' } (or undefined) to print every physical page instead - used by
-		// server/test/pdf.test.js's real end-to-end check, which needs to see the *whole* rendered
-		// document to confirm it is truly only 1 physical page, not just that page 1 was printed.
+		// pageRanges defaults to '1' (existing behavior: print only physical page 1). Pass an
+		// explicit empty string ({ pageRanges: '' }) to print every physical page instead; omitting
+		// the key (or passing undefined) takes the '1' default, since that is how the destructuring
+		// default below behaves. The empty-string form is used by server/test/pdf.test.js's real
+		// end-to-end checks, which need to see the *whole* rendered document so they can tell which
+		// physical page the footer actually landed on - the invariant that matters (a trailing empty
+		// page is fine and expected; see the derivation comment above).
 		const { pageRanges = '1' } = options;
 		const browser = await puppet.launch({
 				//remove security issue with chromium
