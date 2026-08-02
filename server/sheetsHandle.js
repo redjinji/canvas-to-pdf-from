@@ -18,7 +18,7 @@ module.exports = {
 		var form = new formidable.IncomingForm();
 		form.parse(req, function (err, fields, files) {
 			var userToAuth = fields;
-			const users = googleApi.getUserSheets;
+			const users = googleApi.getUserSheets();
 			users.then(function (usersData) {
 				console.log(usersData);
 				const user = usersData.filter(function (user) {

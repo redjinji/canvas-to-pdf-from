@@ -159,8 +159,8 @@ module.exports = {
 		})
 	},
 	
-	getUserSheets: new Promise(function (resolve, reject) {
-		
+	getUserSheets: function () { return new Promise(function (resolve, reject) {
+
 		if (process.env.MAIN_CREDENTIALS) {
 			authorize(JSON.parse(process.env.MAIN_CREDENTIALS), listMajors, '', 'spreadsheets', SHEET);
 		} else {
@@ -168,7 +168,7 @@ module.exports = {
 			console.log('error sheets: ', error);
 			reject(error);
 		}
-		
+
 		function listMajors(auth) {
 			const sheets = google.sheets({version: 'v4', auth});
 			sheets.spreadsheets.values.get({
@@ -185,5 +185,5 @@ module.exports = {
 				}
 			});
 		}
-	})
+	}); }
 };
