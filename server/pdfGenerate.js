@@ -1,4 +1,4 @@
-const formidable = require('formidable'),
+const { formidable } = require('formidable'),
 	googleApi = require('./google_api'),
 	fs = require('fs-extra'),
 	puppet = require('puppeteer'),
@@ -7,29 +7,26 @@ const formidable = require('formidable'),
 
 module.exports = {
 	init: function (req, res) {
-		
-		var form = new formidable.IncomingForm({
-			uploadDir: process.cwd() + '/server/temp_image',
-			keepExtensions: true,
-		});
+		const uploadDir = process.cwd() + '/server/temp_image';
+		fs.ensureDirSync(uploadDir);
+		const form = formidable({ uploadDir, keepExtensions: true });
 		form.on('fileBegin', function (name, file) {
-			file.path = process.cwd() + '/server/temp_image/' + file.name;
-		});
-		
-		form.addListener('file', function (name, file) {
+			file.filepath = uploadDir + '/' + file.originalFilename;
 		});
 		form.parse(req, function (err, fields, files) {
-			fs.writeFile('server/assets/testMeText.json', JSON.stringify(fields));
 			if (err) {
 				// Check for and handle any errors here.
 				console.error('error parse: ', err.message);
 				return;
 			}
-			this.generatePdf(googleApi.sendToDrive, fields, res);
+			const single = {};
+			for (const [k, v] of Object.entries(fields)) single[k] = Array.isArray(v) ? v[0] : v;
+			fs.writeFile('server/assets/testMeText.json', JSON.stringify(single));
+			this.generatePdf(googleApi.sendToDrive, single, res);
 		}.bind(this));
-		
+
 		// res.sendFile(path.join(process.cwd() + '/client/index.html'));
-		
+
 		// res.end();
 	},
 	regeneratePdf: async function(req, res) {

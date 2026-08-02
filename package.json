@@ -22,7 +22,7 @@
   "dependencies": {
     "angular-template": "^2.4.0",
     "express": "^5.2.1",
-    "formidable": "^1.2.1",
+    "formidable": "^3.5.4",
     "fs-extra": "^11.4.0",
     "googleapis": "^39.2.0",
     "nodemailer": "^9.0.3",

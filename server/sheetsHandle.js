@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const formidable = require('formidable');
+const { formidable } = require('formidable');
 const googleApi = require('./google_api');
 
 module.exports = {
@@ -15,9 +15,10 @@ module.exports = {
 	},
 	
 	getSheets: function (req, res) {
-		var form = new formidable.IncomingForm();
+		var form = formidable();
 		form.parse(req, function (err, fields, files) {
-			var userToAuth = fields;
+			var userToAuth = {};
+			for (const [k, v] of Object.entries(fields)) userToAuth[k] = Array.isArray(v) ? v[0] : v;
 			const users = googleApi.getUserSheets();
 			users.then(function (usersData) {
 				console.log(usersData);
