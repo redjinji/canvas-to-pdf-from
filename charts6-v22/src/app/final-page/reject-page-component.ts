@@ -1,12 +1,13 @@
 import {Component} from "@angular/core";
+import {Router} from "@angular/router";
 
-// PLACEHOLDER: minimal stand-in so app.routes.ts can route 'reject-form' ->
-// RejectPageComponent before the final pages are ported. Task 13 ports the real
-// component from charts6/src/app/final-page/reject-page-component.ts (+ .html/.scss)
-// and overwrites this file.
 @Component({
-  selector: 'reject-form-page',
-  template: ''
+    selector: 'reject-form-page',
+    templateUrl: './reject-form-page.html',
+    styleUrls: ['./reject-form-page.scss']
 })
+
 export class RejectPageComponent {
+    constructor(private router:Router){
+    }
 }

@@ -1,12 +1,14 @@
 import {Component} from "@angular/core";
+import {Router} from "@angular/router";
 
-// PLACEHOLDER: minimal stand-in so app.routes.ts can route 'success-form' ->
-// SuccessPageComponent before the final pages are ported. Task 13 ports the real
-// component from charts6/src/app/final-page/success-page-component.ts (+ .html/.scss)
-// and overwrites this file.
 @Component({
-  selector: 'success-form-page',
-  template: ''
+    selector: 'success-form-page',
+    templateUrl: './success-form-page.html',
+    styleUrls: ['./success-form-page.scss']
 })
+
 export class SuccessPageComponent {
+    constructor(private router:Router){
+    }
+
 }

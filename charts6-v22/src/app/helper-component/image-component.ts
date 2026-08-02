@@ -1,15 +1,23 @@
-import {Component, Input} from "@angular/core";
+import {AfterContentInit, Component, Input, OnInit} from "@angular/core";
+import {CommonModule} from "@angular/common";
+import {IImage} from "../form/form-elements-components/form-interface";
 
-// PLACEHOLDER: minimal stand-in so RadioComponent (ported in Task 12) can resolve its
-// <image-component> template dependency before the real component is ported. Task 13 ports
-// the real, byte-identical component from charts6/src/app/helper-component/image-component.ts
-// (+ .html) and overwrites this file. Kept selector/inputs shape-compatible so callers bind
-// cleanly; template intentionally inert (renders nothing) until then.
 @Component({
-  selector: 'image-component',
-  template: ''
+    selector: 'image-component',
+    imports: [CommonModule],
+    templateUrl: './image-component.html',
+    styles: [`
+    img {
+        width: 100%;
+    }
+    svg {
+        width: 100%;
+        height: 100%;
+    }
+    `]
 })
-export class ImageComponent {
-  @Input() image: any;
-  @Input() checked: boolean = false;
+
+export class ImageComponent{
+    @Input() image: IImage;
+    @Input() checked: boolean = false;
 }
