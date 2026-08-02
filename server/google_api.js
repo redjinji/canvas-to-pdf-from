@@ -71,6 +71,7 @@ module.exports = {
 			} else {
 				let error = 'Gmail credentials didn\'t found';
 				console.log(error);
+				reject(new Error(error));
 			}
 			
 			function sendMail(oAuth2Client, dataForCallback, credentials) {

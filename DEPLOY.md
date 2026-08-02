@@ -15,13 +15,14 @@
    `DRIVE_TOKEN`, `SHEET_TOKEN`, `SPEADSHEET_ID`, `DRIVE_UPLOAD_FOLDER`, `senderMail`.
 4. **Smoke test after deploy**: open `/login`, log in, submit a test form, and confirm the email
    arrives and the PDF lands in the Drive folder. Also eyeball the PDF itself — this upgrade
-   changed how Chrome renders the form's webfont (see the PR description / CLAUDE.md PDF rendering
-   notes) — digits and Latin text now render in Alef instead of falling back to Arial.
+   changed how Chrome renders the form's webfont (see the PR description's "PDF rendering notes"
+   section and the derivation comments above `puppetPdf` in `server/pdfGenerate.js`) — digits and
+   Latin text now render in Alef instead of falling back to Arial.
 
 ## Local verification before deploying
 
 - `npm test` from the repo root runs the full smoke + PDF regression suite without any Google
-  credentials configured (8 tests). It exercises the Puppeteer render path directly, so Chromium
+  credentials configured (10 tests). It exercises the Puppeteer render path directly, so Chromium
   must be installed locally (`npx puppeteer browsers install chrome` if `npm install` skipped the
   download).
 - To verify the credentialed flows (Sheet login, email send, Drive upload) that `npm test`

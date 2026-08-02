@@ -107,10 +107,14 @@ module.exports = {
 		// res.end();
 	},
 	regeneratePdf: async function(req, res) {
-		await fs.readJson('server/assets/testMeText.json').then(async (json) => {
-			await this.puppetPdf(json)
-			res('done')
-		})
+		try {
+			const json = await fs.readJson('server/assets/testMeText.json');
+			await this.puppetPdf(json);
+			res.send('done');
+		} catch (e) {
+			console.error('regeneratePdf error:', e);
+			res.status(500).json({ status: 'fail', error: e && e.message ? e.message : String(e) });
+		}
 	},
 	// Exposed so server/test/pdf.test.js asserts against the same single source of truth rather
 	// than duplicated magic numbers. See the derivation comment above for what each one means.
@@ -135,66 +139,84 @@ module.exports = {
 				]
 			}
 		);
-		const page = await browser.newPage();
+		// Everything from here on is wrapped in try/finally so the Chromium process launched above is
+		// always closed - including when rendering throws (e.g. a template error from a malformed
+		// submission missing an expected field). Without this, a single bad render leaks a whole
+		// Chromium process that outlives the request and is never cleaned up; repeated failures
+		// accumulate leaked processes without bound.
+		try {
+			const page = await browser.newPage();
 
-		const htmlToParce = htmlTemplate(__dirname + '/final-form.html', fields);
-		fs.writeFile('server/assets/testMeText.html', htmlToParce);
-		await page.setContent(htmlToParce);
+			const htmlToParce = htmlTemplate(__dirname + '/final-form.html', fields);
+			fs.writeFile('server/assets/testMeText.html', htmlToParce);
+			await page.setContent(htmlToParce);
 
-		await page.emulateMediaType('screen');
-		// Regression guard measurement: body.getBoundingClientRect().height (CSS px -> mm @ 96dpi)
-		// *before* Chrome's print pipeline runs. Because <body> is deliberately wider (225mm) than
-		// the A4 page (210mm) and Chrome's printToPDF scales the whole page down to fit page width,
-		// this number is NOT the physical printed height (it runs ~30mm above the true ~292-297mm
-		// print result) - it's a stable, deterministic proxy for "how tall the content wants to
-		// be". See the scale-to-fit constants above and server/test/pdf.test.js for how it's used
-		// and calibrated.
-		//
-		// Root cause of the Task 7 (Puppeteer 17 -> 25) overflow regression, corrected: `pdffonts`
-		// on the Task 1 baseline PDF (Puppeteer 17 / Chromium 106) shows every glyph embedded as
-		// Arial - the `Alef` webfont requested via <link> in this template's <head> was NEVER
-		// applied, i.e. the baseline shipped in a silent web-font-load failure/fallback. Under
-		// Puppeteer 25 / Chromium 151, Alef *does* load and apply (confirmed via `pdffonts` on a
-		// fresh render: embedded font is Alef-Regular), and Alef's normal line box is taller than
-		// Arial's. That per-line growth, compounded across every stacked text block on the page, is
-		// what pushes the footer business-card onto a second page that `pageRanges: '1'` then
-		// discards - it is a font-substitution change (Arial fallback -> real Alef), not "Alef's
-		// own line-height changing between browser versions." The explicit `line-height: 1.03` on
-		// `html` below in final-form.html compensates for Alef's taller line box; the dynamic
-		// scale-to-fit safety net here exists because the line-height compensation alone still has
-		// only a few mm of headroom for longer real-world submissions.
-		const { contentHeightMm, footerBottomMm } = await page.evaluate(() => {
-			const toMm = (px) => px / 96 * 25.4;
-			const footerEl = document.querySelector('.business-card');
-			return {
-				contentHeightMm: toMm(document.body.getBoundingClientRect().height),
-				footerBottomMm: footerEl ? toMm(footerEl.getBoundingClientRect().bottom) : null,
-			};
-		});
+			await page.emulateMediaType('screen');
+			// page.setContent only waits for the 'load' event, which does not guarantee the Alef webfont
+			// (requested via <link> in final-form.html's <head>) has finished loading and applying yet.
+			// If the measurement below ran before Alef was ready, the browser would still be rendering
+			// with its fallback (Arial) metrics at that instant - shorter than Alef's - so
+			// contentHeightMm would be under-measured and the scale-to-fit safety net below could fail to
+			// engage for content that actually needs it, silently dropping the footer onto page 2 (the
+			// exact regression this whole safety net exists to prevent). Waiting on document.fonts.ready
+			// guarantees the font used for the height measurement is the same one Chrome will actually
+			// print with.
+			await page.evaluate(() => document.fonts.ready);
+			// Regression guard measurement: body.getBoundingClientRect().height (CSS px -> mm @ 96dpi)
+			// *before* Chrome's print pipeline runs. Because <body> is deliberately wider (225mm) than
+			// the A4 page (210mm) and Chrome's printToPDF scales the whole page down to fit page width,
+			// this number is NOT the physical printed height (it runs ~30mm above the true ~292-297mm
+			// print result) - it's a stable, deterministic proxy for "how tall the content wants to
+			// be". See the scale-to-fit constants above and server/test/pdf.test.js for how it's used
+			// and calibrated.
+			//
+			// Root cause of the Task 7 (Puppeteer 17 -> 25) overflow regression, corrected: `pdffonts`
+			// on the Task 1 baseline PDF (Puppeteer 17 / Chromium 106) shows every glyph embedded as
+			// Arial - the `Alef` webfont requested via <link> in this template's <head> was NEVER
+			// applied, i.e. the baseline shipped in a silent web-font-load failure/fallback. Under
+			// Puppeteer 25 / Chromium 151, Alef *does* load and apply (confirmed via `pdffonts` on a
+			// fresh render: embedded font is Alef-Regular), and Alef's normal line box is taller than
+			// Arial's. That per-line growth, compounded across every stacked text block on the page, is
+			// what pushes the footer business-card onto a second page that `pageRanges: '1'` then
+			// discards - it is a font-substitution change (Arial fallback -> real Alef), not "Alef's
+			// own line-height changing between browser versions." The explicit `line-height: 1.03` on
+			// `html` below in final-form.html compensates for Alef's taller line box; the dynamic
+			// scale-to-fit safety net here exists because the line-height compensation alone still has
+			// only a few mm of headroom for longer real-world submissions.
+			const { contentHeightMm, footerBottomMm } = await page.evaluate(() => {
+				const toMm = (px) => px / 96 * 25.4;
+				const footerEl = document.querySelector('.business-card');
+				return {
+					contentHeightMm: toMm(document.body.getBoundingClientRect().height),
+					footerBottomMm: footerEl ? toMm(footerEl.getBoundingClientRect().bottom) : null,
+				};
+			});
 
-		// Dynamic scale-to-fit safety net: the line-height fix restores parity for the fixture, but
-		// only leaves a few mm of headroom (see task-7-report.md fix round 2) before longer
-		// real-world submissions (extra lines in patalog/comments, etc.) push the footer onto page
-		// 2 again. Rather than relying solely on a static content-height ceiling to *detect* that
-		// (which a reviewer showed can pass while the footer is already lost), shrink the printed
-		// page whenever measured content exceeds NO_SCALE_MM, so pathological submissions degrade
-		// to a slightly smaller single page instead of silently losing the contact bar. Typical/
-		// fixture submissions measure below NO_SCALE_MM and print at scale 1 (unchanged from
-		// before this safety net existed). See the derivation comment above NO_SCALE_MM/TARGET_MM
-		// for why a plain linear ratio (not a power curve) is correct here.
-		const scale = contentHeightMm <= NO_SCALE_MM
-			? 1
-			: Math.max(0.1, Math.min(1, TARGET_MM / contentHeightMm));
+			// Dynamic scale-to-fit safety net: the line-height fix restores parity for the fixture, but
+			// only leaves a few mm of headroom (see task-7-report.md fix round 2) before longer
+			// real-world submissions (extra lines in patalog/comments, etc.) push the footer onto page
+			// 2 again. Rather than relying solely on a static content-height ceiling to *detect* that
+			// (which a reviewer showed can pass while the footer is already lost), shrink the printed
+			// page whenever measured content exceeds NO_SCALE_MM, so pathological submissions degrade
+			// to a slightly smaller single page instead of silently losing the contact bar. Typical/
+			// fixture submissions measure below NO_SCALE_MM and print at scale 1 (unchanged from
+			// before this safety net existed). See the derivation comment above NO_SCALE_MM/TARGET_MM
+			// for why a plain linear ratio (not a power curve) is correct here.
+			const scale = contentHeightMm <= NO_SCALE_MM
+				? 1
+				: Math.max(0.1, Math.min(1, TARGET_MM / contentHeightMm));
 
-		await page.pdf({
-			path: outPath,
-			format: 'A4',
-			printBackground: true,
-			pageRanges,
-			scale
-		});
-		await browser.close();
-		return { contentHeightMm, scale, footerBottomMm };
+			await page.pdf({
+				path: outPath,
+				format: 'A4',
+				printBackground: true,
+				pageRanges,
+				scale
+			});
+			return { contentHeightMm, scale, footerBottomMm };
+		} finally {
+			await browser.close();
+		}
 	},
 	generatePdf: async function(callbackFunc, fields, res) {
 
@@ -202,17 +224,31 @@ module.exports = {
 			res.json(status);
 		}
 
+		let generatePdfPromise;
 		try {
 			await this.puppetPdf(fields)
 
-			const generatePdfPromise = callbackFunc(fields);
-			if (fields.email.indexOf('@') > -1 || fields.fieldAgentMail.indexOf('@') > -1) {
+			generatePdfPromise = callbackFunc(fields);
+			// Attach a handler to the Drive-upload promise immediately, at creation. Without this, a
+			// rejection (e.g. missing MAIN_CREDENTIALS, which sendToDrive rejects synchronously) can
+			// be reported as an unhandled promise rejection - and crash the whole process - while
+			// we're still awaiting sendMail below, since that await introduces a microtask gap before
+			// generatePdfPromise.then(...) is reached further down. The no-op catch here just marks
+			// the promise as handled; the real resolved/rejected value is still read from
+			// generatePdfPromise via the .then(sendResolve, sendResolve) call below, so the response
+			// sent to the client is unchanged for the fully-credentialed path.
+			generatePdfPromise.catch(() => {});
+
+			if (fields.email && fields.email.indexOf('@') > -1 || fields.fieldAgentMail && fields.fieldAgentMail.indexOf('@') > -1) {
 				await googleApi.sendMail(fields);
 			}
 
 			await generatePdfPromise.then(sendResolve, sendResolve);
 		} catch (e) {
 			console.log('our error', e);
+			if (!res.headersSent) {
+				res.status(500).json({ status: 'fail', error: e && e.message ? e.message : String(e) });
+			}
 		}
 	},
 	getTemplate: function () {
