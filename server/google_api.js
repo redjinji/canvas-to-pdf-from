@@ -134,7 +134,7 @@ module.exports = {
 				};
 				
 				drive.files.create({
-					resource: fileMetadata,
+					requestBody: fileMetadata,
 					media: media,
 					fields: 'id'
 				}, function (err, file) {
