@@ -1,0 +1,30 @@
+html {
+  font-size: 10px;
+  scrollbar-width: none;
+}
+body {
+  margin: 0;
+  padding: 0;
+  direction: rtl;
+}
+
+img {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+button{
+  background: none;
+  border: 0;
+  &:focus {
+    outline: none;
+  }
+}
+label, input {
+  display: inline-block;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
