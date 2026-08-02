@@ -19,31 +19,43 @@ const { formidable } = require('formidable'),
 // (active8.il / phone numbers) actually lands on:
 //   contentHeightMm=329.588 (line-height 1.132) -> footer text found on page 1 (fits)
 //   contentHeightMm=329.675 (line-height 1.135) -> footer text found on page 2 (dropped)
-// So the true no-scale-needed boundary sits at ~329.6mm in this proxy's units.
+// So the true no-scale-needed boundary sits at ~329.6mm in this proxy's units, with the gate
+// below (329.5) sitting only ~0.1mm below the last confirmed-good point - a thin margin, not a
+// generous one. (Fix round 2's write-up claimed the opposite - that marginal overflow "may be
+// under-rescued" - which had it backwards: the risk at this boundary is running the gate too
+// close, not under-correcting past it. Corrected in fix round 3.)
 //
-// Derivation, part 2 - why a plain `TARGET_MM / contentHeightMm` ratio (as first specified) is
-// NOT used: that plain ratio was implemented and directly tested against real, unrestricted
-// (no-pageRanges) renders at several overflow magnitudes, bisecting page.pdf()'s `scale` option
-// to find the real minimum scale that actually produces a single physical page:
-//   contentHeightMm=329.675 -> real single-page requires scale <= ~0.96   (plain ratio gives 0.9995 - not enough)
-//   contentHeightMm=336.054 -> real single-page requires scale <= ~0.917  (plain ratio gives 0.980  - not enough)
-//   contentHeightMm=375.295 -> real single-page requires scale <= ~0.80   (plain ratio gives 0.878  - not enough)
-// Chrome's print engine turns out to be far more sensitive than a linear ratio near the boundary:
-// a fraction of a millimeter of overflow can flip a whole line of justified Hebrew text between
-// wrapping and not wrapping, which is a step change, not a smooth one. A plain reciprocal ratio,
-// anchored so the fixture (contentHeightMm=326.24) is untouched (ratio >= 1), is provably unable
-// to ever produce a strong enough correction (verified: even the most aggressive ratio allowed by
-// that constraint, using TARGET_MM=326.24 itself, only reaches ~0.99 at the 329.675 case - nowhere
-// near the ~0.96 actually required). So the ratio is raised to an empirically-fit power (5) using
-// a slightly lower base target (327mm, still >= the fixture so it stays untouched) to inject the
-// needed steepness just past the boundary; this was verified against all three real data points
-// above (each comes out comfortably on the safe/aggressive side) plus a fourth direct check at the
-// most marginal point (computed scale 0.9601 at contentHeightMm=329.675, empirically confirmed via
-// a real Puppeteer render to still produce a single physical page).
+// Derivation (fix round 3) - the *criterion* fix round 2 calibrated its scale curve against was
+// wrong. It treated "whole document collapses to 1 physical page" as the target, but even the
+// fixture (contentHeightMm=326.24, comfortably below the gate) genuinely renders as 2 physical
+// pages at scale 1 - page 2 is harmless body min-height/margin spillover with no content on it,
+// and that fixture PDF is correct today. The only invariant that actually matters is "the footer
+// lands on printed page 1"; a second, empty trailing page is fine. Judged against that corrected
+// criterion, fix round 2's power-of-5 curve was badly over-corrected - independently re-bisected
+// here (via real, unrestricted `page.pdf({scale})` renders, checking with `pdftotext -bbox-layout`
+// + `pdfinfo` which physical page the footer's ".business-card" text lands on) at three magnitudes:
+//   contentHeightMm=329.66 -> footer-on-page-1 needs scale <= ~1.00   (old ^5 curve applied 0.9629)
+//   contentHeightMm=336.05 -> footer-on-page-1 needs scale <= ~0.978  (old ^5 curve applied 0.8724)
+//   contentHeightMm=381.84 -> footer-on-page-1 needs scale <= ~0.850  (old ^5 curve applied 0.4606,
+//                                                                       i.e. ~5pt text, half the
+//                                                                       sheet left blank)
+// The old curve's justification - "a plain ratio can never correct enough while leaving the
+// fixture untouched" - assumed the correction had to hit ~0.96 at contentHeightMm=329.675 (the
+// wrong, too-strict criterion above). Under the real criterion, that same point only needs
+// scale <= ~1.00, i.e. next to no correction at all; the NO_SCALE_MM gate already keeps the
+// fixture untouched, so anchoring the ratio's target *above* the fixture height was never
+// necessary. A plain linear ratio is sufficient once anchored correctly:
+//   scale = Math.min(1, TARGET_MM / contentHeightMm)
+// With TARGET_MM=324 this gives scale ~0.983 / ~0.964 / ~0.849 at the three points above -
+// comfortably inside the empirically-measured safe region at each (re-verified directly against
+// real renders, not just the arithmetic). Note this is a local calibration: spot-checked well
+// beyond these points (a ~473mm synthetic case) the plain ratio's margin shrinks and can invert -
+// this formula is tuned for the realistic long-submission range demonstrated above, not proven
+// safe at arbitrary overflow. See task-7-report.md, "Fix round 3" for the full data.
 const NO_SCALE_MM = 329.5; // below this, content already fits at scale 1 - no correction applied
-const SCALE_TARGET_MM = 327; // base for the correction below; kept >= fixture height (326.24) so
-                              // the fixture is never touched, regardless of the exponent
-const SCALE_POWER = 5;
+const TARGET_MM = 324; // linear ratio target; empirically verified (see derivation above) to give
+                        // enough correction at realistic overflow magnitudes while the NO_SCALE_MM
+                        // gate (not this constant) is what keeps the fixture untouched
 
 module.exports = {
 	init: function (req, res) {
@@ -78,9 +90,13 @@ module.exports = {
 	// Exposed so server/test/pdf.test.js asserts against the same single source of truth rather
 	// than duplicated magic numbers. See the derivation comment above for what each one means.
 	NO_SCALE_MM,
-	SCALE_TARGET_MM,
-	SCALE_POWER,
-	puppetPdf: async function (fields, outPath = 'server/pdfs/mypdf.pdf') {
+	TARGET_MM,
+	puppetPdf: async function (fields, outPath = 'server/pdfs/mypdf.pdf', options = {}) {
+		// pageRanges defaults to '1' (existing behavior: print only physical page 1). Callers can
+		// pass { pageRanges: '' } (or undefined) to print every physical page instead - used by
+		// server/test/pdf.test.js's real end-to-end check, which needs to see the *whole* rendered
+		// document to confirm it is truly only 1 physical page, not just that page 1 was printed.
+		const { pageRanges = '1' } = options;
 		const browser = await puppet.launch({
 				//remove security issue with chromium
 				headless: true,
@@ -136,17 +152,17 @@ module.exports = {
 		// page whenever measured content exceeds NO_SCALE_MM, so pathological submissions degrade
 		// to a slightly smaller single page instead of silently losing the contact bar. Typical/
 		// fixture submissions measure below NO_SCALE_MM and print at scale 1 (unchanged from
-		// before this safety net existed). See the derivation comment above NO_SCALE_MM for why
-		// this is a power curve rather than a plain ratio.
+		// before this safety net existed). See the derivation comment above NO_SCALE_MM/TARGET_MM
+		// for why a plain linear ratio (not a power curve) is correct here.
 		const scale = contentHeightMm <= NO_SCALE_MM
 			? 1
-			: Math.max(0.1, Math.min(1, Math.pow(SCALE_TARGET_MM / contentHeightMm, SCALE_POWER)));
+			: Math.max(0.1, Math.min(1, TARGET_MM / contentHeightMm));
 
 		await page.pdf({
 			path: outPath,
 			format: 'A4',
 			printBackground: true,
-			pageRanges: '1',
+			pageRanges,
 			scale
 		});
 		await browser.close();
