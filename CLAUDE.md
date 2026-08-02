@@ -30,7 +30,11 @@ himself. Do not merge PRs on his behalf.
 ### Backend (run from repo root)
 - `npm start` — start the server with nodemon (uses `nodemon.json`). Listens on `PORT` env var or 3000.
 - `npm run start:dev` — start with `nodemon-dev.json` (gitignored; create locally).
-- There are **no automated tests** and no linter for the backend. `npm test` is a placeholder that exits 1.
+- `npm test` — `node:test` smoke + PDF regression suite (`server/test/*.test.js`, 8 tests). Runs
+  without any Google credentials (the server must start cleanly with none configured — see
+  `server/google_api.js#getUserSheets` below). Two tests render real PDFs and read them back with
+  `pdftotext -bbox-layout` (poppler-utils); those two skip gracefully if `pdftotext` isn't
+  installed locally, everything else still runs. No linter for the backend.
 
 ### Frontend (run from `charts6/`)
 - `npm start` / `ng serve` — dev server on `http://localhost:4200` (the backend CORS-allows this origin).
@@ -102,6 +106,11 @@ The backend reads everything sensitive from environment variables (loaded via `.
 
 ## Deployment
 
-`Procfile` runs `npm start` (web dyno; Heroku-style). Puppeteer downloads/uses Chromium and runs
-headless with `--no-sandbox`. The committed `charts6/dist/` is what gets served in production, so a
+`Procfile` runs `npm start` (web dyno; Heroku-style). Node version is pinned via `engines` in
+`package.json` (`22.x`) and `.nvmrc`. Puppeteer launches headless Chromium with `--no-sandbox`,
+picking an explicit binary via `process.env.PUPPETEER_EXECUTABLE_PATH || process.env.CHROME_PATH`
+(`server/pdfGenerate.js`) — on Heroku this is set by the `heroku-community/chrome-for-testing`
+buildpack, which must be added before the Node buildpack; `PUPPETEER_SKIP_DOWNLOAD=true` can then
+be set so Puppeteer doesn't also fetch its own bundled Chromium. See `DEPLOY.md` for the full
+Heroku (heroku-24) checklist. The committed `charts6/dist/` is what gets served in production, so a
 frontend change is only live after rebuilding and committing the dist output.
