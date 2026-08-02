@@ -18,10 +18,6 @@ export class Header {
     formNavigationService.navigate.subscribe(this.activeIcon.bind(this));
   }
 
-  ngDoCheck() {
-    this.cdr.detectChanges();
-  }
-
   activeIcon(param) {
     this.start = false;
     this.camera = false;
@@ -41,6 +37,11 @@ export class Header {
       default:
         this.start = true;
     }
+
+    // Angular >=18 ticks only marked views; this method runs from
+    // FormNavigationService.navigate's subscription (a service event, not a listener
+    // in this component's own template), so mark explicitly.
+    this.cdr.markForCheck();
   }
 
   goto(position) {

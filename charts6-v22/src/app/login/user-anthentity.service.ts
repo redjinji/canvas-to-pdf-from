@@ -1,11 +1,11 @@
-import {Injectable} from "@angular/core";
+import {Injectable, signal} from "@angular/core";
 import {ActivatedRouteSnapshot, Router} from "@angular/router";
 import {IUser, IUserResponse} from "./login.model";
 import {environment} from "../../environments/environment";
 
 @Injectable({providedIn: 'root'})
 export class UserAnthentityService {
-    loginAlready: boolean = false;
+    loginAlready = signal(false);
     currentUser: IUser;
 
     constructor(private router: Router) {
@@ -41,7 +41,7 @@ export class UserAnthentityService {
     }
 
     isLogin() {
-        return this.loginAlready;
+        return this.loginAlready();
     }
 
     isAuthenticated() {
@@ -56,7 +56,7 @@ export class UserAnthentityService {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     var res = JSON.parse(xhr.response);
                     if (res.isAuthentic) {
-                        this.loginAlready = true;
+                        this.loginAlready.set(true);
                         resolve(res);
                     } else {
                         resolve({isAuthentic:false});

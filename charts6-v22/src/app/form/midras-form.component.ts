@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {Router} from "@angular/router";
 import {UserAnthentityService} from "../login";
 import {IFormElement} from "./form-elements-components";
@@ -42,7 +42,8 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
               private videoService: VideoService,
               private formBuilder: FormBuilder,
               private fromNavigationService: FormNavigationService,
-              private _http: HttpClient) {
+              private _http: HttpClient,
+              private cdr: ChangeDetectorRef) {
 
     fromNavigationService.navigate.subscribe(this.formMoveTo.bind(this))
   }
@@ -69,6 +70,11 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     this.screenContainer.nativeElement.style = `transform: translateX(${position}00%)`;
     this.nextDisable = end;
     this.prevDisable = start;
+
+    // Angular >=18 ticks only marked views; this subscription also fires when
+    // navigation is driven from Header's nav buttons (a sibling component's click,
+    // not this component's own template listener), so mark explicitly.
+    this.cdr.markForCheck();
   }
 
   nextStep() {
