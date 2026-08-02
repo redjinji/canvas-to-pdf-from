@@ -35,10 +35,11 @@ module.exports = {
 			res('done')
 		})
 	},
-	puppetPdf: async function (fields) {
+	puppetPdf: async function (fields, outPath = 'server/pdfs/mypdf.pdf') {
 		const browser = await puppet.launch({
 				//remove security issue with chromium
 				headless: true,
+				executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || process.env.CHROME_PATH || undefined,
 				args: [
 					'--no-sandbox',
 					'--disable-setuid-sandbox',
@@ -46,19 +47,30 @@ module.exports = {
 			}
 		);
 		const page = await browser.newPage();
-		
+
 		const htmlToParce = htmlTemplate(__dirname + '/final-form.html', fields);
 		fs.writeFile('server/assets/testMeText.html', htmlToParce);
 		await page.setContent(htmlToParce);
-		
+
 		await page.emulateMediaType('screen');
+		// Regression guard: body.getBoundingClientRect().height (CSS px -> mm @ 96dpi) *before*
+		// Chrome's print pipeline runs. Because <body> is deliberately wider (225mm) than the
+		// A4 page (210mm) and Chrome's printToPDF scales the whole page down to fit page width,
+		// this number is NOT the physical printed height (it runs ~30mm above the true ~292-297mm
+		// print result) - it's a stable, deterministic proxy for "how tall the content wants to
+		// be". See server/test/pdf.test.js for the calibrated threshold and rationale: it exists
+		// to catch exactly the class of bug fixed alongside this comment, where Chromium's default
+		// line-height for the Alef webfont grew across a Puppeteer/Chrome upgrade, silently pushing
+		// the footer (business contact bar) onto a second page that pageRanges discards.
+		const contentHeightMm = await page.evaluate(() => document.body.getBoundingClientRect().height / 96 * 25.4);
 		await page.pdf({
-			path: 'server/pdfs/mypdf.pdf',
+			path: outPath,
 			format: 'A4',
 			printBackground: true,
 			pageRanges: '1'
 		});
 		await browser.close();
+		return { contentHeightMm };
 	},
 	generatePdf: async function(callbackFunc, fields, res) {
 		

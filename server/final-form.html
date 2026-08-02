@@ -17,6 +17,15 @@
 		html {
 			font-size: 10px;
 			font-family: 'Alef', sans-serif;
+			/* Explicit line-height: Chromium's default ('normal') line-height for the Alef
+			   webfont grew slightly between Chromium 106 (Puppeteer 17) and Chromium 151
+			   (Puppeteer 25), which compounds across every stacked text block on the page
+			   (header details, form-selections list, diagnosis text, figcaptions) and was
+			   enough to push the footer business-card onto a second page that pageRanges
+			   silently drops. Pinning it removes the browser-version dependency and restores
+			   single-page fit; value chosen empirically to match the pre-upgrade layout.
+			*/
+			line-height: 1.03;
 		}
 		body {
 			margin: 20px;
