@@ -1,12 +1,16 @@
 import {
-    AfterViewInit, Component, ElementRef, HostListener, Input, OnChanges, OnInit, QueryList, ViewChild,
+    AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnChanges, OnInit, QueryList, ViewChild,
     ViewChildren
 } from "@angular/core";
 import {VideoService} from "./video.service";
-import {FormControl, FormGroup} from "@angular/forms";
+import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
+import {CommonModule} from "@angular/common";
+import {ImageComponent} from "../../../helper-component/image-component";
+import {VideosComponent} from "./videos.component";
 
 @Component({
     selector: 'foot-image',
+    imports: [CommonModule, ReactiveFormsModule, ImageComponent, VideosComponent],
     templateUrl: 'foot-image-component.html',
     styleUrls: ['./foot-image.component.scss']
 })
@@ -37,7 +41,7 @@ export class FootImageComponent implements OnInit, AfterViewInit {
         setTimeout(this.updateCanvasElements.bind(this), 0); //wait for resize to finish
     }
 
-    constructor(private videoService: VideoService) {
+    constructor(private videoService: VideoService, private cdr: ChangeDetectorRef) {
         this.cameraOn = false;
     }
 
@@ -52,6 +56,14 @@ export class FootImageComponent implements OnInit, AfterViewInit {
                 [{svg: 'stand-knee', imageTaken: false}],
                 [{svg: 'stand-toe', imageTaken: false}]
             ];
+
+            // Angular >=18 ticks only marked views; this setTimeout callback (from
+            // ngAfterViewInit, not this component's own template listener) sets
+            // thumbnailGalleryAmount, whose *ngFor creates the #thumbnailGalleryItem
+            // canvases that initThumbnailPlaceHolder()'s async img.onload callbacks
+            // below need populated in the @ViewChildren QueryList — mark now so CD
+            // creates those canvases before the images finish loading.
+            this.cdr.markForCheck();
             this.initThumbnailPlaceHolder();
         }.bind(this));
         this.parentForm.addControl('image0', new FormControl());
@@ -62,9 +74,17 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     ngOnInit() {
         this.videoService.change.subscribe(function (event) {
             this.updateImageFromVideo(event);
+
+            // Angular >=18 ticks only marked views; this subscription fires from
+            // VideoService's EventEmitter (a service event, not a listener in this
+            // component's own template), so mark explicitly.
+            this.cdr.markForCheck();
         }.bind(this));
         this.videoService.cameraOn.subscribe(function () {
             this.killVideo = false
+
+            // Angular >=18 ticks only marked views; service EventEmitter subscription.
+            this.cdr.markForCheck();
         }.bind(this));
         this.parentForm.addControl('legLine', new FormControl());
     }
@@ -130,6 +150,10 @@ export class FootImageComponent implements OnInit, AfterViewInit {
     updateImageFromFile(event, index) {
       window['loadImage'](event.target.files[0], img => {
         this.drew(img, index)
+
+        // Angular >=18 ticks only marked views; callback from the loadImage
+        // third-party library, not this component's own template listener.
+        this.cdr.markForCheck();
       }, {
         maxWidth: this.canvasParams.canvasWidth,
         orientation: true
@@ -143,6 +167,9 @@ export class FootImageComponent implements OnInit, AfterViewInit {
             fileReader.onloadend = function () {
                 let base64data = fileReader.result;
                 this.parentForm.controls[`image${index}`].setValue(base64data);
+
+                // Angular >=18 ticks only marked views; canvas.toBlob -> FileReader.onloadend chain.
+                this.cdr.markForCheck();
             }.bind(this);
         }.bind(this));
     }
@@ -181,6 +208,9 @@ export class FootImageComponent implements OnInit, AfterViewInit {
                 this.canvasParams.images.push(img);
                 this.updateCanvasThumbnails(img, i, true);
                 this.updateCanvasElements(true);
+
+                // Angular >=18 ticks only marked views; Image.onload callback.
+                this.cdr.markForCheck();
             }.bind(this, img);
             img.onerror = this.failed;
             img.src = `assets/SoftwareIcons_S${i + 1}.png`;

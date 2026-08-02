@@ -13,8 +13,9 @@ The repo contains **two separate Node projects** that are developed and built in
 
 - **`server/`** — Express backend (plain JS, CommonJS). Run from the repo root via the root
   `package.json`.
-- **`charts6/`** — Angular 9 frontend (TypeScript), its own `package.json` and toolchain. This is
-  the **active** frontend. The server serves its built output from `charts6/dist/charts6/`.
+- **`charts6/`** — Angular 22 frontend (TypeScript), its own `package.json` and toolchain. This is
+  the **active** frontend. The server serves its built output from `charts6/dist/charts6/` (flat
+  output directory, unchanged path).
 
 `client/` is a legacy static frontend; all of `rout.js`'s page routes have been switched to serve
 `charts6/dist`. Treat `client/` as dead code unless told otherwise.
@@ -38,10 +39,12 @@ himself. Do not merge PRs on his behalf.
 
 ### Frontend (run from `charts6/`)
 - `npm start` / `ng serve` — dev server on `http://localhost:4200` (the backend CORS-allows this origin).
-- `ng build` / `npm run build:prod` — build into `charts6/dist/charts6/`. **The server serves the
-  built output, so you must rebuild after frontend changes for them to appear in the running app.**
-- `ng test` — Karma/Jasmine unit tests. `ng test --include='**/some.spec.ts'` to run a single spec.
-- `ng lint` — TSLint. `ng e2e` — Protractor.
+- `npm run build` (= `ng build`) — production build by default (the `--prod` flag is gone in
+  Angular 22), builds into `charts6/dist/charts6/` (flat). **The server serves the built output, so
+  you must rebuild after frontend changes for them to appear in the running app.** `npm run
+  build:prod` is kept as an alias for muscle-memory compatibility.
+- `ng test` — unit tests, now run via **vitest** (not Karma). `ng test --include='**/some.spec.ts'`
+  to run a single spec.
 
 ## Architecture & request flow
 
@@ -89,7 +92,8 @@ stdin** to complete the OAuth flow and prints the token to the console for you t
   `LoginRouteActivatorService` guards the `/form` route. Login state is the in-memory
   `loginAlready` flag (lost on refresh) plus `localStorage.userAuth`.
 - `environment.serverCall` is `http://localhost:3000` in dev and `''` (same-origin) in prod
-  (`environment.prod.ts`, swapped in by `ng build --prod`).
+  (`environment.prod.ts`, swapped in via `fileReplacements` in the `production` build configuration,
+  which is `ng build`'s default).
 
 ## Configuration / environment
 

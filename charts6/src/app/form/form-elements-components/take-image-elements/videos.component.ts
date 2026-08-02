@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from "@angular/core";
+import {ChangeDetectorRef, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from "@angular/core";
 import {VideoService} from "./video.service";
 
 @Component({
@@ -13,7 +13,7 @@ export class VideosComponent implements OnInit{
     @ViewChild('videoElement', { static: true }) video:ElementRef;
     @Output() takePhoto = new EventEmitter();
 
-    constructor(private videoService:VideoService){}
+    constructor(private videoService:VideoService, private cdr: ChangeDetectorRef){}
 
     ngOnInit(){
         this.activeVideo();
@@ -27,6 +27,10 @@ export class VideosComponent implements OnInit{
                 // var me = document.getElementById('videoElement');
                 // me.srcObject = stream;
                 that.video.nativeElement.srcObject = stream
+
+                // Angular >=18 ticks only marked views; navigator.mediaDevices promise
+                // callback is not this component's own template listener.
+                that.cdr.markForCheck();
             })
             .catch(function (err0r) {
                 console.log("Something went wrong!");

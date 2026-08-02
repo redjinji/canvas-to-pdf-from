@@ -10,5 +10,5 @@ import {Router} from "@angular/router";
 export class SuccessPageComponent {
     constructor(private router:Router){
     }
-    
+
 }

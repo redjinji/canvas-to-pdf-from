@@ -1,9 +1,10 @@
 import {Component, Input, OnInit, ViewEncapsulation} from "@angular/core";
 import {IInput} from "./form-interface";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 
 @Component({
     selector: 'input-component',
+    imports: [ReactiveFormsModule],
     template: `
     <div class="input__text--container" [formGroup]="parentForm">
         <label class="input__text--label">

@@ -1,9 +1,11 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {ISelect} from "./form-interface";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {CommonModule} from "@angular/common";
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 
 @Component({
     selector: 'select-component',
+    imports: [CommonModule, ReactiveFormsModule],
     template: `
 <div class="select-component" [formGroup]="parentForm">
         <label class="selected--label selected--{{parentForm.controls[selectElem.name].dirty}}" *ngIf="selectElem.label" [attr.for]="selectElem.id ? selectElem.id : null">{{selectElem.label}}</label>
@@ -29,12 +31,12 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 export class SelectComponent implements OnInit{
     @Input() selectElem: ISelect;
     @Input() parentForm: FormGroup;
-    
+
     ngOnInit(){
         const formControlValidationNeeded = this.selectElem.required ? new FormControl('',Validators.required) : new FormControl();
         this.parentForm.addControl(this.selectElem.name,formControlValidationNeeded);
     }
-    
+
     checkDefaultValue(hidden, disable, defaultSelect, value, text){
         if(hidden && disable && defaultSelect) {
             return '';
