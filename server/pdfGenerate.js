@@ -92,12 +92,18 @@ module.exports = {
 		});
 		form.parse(req, function (err, fields, files) {
 			if (err) {
-				// Check for and handle any errors here.
 				console.error('error parse: ', err.message);
+				// An aborted/failed upload must still get a response, or the client
+				// hangs until the router's idle timeout (seen in production as H28/499).
+				if (!res.headersSent) res.status(400).json({status: 'fail', error: err.message});
 				return;
 			}
 			const single = {};
 			for (const [k, v] of Object.entries(fields)) single[k] = Array.isArray(v) ? v[0] : v;
+			const imageBytes = ['image0', 'image1', 'image2']
+				.map(k => `${k}=${((single[k] || '').length / 1024).toFixed(0)}KB`).join(' ');
+			console.log(`sendForm parsed: ${Object.keys(single).length} fields, ` +
+				`${(JSON.stringify(single).length / 1024).toFixed(0)}KB total, ${imageBytes}`);
 			fs.writeFile('server/assets/testMeText.json', JSON.stringify(single));
 			this.generatePdf(googleApi.sendToDrive, single, res);
 		}.bind(this));
