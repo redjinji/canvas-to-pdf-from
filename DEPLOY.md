@@ -6,11 +6,16 @@
    ```
    heroku buildpacks:add -i 1 heroku-community/chrome-for-testing
    ```
-   This buildpack installs Chrome for Testing and sets `CHROME_PATH`, which
-   `server/pdfGenerate.js` reads (`process.env.PUPPETEER_EXECUTABLE_PATH || process.env.CHROME_PATH`)
-   when launching Puppeteer. Optionally set `PUPPETEER_SKIP_DOWNLOAD=true` as a config var so
-   Puppeteer doesn't also download its own bundled Chromium during `npm install` — the buildpack's
-   Chrome is what actually gets used.
+   This buildpack installs Chrome for Testing at `/app/.chrome-for-testing/chrome-linux64/chrome`
+   and adds it to `PATH` — but it does **not** export `CHROME_PATH` or any env var (verified on a
+   live dyno). You must therefore set a config var so `server/pdfGenerate.js` finds it:
+   ```
+   heroku config:set PUPPETEER_EXECUTABLE_PATH=/app/.chrome-for-testing/chrome-linux64/chrome
+   ```
+   Also set `PUPPETEER_SKIP_DOWNLOAD=true` so Puppeteer doesn't download its own bundled Chromium
+   during `npm install` — the buildpack's Chrome is what actually gets used. (Symptom if the
+   executable path is missing: every submission fails with `Could not find Chrome (ver. ...)` in
+   the logs and the app routes to `/reject-form`.)
 3. **Config vars** (unchanged from before this upgrade): `MAIN_CREDENTIALS`, `GMAIL_TOKEN`,
    `DRIVE_TOKEN`, `SHEET_TOKEN`, `SPEADSHEET_ID`, `DRIVE_UPLOAD_FOLDER`, `senderMail`.
    The production environment also carries `SHEET_CREDENTIALS` and `DRIVE_CREDENTIALS` — those are
