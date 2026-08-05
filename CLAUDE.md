@@ -111,7 +111,7 @@ The backend reads everything sensitive from environment variables (loaded via `.
 ## Deployment
 
 `Procfile` runs `npm start` (web dyno; Heroku-style). Node version is pinned via `engines` in
-`package.json` (`22.x`) and `.nvmrc`. Puppeteer launches headless Chromium with `--no-sandbox`,
+`package.json` (`24.x`, current Active LTS, EOL 2028) and `.nvmrc`. Puppeteer launches headless Chromium with `--no-sandbox`,
 picking an explicit binary via `process.env.PUPPETEER_EXECUTABLE_PATH || process.env.CHROME_PATH`
 (`server/pdfGenerate.js`) — on Heroku the `heroku-community/chrome-for-testing` buildpack (added
 before the Node buildpack) installs Chrome but does **not** set any env var, so

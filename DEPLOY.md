@@ -2,7 +2,7 @@
 
 1. **Stack & Node**: `heroku stack:set heroku-26` (verified working end-to-end on staging 2026-08-05,
    incl. Chrome/PDF pipeline; `heroku-24` is an equally verified fallback). Node version comes from `engines` in
-   `package.json` (`22.x`) — no separate buildpack config needed for the Node version itself.
+   `package.json` (`24.x`, current Active LTS — Node 22 goes EOL April 2027) — no separate buildpack config needed for the Node version itself.
 2. **Chrome for Puppeteer**: add the Chrome buildpack *before* the Node buildpack:
    ```
    heroku buildpacks:add -i 1 heroku-community/chrome-for-testing
