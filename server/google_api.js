@@ -71,6 +71,7 @@ module.exports = {
 			} else {
 				let error = 'Gmail credentials didn\'t found';
 				console.log(error);
+				reject(new Error(error));
 			}
 			
 			function sendMail(oAuth2Client, dataForCallback, credentials) {
@@ -134,7 +135,7 @@ module.exports = {
 				};
 				
 				drive.files.create({
-					resource: fileMetadata,
+					requestBody: fileMetadata,
 					media: media,
 					fields: 'id'
 				}, function (err, file) {
@@ -159,8 +160,8 @@ module.exports = {
 		})
 	},
 	
-	getUserSheets: new Promise(function (resolve, reject) {
-		
+	getUserSheets: function () { return new Promise(function (resolve, reject) {
+
 		if (process.env.MAIN_CREDENTIALS) {
 			authorize(JSON.parse(process.env.MAIN_CREDENTIALS), listMajors, '', 'spreadsheets', SHEET);
 		} else {
@@ -168,7 +169,7 @@ module.exports = {
 			console.log('error sheets: ', error);
 			reject(error);
 		}
-		
+
 		function listMajors(auth) {
 			const sheets = google.sheets({version: 'v4', auth});
 			sheets.spreadsheets.values.get({
@@ -185,5 +186,5 @@ module.exports = {
 				}
 			});
 		}
-	})
+	}); }
 };
