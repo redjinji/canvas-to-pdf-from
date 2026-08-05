@@ -31,11 +31,11 @@ himself. Do not merge PRs on his behalf.
 ### Backend (run from repo root)
 - `npm start` — start the server with nodemon (uses `nodemon.json`). Listens on `PORT` env var or 3000.
 - `npm run start:dev` — start with `nodemon-dev.json` (gitignored; create locally).
-- `npm test` — `node:test` smoke + PDF regression suite (`server/test/*.test.js`, 8 tests). Runs
+- `npm test` — `node:test` smoke + PDF regression suite (`server/test/*.test.js`, 10 tests). Runs
   without any Google credentials (the server must start cleanly with none configured — see
-  `server/google_api.js#getUserSheets` below). Two tests render real PDFs and read them back with
-  `pdftotext -bbox-layout` (poppler-utils); those two skip gracefully if `pdftotext` isn't
-  installed locally, everything else still runs. No linter for the backend.
+  `server/google_api.js#getUserSheets` below). The PDF-fit tests render real PDFs; two of them read
+  the output back with `pdftotext -bbox-layout` (poppler-utils) and skip gracefully if `pdftotext`
+  isn't installed locally, everything else still runs. No linter for the backend.
 
 ### Frontend (run from `charts6/`)
 - `npm start` / `ng serve` — dev server on `http://localhost:4200` (the backend CORS-allows this origin).
@@ -119,3 +119,9 @@ before the Node buildpack) installs Chrome but does **not** set any env var, so
 var, plus `PUPPETEER_SKIP_DOWNLOAD=true` so Puppeteer doesn't also fetch its own bundled Chromium. See `DEPLOY.md` for the full
 Heroku (heroku-26) checklist. The committed `charts6/dist/` is what gets served in production, so a
 frontend change is only live after rebuilding and committing the dist output.
+
+Production runs on the client's Heroku app `pro-active8` (deploys track `master`). A separate
+staging app `midras-staging` (Gavriel's Heroku + Google account, own test Sheet/Drive) exists for
+pre-merge testing — deploy any branch to it with `git push staging <branch>:main` (the `staging`
+git remote); see `DEPLOY.md` for its full setup, including minting Google tokens with
+`server/tools/get-google-token.js`.
