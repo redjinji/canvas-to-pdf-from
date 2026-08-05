@@ -1,9 +1,11 @@
 import {Component} from "@angular/core";
+import {FormsModule} from "@angular/forms";
 import {UserAnthentityService} from "./user-anthentity.service";
 import {Router} from "@angular/router";
 
 @Component({
     selector: 'login-popup',
+    imports: [FormsModule],
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss']
 })
@@ -18,9 +20,9 @@ export class LoginComponent {
             this.userName = lastLogin.userName;
             this.password = lastLogin.password;
         }
-    
+
     }
-    
+
     login(formValues){
         this.auth.updateCurrentUser(formValues.userName, formValues.password);
     }

@@ -1,9 +1,10 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {IInput, IInputBirthday} from "./form-interface";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 
 @Component({
     selector: 'input-birthday',
+    imports: [ReactiveFormsModule],
     template: `
 <div [formGroup]="parentForm" class="birthday__container">
         <label>{{inputBirthday.title}}</label>

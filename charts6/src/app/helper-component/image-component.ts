@@ -1,8 +1,10 @@
 import {AfterContentInit, Component, Input, OnInit} from "@angular/core";
-import {IImage} from "../form/form-elements-components";
+import {CommonModule} from "@angular/common";
+import {IImage} from "../form/form-elements-components/form-interface";
 
 @Component({
     selector: 'image-component',
+    imports: [CommonModule],
     templateUrl: './image-component.html',
     styles: [`
     img {

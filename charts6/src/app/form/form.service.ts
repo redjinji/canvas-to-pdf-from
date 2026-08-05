@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {IFormElement} from "./form-elements-components/";
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class FormService {
     getFormElements() {
         return FORM_ELEMENTS;

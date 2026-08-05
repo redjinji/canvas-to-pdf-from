@@ -6,4 +6,4 @@ nodemon-dev.json
 nodemon-prod.json
 .env
 /server/assets/testMeText.html
-/server/assets/testMeText.json
+/server/assets/testMeText.jsonclient_secret_*.json

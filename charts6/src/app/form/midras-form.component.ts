@@ -1,13 +1,18 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {Router} from "@angular/router";
 import {UserAnthentityService} from "../login";
 import {IFormElement} from "./form-elements-components";
 import {FormService} from "./form.service";
 import {VideoService} from "./form-elements-components/take-image-elements";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {CommonModule} from "@angular/common";
+import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 import {FormNavigationService} from "./form-navigation.service";
+import {RadioComponent} from "./form-elements-components/radio-component/radio.component";
+import {TextAreaComponent} from "./form-elements-components/textArea.component";
+import {FootImageComponent} from "./form-elements-components/take-image-elements/foot-image-component";
+import {SimpleFormComponent} from "./form-elements-components/simple-form.component";
 
 interface FormResponse {
   status: string;
@@ -16,6 +21,7 @@ interface FormResponse {
 
 @Component({
   selector: 'midras-form',
+  imports: [CommonModule, ReactiveFormsModule, RadioComponent, TextAreaComponent, FootImageComponent, SimpleFormComponent],
   templateUrl: './midras-form.component.html',
   styleUrls: ['./midras-form.component.scss']
 })
@@ -36,7 +42,8 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
               private videoService: VideoService,
               private formBuilder: FormBuilder,
               private fromNavigationService: FormNavigationService,
-              private _http: HttpClient) {
+              private _http: HttpClient,
+              private cdr: ChangeDetectorRef) {
 
     fromNavigationService.navigate.subscribe(this.formMoveTo.bind(this))
   }
@@ -63,6 +70,11 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     this.screenContainer.nativeElement.style = `transform: translateX(${position}00%)`;
     this.nextDisable = end;
     this.prevDisable = start;
+
+    // Angular >=18 ticks only marked views; this subscription also fires when
+    // navigation is driven from Header's nav buttons (a sibling component's click,
+    // not this component's own template listener), so mark explicitly.
+    this.cdr.markForCheck();
   }
 
   nextStep() {

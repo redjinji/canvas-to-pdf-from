@@ -1,9 +1,11 @@
-import {Component} from "@angular/core";
+import {ChangeDetectorRef, Component} from "@angular/core";
+import {CommonModule} from "@angular/common";
 import {FormNavigationService} from "../form/form-navigation.service";
 import {UserAnthentityService} from "../login";
 
 @Component({
   selector: 'Header-component',
+  imports: [CommonModule],
   templateUrl: './header.html'
 })
 export class Header {
@@ -12,7 +14,7 @@ export class Header {
   angel: boolean = false;
   details: boolean = false;
 
-  constructor(private formNavigationService: FormNavigationService, public auth: UserAnthentityService) {
+  constructor(private formNavigationService: FormNavigationService, public auth: UserAnthentityService, private cdr: ChangeDetectorRef) {
     formNavigationService.navigate.subscribe(this.activeIcon.bind(this));
   }
 
@@ -35,6 +37,11 @@ export class Header {
       default:
         this.start = true;
     }
+
+    // Angular >=18 ticks only marked views; this method runs from
+    // FormNavigationService.navigate's subscription (a service event, not a listener
+    // in this component's own template), so mark explicitly.
+    this.cdr.markForCheck();
   }
 
   goto(position) {

@@ -13,8 +13,9 @@ The repo contains **two separate Node projects** that are developed and built in
 
 - **`server/`** — Express backend (plain JS, CommonJS). Run from the repo root via the root
   `package.json`.
-- **`charts6/`** — Angular 9 frontend (TypeScript), its own `package.json` and toolchain. This is
-  the **active** frontend. The server serves its built output from `charts6/dist/charts6/`.
+- **`charts6/`** — Angular 22 frontend (TypeScript), its own `package.json` and toolchain. This is
+  the **active** frontend. The server serves its built output from `charts6/dist/charts6/` (flat
+  output directory, unchanged path).
 
 `client/` is a legacy static frontend; all of `rout.js`'s page routes have been switched to serve
 `charts6/dist`. Treat `client/` as dead code unless told otherwise.
@@ -38,10 +39,12 @@ himself. Do not merge PRs on his behalf.
 
 ### Frontend (run from `charts6/`)
 - `npm start` / `ng serve` — dev server on `http://localhost:4200` (the backend CORS-allows this origin).
-- `ng build` / `npm run build:prod` — build into `charts6/dist/charts6/`. **The server serves the
-  built output, so you must rebuild after frontend changes for them to appear in the running app.**
-- `ng test` — Karma/Jasmine unit tests. `ng test --include='**/some.spec.ts'` to run a single spec.
-- `ng lint` — TSLint. `ng e2e` — Protractor.
+- `npm run build` (= `ng build`) — production build by default (the `--prod` flag is gone in
+  Angular 22), builds into `charts6/dist/charts6/` (flat). **The server serves the built output, so
+  you must rebuild after frontend changes for them to appear in the running app.** `npm run
+  build:prod` is kept as an alias for muscle-memory compatibility.
+- `ng test` — unit tests, now run via **vitest** (not Karma). `ng test --include='**/some.spec.ts'`
+  to run a single spec.
 
 ## Architecture & request flow
 
@@ -86,10 +89,11 @@ stdin** to complete the OAuth flow and prints the token to the console for you t
   agent's name/mail from `localStorage.userAuth` and a Hebrew-locale timestamp) and POSTs to
   `${environment.serverCall}/sendForm`.
 - Auth: `login/user-anthentity.service.ts` POSTs credentials to `/get-user-sheets`;
-  `LoginRouteActivatorService` guards the `/form` route. Login state is the in-memory
+  the functional `loginGuard` (exported from `charts6/src/app/login/login-route-activator.ts`) guards the `/form` route. Login state is the in-memory
   `loginAlready` flag (lost on refresh) plus `localStorage.userAuth`.
 - `environment.serverCall` is `http://localhost:3000` in dev and `''` (same-origin) in prod
-  (`environment.prod.ts`, swapped in by `ng build --prod`).
+  (`environment.prod.ts`, swapped in via `fileReplacements` in the `production` build configuration,
+  which is `ng build`'s default).
 
 ## Configuration / environment
 
@@ -107,10 +111,11 @@ The backend reads everything sensitive from environment variables (loaded via `.
 ## Deployment
 
 `Procfile` runs `npm start` (web dyno; Heroku-style). Node version is pinned via `engines` in
-`package.json` (`22.x`) and `.nvmrc`. Puppeteer launches headless Chromium with `--no-sandbox`,
+`package.json` (`24.x`, current Active LTS, EOL 2028) and `.nvmrc`. Puppeteer launches headless Chromium with `--no-sandbox`,
 picking an explicit binary via `process.env.PUPPETEER_EXECUTABLE_PATH || process.env.CHROME_PATH`
-(`server/pdfGenerate.js`) — on Heroku this is set by the `heroku-community/chrome-for-testing`
-buildpack, which must be added before the Node buildpack; `PUPPETEER_SKIP_DOWNLOAD=true` can then
-be set so Puppeteer doesn't also fetch its own bundled Chromium. See `DEPLOY.md` for the full
-Heroku (heroku-24) checklist. The committed `charts6/dist/` is what gets served in production, so a
+(`server/pdfGenerate.js`) — on Heroku the `heroku-community/chrome-for-testing` buildpack (added
+before the Node buildpack) installs Chrome but does **not** set any env var, so
+`PUPPETEER_EXECUTABLE_PATH=/app/.chrome-for-testing/chrome-linux64/chrome` must be set as a config
+var, plus `PUPPETEER_SKIP_DOWNLOAD=true` so Puppeteer doesn't also fetch its own bundled Chromium. See `DEPLOY.md` for the full
+Heroku (heroku-26) checklist. The committed `charts6/dist/` is what gets served in production, so a
 frontend change is only live after rebuilding and committing the dist output.
