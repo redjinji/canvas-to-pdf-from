@@ -117,5 +117,5 @@ picking an explicit binary via `process.env.PUPPETEER_EXECUTABLE_PATH || process
 before the Node buildpack) installs Chrome but does **not** set any env var, so
 `PUPPETEER_EXECUTABLE_PATH=/app/.chrome-for-testing/chrome-linux64/chrome` must be set as a config
 var, plus `PUPPETEER_SKIP_DOWNLOAD=true` so Puppeteer doesn't also fetch its own bundled Chromium. See `DEPLOY.md` for the full
-Heroku (heroku-24) checklist. The committed `charts6/dist/` is what gets served in production, so a
+Heroku (heroku-26) checklist. The committed `charts6/dist/` is what gets served in production, so a
 frontend change is only live after rebuilding and committing the dist output.

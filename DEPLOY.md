@@ -1,6 +1,7 @@
-# Deploying to Heroku (heroku-24)
+# Deploying to Heroku (heroku-26)
 
-1. **Stack & Node**: `heroku stack:set heroku-24`. Node version comes from `engines` in
+1. **Stack & Node**: `heroku stack:set heroku-26` (verified working end-to-end on staging 2026-08-05,
+   incl. Chrome/PDF pipeline; `heroku-24` is an equally verified fallback). Node version comes from `engines` in
    `package.json` (`22.x`) — no separate buildpack config needed for the Node version itself.
 2. **Chrome for Puppeteer**: add the Chrome buildpack *before* the Node buildpack:
    ```
@@ -33,7 +34,7 @@
 Production is untouched by a staging app: it is a separate Heroku app with its own dyno, URL, and
 config vars, and production deploys track `master` while staging deploys a feature branch.
 
-1. Create a new app in the Heroku dashboard (e.g. `midras-staging`), stack heroku-24.
+1. Create a new app in the Heroku dashboard (e.g. `midras-staging`), stack heroku-26.
 2. **Settings → Buildpacks**, order matters: `heroku-community/chrome-for-testing` first,
    `heroku/nodejs` second.
 3. **Settings → Config Vars**: add the vars from step 3 above (see the next section to generate
