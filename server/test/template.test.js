@@ -76,3 +76,15 @@ test('the keshet answer appears in the PDF under the same wording the agent mark
         'exactly the reversed-marking bug - it must no longer appear in the PDF'
     );
 });
+
+// Task 6 - free-text מקור הגעה: when the agent picks אחר and types a custom source, the frontend
+// submits the typed text itself as the referred field, and the PDF must print it verbatim under
+// "מקור הגעה". The template interpolates {{referred}} generically; this locks that contract.
+test('a free-text מקור הגעה value is printed verbatim in the PDF', () => {
+    const fields = Object.assign({}, fixtureFields, { referred: 'המלצה מרופא' });
+    const text = renderedText(fields);
+    assert.ok(
+        text.includes('מקור הגעה: המלצה מרופא'),
+        'expected the PDF text to print the typed free-text source verbatim under "מקור הגעה"'
+    );
+});
