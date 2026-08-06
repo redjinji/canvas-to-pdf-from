@@ -83,7 +83,7 @@ const FORM_ELEMENTS: IFormElement[] = [
         }
     },
     {
-        title: 'טביעת רגל',
+        title: 'דגימת רגל',
         subtitle: 'סוג קשת פלנטארית',
         radio: {
             name: 'footPrint',

@@ -31,11 +31,16 @@ himself. Do not merge PRs on his behalf.
 ### Backend (run from repo root)
 - `npm start` — start the server with nodemon (uses `nodemon.json`). Listens on `PORT` env var or 3000.
 - `npm run start:dev` — start with `nodemon-dev.json` (gitignored; create locally).
-- `npm test` — `node:test` smoke + PDF regression suite (`server/test/*.test.js`, 10 tests). Runs
+- `npm test` — `node:test` smoke + PDF regression suite (`server/test/*.test.js`, 12 tests). Runs
   without any Google credentials (the server must start cleanly with none configured — see
   `server/google_api.js#getUserSheets` below). The PDF-fit tests render real PDFs; two of them read
   the output back with `pdftotext -bbox-layout` (poppler-utils) and skip gracefully if `pdftotext`
   isn't installed locally, everything else still runs. No linter for the backend.
+- **Gotcha when testing `final-form.html` output**: `angular-template` emits the template's own
+  static Hebrew text as numeric HTML entities (`&#x5E7;…`) while interpolated `{{field}}` values
+  stay literal. Any assertion against Hebrew template text must decode entities first or it will
+  match nothing and pass/fail vacuously — see the `renderedText` helper in
+  `server/test/template.test.js`.
 
 ### Frontend (run from `charts6/`)
 - `npm start` / `ng serve` — dev server on `http://localhost:4200` (the backend CORS-allows this origin).
@@ -120,8 +125,12 @@ var, plus `PUPPETEER_SKIP_DOWNLOAD=true` so Puppeteer doesn't also fetch its own
 Heroku (heroku-26) checklist. The committed `charts6/dist/` is what gets served in production, so a
 frontend change is only live after rebuilding and committing the dist output.
 
-Production runs on the client's Heroku app `pro-active8` (deploys track `master`). A separate
-staging app `midras-staging` (Gavriel's Heroku + Google account, own test Sheet/Drive) exists for
-pre-merge testing — deploy any branch to it with `git push staging <branch>:main` (the `staging`
-git remote); see `DEPLOY.md` for its full setup, including minting Google tokens with
-`server/tools/get-google-token.js`.
+Production runs on the client's Heroku app `pro-active8` (deploys track `master`) — never deploy
+there without Gavriel's explicit go-ahead. A separate staging app `midras-staging`
+(https://midras-staging-263106d691c6.herokuapp.com/ — Gavriel's Heroku + Google account, own test
+Sheet/Drive) exists for pre-merge testing — deploy any branch to it with
+`git push staging <branch>:main --force` (the `staging` git remote; force is normally needed since
+deployed branches don't share linear history); see `DEPLOY.md` for its full setup, including
+minting Google tokens with `server/tools/get-google-token.js`. Useful staging verification
+endpoints: `POST /sendForm` (fixture at `server/test/fixtures/sample-fields.json`), then
+`GET /latestpdf` returns the rendered HTML the PDF was printed from.
