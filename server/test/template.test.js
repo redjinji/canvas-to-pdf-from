@@ -30,6 +30,35 @@ function renderedText(fields) {
         .replace(/\s+/g, ' ');
 }
 
+// Task 7 - "images vs recorded text" (תיקון של תמונות מול טקסט שנרשם).
+//
+// The form's three capture slots have shown the agent, in this order since 2019:
+//   image0 - stand-regular (straight leg, foot flat: natural standing)
+//   image1 - stand-knee    (knee bent forward: the athletic "power" stance)
+//   image2 - stand-toe     (toes raised: the windlass / talus-neutral test)
+// but the PDF captioned them Talus / Natural Standing / Power - every caption rotated one slot
+// off its photo (also unchanged since 2019). The image *data* always landed in the right slot;
+// only the caption-to-slot pairing in the template was wrong.
+test('each submitted foot photo is captioned with the stance the agent actually photographed', () => {
+    // The fixture's three images are byte-identical placeholders, so distinguishable markers are
+    // injected per slot - the template interpolates them into each <figure>'s img src verbatim.
+    const fields = Object.assign({}, fixtureFields, {
+        image0: 'data:image/png;base64,MARKER-SLOT-0',
+        image1: 'data:image/png;base64,MARKER-SLOT-1',
+        image2: 'data:image/png;base64,MARKER-SLOT-2',
+    });
+    const html = htmlTemplate(TEMPLATE_PATH, fields);
+
+    const figures = [...html.matchAll(/<figure><img src="([^"]+)">\s*<figcaption>([^<]+)<\/figcaption>/g)]
+        .map(m => [m[1], m[2].trim()]);
+    assert.deepStrictEqual(figures, [
+        ['data:image/png;base64,MARKER-SLOT-0', 'Natural Standing Position'],
+        ['data:image/png;base64,MARKER-SLOT-1', 'Power Position'],
+        ['data:image/png;base64,MARKER-SLOT-2', 'Talus Natural Position'],
+    ], 'each photo must be captioned with the stance shown in its capture slot (image0 = natural ' +
+       'standing, image1 = bent-knee power stance, image2 = toes-raised talus test)');
+});
+
 test('the keshet answer appears in the PDF under the same wording the agent marked ("קשת קשיחה")', () => {
     assert.strictEqual(fixtureFields.keshet, 'כן',
         'fixture precondition: this test assumes the sample submission marked קשת קשיחה = כן');
