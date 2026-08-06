@@ -11,6 +11,7 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/
             <input
                 class="input__text--input"
                 formControlName="{{inputElem.name}}"
+                [attr.id]="inputElem.id ? inputElem.id : null"
                 [attr.max]="inputElem.maxDate ? inputElem.maxDateParsed : null"
                 [attr.min]="inputElem.maxDate ? '1900-01-01' : null"
                 type="{{inputElem.type}}" name="{{inputElem.name}}"
