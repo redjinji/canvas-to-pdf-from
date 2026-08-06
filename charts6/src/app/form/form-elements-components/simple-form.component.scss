@@ -26,3 +26,10 @@ simple-form{
     stroke: $color-blue;
   }
 }
+
+// Task 3: the treated-insoles question spans both columns. Because the two-column layout
+// is just a 2-per-row flex flow, a half-width insertion here would flip the column of
+// every later field - a 100% basis row keeps the flow parity intact.
+.input__container.full-row {
+  flex-basis: 100%;
+}

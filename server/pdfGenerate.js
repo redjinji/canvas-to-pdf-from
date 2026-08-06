@@ -74,6 +74,21 @@ module.exports = {
 	// than duplicated magic numbers. See the derivation comment above for what each one means.
 	NO_SCALE_MM,
 	TARGET_MM,
+	// Submissions saved before Task 3 (and old test fixtures) lack these keys, and
+	// angular-template throws on any interpolated key that is absent - so default them
+	// before every render. insolesDetail is derived here rather than tested in the
+	// template because ht-if cannot compare against Hebrew literals (the template source
+	// is entity-encoded, so treatedInsoles === 'כן' never matches).
+	prepareTemplateFields: function (fields) {
+		for (const key of ['treatedInsoles', 'insolesType', 'insolesDuration', 'midrasType']) {
+			if (fields[key] === undefined) fields[key] = '';
+		}
+		fields.insolesDetail = [
+			fields.insolesType && `סוג: ${fields.insolesType}`,
+			fields.insolesDuration && `זמן: ${fields.insolesDuration}`,
+		].filter(Boolean).join(', ');
+		return fields;
+	},
 	puppetPdf: async function (fields, outPath = 'server/pdfs/mypdf.pdf', options = {}) {
 		// pageRanges defaults to '1' (existing behavior: print only physical page 1). Pass an
 		// explicit empty string ({ pageRanges: '' }) to print every physical page instead; omitting
@@ -101,6 +116,7 @@ module.exports = {
 		try {
 			const page = await browser.newPage();
 
+			this.prepareTemplateFields(fields);
 			const htmlToParce = htmlTemplate(__dirname + '/final-form.html', fields);
 			fs.writeFile('server/assets/testMeText.html', htmlToParce);
 			await page.setContent(htmlToParce);

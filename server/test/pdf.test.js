@@ -4,14 +4,15 @@
 // a fixture rendering as 2 physical pages (page 2 empty, body min-height/margin spillover) is fine
 // and expected; it is not a regression.
 //
-// This file exercises both the proxy math and, in tests 3 and 4, real end-to-end checks. Proxy
-// algebra alone cannot catch a miscalibrated constant - test 2's scaled-footer assertion reduces to
-// `TARGET_MM <= NO_SCALE_MM - 3`, because `footerBottomMm` always equals `contentHeightMm` (the
-// footer is the last in-flow element). Only the real-PDF tests are render-sensitive: they render
-// with pageRanges disabled and read the result back with `pdftotext -bbox-layout`, asserting the
-// footer's own text lands on physical page 1. They cover two magnitudes deliberately:
-//   test 3 (~336mm) - a realistic long submission.
-//   test 4 (~401mm) - inside the region where a TARGET_MM=324 calibration empirically LOST the
+// This file exercises both the proxy math and, in tests 4 and 5, real end-to-end checks. Proxy
+// algebra alone cannot catch a miscalibrated constant - tests 2 and 3 both have scaled-footer
+// assertions that reduce to `TARGET_MM <= NO_SCALE_MM - 3`, because `footerBottomMm` always
+// equals `contentHeightMm` (the footer is the last in-flow element). Only the real-PDF tests are
+// render-sensitive: they render with pageRanges disabled and read the result back with
+// `pdftotext -bbox-layout`, asserting the footer's own text lands on physical page 1. They cover
+// two magnitudes deliberately:
+//   test 4 (~336mm) - a realistic long submission.
+//   test 5 (~401mm) - inside the region where a TARGET_MM=324 calibration empirically LOST the
 //     footer (bisected max safe scale 0.80508 there vs 0.8071 applied by 324); it fails if
 //     TARGET_MM is ever raised back to 324.
 const { test, after } = require('node:test');
@@ -88,25 +89,72 @@ after(() => {
     fs.rmSync(longTextOutPath, { force: true });
     fs.rmSync(longTextFullOutPath, { force: true });
     fs.rmSync(veryLongTextFullOutPath, { force: true });
+    fs.rmSync(path.join(os.tmpdir(), 'canvas-to-pdf-test-legacy-fixture.pdf'), { force: true });
 });
 
-test('puppetPdf renders the fixture at scale 1 with the footer within the single-page boundary', async () => {
-    const { contentHeightMm, scale, footerBottomMm } = await pdfGenerate.puppetPdf(fixtureFields, fixtureOutPath);
+test('a legacy submission (without Task-3 keys) renders below the single-page boundary at scale 1', async () => {
+    // Task 3 added treatedInsoles, insolesType, insolesDuration, midrasType fields and their template
+    // lines. A submission predating these fields (e.g. regenerateLastPdf on a pre-Aug-2026 render)
+    // has these keys absent or undefined - the prepareTemplateFields defaults them to '' which hides
+    // their template lines, reproducing the legacy form layout. This below-boundary baseline
+    // continues to render unscaled.
+    const legacyFixture = Object.assign({}, fixtureFields);
+    delete legacyFixture.treatedInsoles;
+    delete legacyFixture.insolesType;
+    delete legacyFixture.insolesDuration;
+    delete legacyFixture.midrasType;
 
-    assert.ok(fs.existsSync(fixtureOutPath), 'PDF file should have been written');
-    const { size } = fs.statSync(fixtureOutPath);
+    const legacyOutPath = path.join(os.tmpdir(), 'canvas-to-pdf-test-legacy-fixture.pdf');
+    const { contentHeightMm, scale, footerBottomMm } = await pdfGenerate.puppetPdf(legacyFixture, legacyOutPath);
+
+    assert.ok(fs.existsSync(legacyOutPath), 'PDF file should have been written');
+    const { size } = fs.statSync(legacyOutPath);
     assert.ok(size > 50 * 1024, `PDF should be a real render, not empty/broken (got ${size} bytes)`);
 
     assert.strictEqual(
         scale, 1,
-        `expected the fixture (contentHeightMm=${contentHeightMm}) to print unscaled - it is a ` +
-        'typical submission and should look identical to the pre-safety-net render'
+        `expected the legacy layout (contentHeightMm=${contentHeightMm}) to print unscaled - ` +
+        'it is the below-boundary baseline that should look identical to the pre-Task-3 render'
     );
     assert.ok(
         footerBottomMm <= pdfGenerate.NO_SCALE_MM,
         `footer bottom (${footerBottomMm}mm) should fit within the empirically-measured single-page ` +
         `boundary (${pdfGenerate.NO_SCALE_MM}mm) at scale 1 - see the derivation comment in ` +
         'pdfGenerate.js for how that boundary was found'
+    );
+});
+
+test('the full fixture with Task-3 fields now exceeds NO_SCALE_MM and scales down to keep the footer on page 1', async () => {
+    // Task 3 added the treated-insoles question and recommended-type fields to the form. The fixture
+    // includes values for these fields, so all three new template lines display (treatedInsoles
+    // question, derived detail line, and midrasType recommendation). This increases the fixture's
+    // measured contentHeightMm to ~337.6, exceeding NO_SCALE_MM (329.5). The scale-to-fit safety net
+    // engages and applies ~0.94 scale rather than increasing template complexity or reclaiming space.
+    // This behavior was accepted on 2026-08-06 as preferable to further layout reduction.
+    const { contentHeightMm, scale, footerBottomMm } = await pdfGenerate.puppetPdf(fixtureFields, fixtureOutPath);
+
+    assert.ok(fs.existsSync(fixtureOutPath), 'PDF file should have been written');
+    const { size } = fs.statSync(fixtureOutPath);
+    assert.ok(size > 50 * 1024, `PDF should be a real render, not empty/broken (got ${size} bytes)`);
+
+    assert.ok(
+        contentHeightMm > pdfGenerate.NO_SCALE_MM,
+        `expected the full fixture with Task-3 fields (contentHeightMm=${contentHeightMm}) to exceed ` +
+        `the single-page boundary (${pdfGenerate.NO_SCALE_MM}mm) - otherwise the scale-to-fit safety ` +
+        'net would not be exercised'
+    );
+    assert.ok(
+        scale < 1,
+        `expected the safety net to engage (scale < 1) for contentHeightMm=${contentHeightMm}, got scale=${scale}`
+    );
+    // footerBottomMm is measured pre-scale; after shrinking by `scale`, the proxy estimate of footer
+    // position is footerBottomMm * scale. A 3mm safety factor is subtracted (see the note in the
+    // long-text test) so this proxy assertion has real headroom, not a near-miss.
+    assert.ok(
+        footerBottomMm * scale <= pdfGenerate.NO_SCALE_MM - 3,
+        `scaled footer position (${footerBottomMm} * ${scale} = ${footerBottomMm * scale}mm) should ` +
+        `fit with margin under the single-page boundary (${pdfGenerate.NO_SCALE_MM}mm) - the safety ` +
+        'net should leave real headroom, not just barely graze the edge'
     );
 });
 
@@ -137,7 +185,7 @@ test('puppetPdf scales down a long pathology description so the footer still fit
     // element, footerBottomMm always equals contentHeightMm, so once the safety net engages this
     // reduces algebraically to the constant check `TARGET_MM <= NO_SCALE_MM - 3` and is not
     // sensitive to what the renderer actually produced. It is kept as a cheap sanity check on the
-    // constants; the real proof lives in tests 3 and 4, which read back genuinely rendered PDFs
+    // constants; the real proof lives in tests 4 and 5, which read back genuinely rendered PDFs
     // with `pdftotext -bbox-layout`.
     assert.ok(
         footerBottomMm * scale <= pdfGenerate.NO_SCALE_MM - 3,

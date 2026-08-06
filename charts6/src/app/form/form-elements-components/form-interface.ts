@@ -66,13 +66,19 @@ export interface ISelectOption {
     other?: boolean
 }
 
+export interface IShowIf {
+    field: string,
+    equals: string
+}
+
 export interface ICustomerDetails {
     input?: IInput,
     inputBirthday?: IInputBirthday,
     textarea?: ITextArea,
     radio?: IRadio,
     select?: ISelect,
-    class?: string
+    class?: string,
+    showIf?: IShowIf
 }
 
 export interface IFormElement {

@@ -227,6 +227,41 @@ const FORM_ELEMENTS: IFormElement[] = [
                 }
             },
             {
+                class: 'full-row',
+                radio: {
+                    name: 'treatedInsoles',
+                    label: 'האם מטופל במדרסים?',
+                    elements: [
+                        {
+                            id: 'treated-insoles-yes',
+                            label: 'כן'
+                        },
+                        {
+                            id: 'treated-insoles-no',
+                            label: 'לא'
+                        }
+                    ]
+                }
+            },
+            {
+                showIf: {field: 'treatedInsoles', equals: 'כן'},
+                input: {
+                    id: 'insoles-type',
+                    name: 'insolesType',
+                    type: 'text',
+                    label: 'איזה סוג?'
+                }
+            },
+            {
+                showIf: {field: 'treatedInsoles', equals: 'כן'},
+                input: {
+                    id: 'insoles-duration',
+                    name: 'insolesDuration',
+                    type: 'text',
+                    label: 'כמה זמן?'
+                }
+            },
+            {
                 select: {
                     label: 'ביטוח',
                     name: 'insurance',
@@ -252,9 +287,9 @@ const FORM_ELEMENTS: IFormElement[] = [
             },
             {
                 select: {
-                    label: 'סוג מדרס',
+                    label: 'סוג המדרס המומלץ',
                     id: 'midras-type',
-                    name: 'midras-type',
+                    name: 'midrasType',
                     options: [
                         {
                             text: 'אקטיבי',
