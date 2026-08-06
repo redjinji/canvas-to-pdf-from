@@ -221,6 +221,7 @@ const FORM_ELEMENTS: IFormElement[] = [
                         },
                         {
                             text: 'אחר',
+                            other: true
                         }
                     ]
                 }

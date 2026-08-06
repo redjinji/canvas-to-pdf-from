@@ -1,47 +1,19 @@
-// server/test/pdf.test.js
-// Regression guard for the Task 7 (Puppeteer 25 upgrade) A4-overflow bug: `pdffonts` on the Task 1
-// baseline PDF (Puppeteer 17 / Chromium 106) shows every glyph embedded as Arial - the `Alef`
-// webfont requested by server/final-form.html never actually applied, i.e. the baseline shipped in
-// a silent font-fallback state. Under Puppeteer 25 / Chromium 151, Alef DOES load and apply
-// (confirmed via `pdffonts` on a fresh render), and Alef's normal line box is taller than Arial's.
-// That per-line growth, compounded across every stacked text block on the page, was enough to push
-// the footer (business contact bar: active8.il / phone numbers / active8.co.il) onto a second PDF
-// page that `pageRanges: '1'` then silently discarded. This is a font-substitution change (Arial
-// fallback -> real Alef), not "Alef's own line-height changing between browser versions."
-//
-// Fixed two ways in server/pdfGenerate.js#puppetPdf:
-//  1. An explicit `line-height: 1.03` on `html` in final-form.html compensates for Alef's taller
-//     line box, restoring single-page fit for the fixture (see that file for its own derivation
-//     comment).
-//  2. A dynamic scale-to-fit safety net (see the NO_SCALE_MM / TARGET_MM derivation comment in
-//     pdfGenerate.js) shrinks the printed page whenever measured content exceeds the true
-//     single-page boundary, so longer real-world submissions (extra lines in patalog/comments)
-//     degrade to a slightly smaller single page instead of silently losing the footer - which a
-//     code reviewer found still happened with only the line-height fix and a static content-height
-//     *assertion* (no correction), since realistic submissions have only ~3.3mm of headroom past
-//     the fixture.
-//
-// The only invariant that actually matters is "the footer lands on printed page 1" - a fixture
-// rendering as 2 physical pages (page 2 empty, body min-height/margin spillover) is fine and
-// expected; it is not a regression. Fix round 2's scale curve was calibrated against the wrong,
-// stricter criterion ("whole document collapses to 1 physical page") and badly over-corrected as a
-// result (e.g. shrinking a long-but-reasonable submission to ~5pt text). Fix round 3 replaced that
-// power curve with a plain linear ratio, re-calibrated against the real footer-on-page-1 criterion
-// using real (non-proxy) Puppeteer renders - see the derivation comment in pdfGenerate.js.
+// Guards the PDF's single-page fit (see the line-height comment in final-form.html for why content
+// grew: Chromium >=151 actually applies the Alef webfont, whose line box is taller than the old
+// silent Arial fallback). The only invariant that matters is "the footer lands on printed page 1" -
+// a fixture rendering as 2 physical pages (page 2 empty, body min-height/margin spillover) is fine
+// and expected; it is not a regression.
 //
 // This file exercises both the proxy math and, in tests 3 and 4, real end-to-end checks. Proxy
-// algebra alone cannot catch a miscalibrated constant - in fact test 2's scaled-footer assertion
-// reduces to a constant check, because `footerBottomMm` always equals `contentHeightMm` (the footer
-// is the last in-flow element), so it is really just `TARGET_MM <= NO_SCALE_MM - 3`. Only the
-// real-PDF tests are render-sensitive. Each of those renders a submission with pageRanges disabled
-// (so every physical page Chrome produces is written out) and reads the result back with
-// `pdftotext -bbox-layout`, asserting the footer's own text lands on physical page 1 - the only
-// invariant that matters. They cover two magnitudes deliberately:
-//   test 3 (~336mm) - a realistic long submission, the reviewer's original 3-line-patalog repro.
-//   test 4 (~401mm) - inside the region where the previous TARGET_MM=324 calibration empirically
-//     LOST the footer (bisected max safe scale 0.80508 there vs 0.8071 applied by 324). Fix round
-//     3's suite had no case in this failure region at all, so a too-high TARGET_MM went undetected;
-//     this test exists specifically to close that gap and fails if TARGET_MM is raised back to 324.
+// algebra alone cannot catch a miscalibrated constant - test 2's scaled-footer assertion reduces to
+// `TARGET_MM <= NO_SCALE_MM - 3`, because `footerBottomMm` always equals `contentHeightMm` (the
+// footer is the last in-flow element). Only the real-PDF tests are render-sensitive: they render
+// with pageRanges disabled and read the result back with `pdftotext -bbox-layout`, asserting the
+// footer's own text lands on physical page 1. They cover two magnitudes deliberately:
+//   test 3 (~336mm) - a realistic long submission.
+//   test 4 (~401mm) - inside the region where a TARGET_MM=324 calibration empirically LOST the
+//     footer (bisected max safe scale 0.80508 there vs 0.8071 applied by 324); it fails if
+//     TARGET_MM is ever raised back to 324.
 const { test, after } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
@@ -56,10 +28,9 @@ const longTextOutPath = path.join(os.tmpdir(), 'canvas-to-pdf-test-longtext.pdf'
 const longTextFullOutPath = path.join(os.tmpdir(), 'canvas-to-pdf-test-longtext-full.pdf');
 const veryLongTextFullOutPath = path.join(os.tmpdir(), 'canvas-to-pdf-test-verylongtext-full.pdf');
 
-// Reproduces the reviewer's finding: a realistic multi-line patalog ("describe pain location /
-// pathology") field alone, with no other change, pushes content well past the single-page
-// boundary. This ~200-character Hebrew description wraps to 3 lines in the form's answer column,
-// matching the reviewer's "3-line patalog field" repro. Measures contentHeightMm ~336.
+// A realistic multi-line patalog ("describe pain location / pathology") field alone, with no
+// other change, pushes content well past the single-page boundary. This ~200-character Hebrew
+// description wraps to 3 lines in the form's answer column. Measures contentHeightMm ~336.
 const PATHOLOGY_TEXT = 'דלקת בגיד אכילס בעקב שמאל עם הגבלה בטווח התנועה של הקרסול, כאבים משמעותיים ' +
     'בהליכה ובעמידה ממושכת, נפיחות קלה באזור העקב, רגישות במישוש, היסטוריה של פציעות ' +
     'חוזרות באזור זה בשנתיים האחרונות הדורשות מעקב';
@@ -220,12 +191,11 @@ test('real end-to-end check: a ~1,000-char pathology description (past where TAR
         return;
     }
 
-    // This case exists because fix round 3's suite had NO coverage in the region where its own
-    // calibration broke. Bisecting the true maximum footer-on-page-1 scale at this content height
-    // (~401.5mm) gives 0.80508, while TARGET_MM=324 applies 0.8071 - over the line, footer lost on
-    // page 2. TARGET_MM=318 applies 0.7921, inside the safe region. So this test is the direct
-    // guard on the constant: raising TARGET_MM back to 324 makes it fail (verified by mutation),
-    // whereas the proxy assertions in tests 1-2 stay green under that same mutation.
+    // Direct guard on the TARGET_MM constant. Bisecting the true maximum footer-on-page-1 scale at
+    // this content height (~401.5mm) gives 0.80508; TARGET_MM=324 applies 0.8071 - over the line,
+    // footer lost on page 2 - while TARGET_MM=318 applies 0.7921, inside the safe region. Raising
+    // TARGET_MM back to 324 makes this test fail (verified by mutation), whereas the proxy
+    // assertions in tests 1-2 stay green under that same mutation.
     const { footerPage, totalPages, contentHeightMm, scale } =
         await renderAndFindFooterPage(veryLongTextFields, veryLongTextFullOutPath);
 
@@ -246,6 +216,6 @@ test('real end-to-end check: a ~1,000-char pathology description (past where TAR
         `expected the footer ("active8.il") to land on physical page 1 of the real rendered PDF ` +
         `(contentHeightMm=${contentHeightMm}, scale=${scale}, ${totalPages} physical page(s) total), ` +
         `but it was found on page ${footerPage} - TARGET_MM is calibrated too high for content this ` +
-        'long; see the fix round 4 derivation comment in pdfGenerate.js'
+        'long; see the TARGET_MM derivation comment in pdfGenerate.js'
     );
 });

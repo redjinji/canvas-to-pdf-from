@@ -9,78 +9,26 @@ const { formidable } = require('formidable'),
 // contentHeightMm below (NOT physical printed mm - see the comment on that measurement, in
 // puppetPdf). NOT the physical A4 page height (297mm) either.
 //
-// Derivation (fix round 2), part 1 - find the true single-page boundary: the previous regression
-// guard only asserted contentHeightMm against a static 333mm ceiling, which a reviewer showed
-// still passes states where the footer contact bar has already fallen onto page 2 (which
-// `pageRanges: '1'` then silently discards) - up to 332.78mm on a realistic 3-line
-// pathology-description submission. To find the *real* boundary, we bisected on a synthetic
-// line-height sweep of the fixture template, rendering full PDFs (no pageRanges restriction) and
-// checking with `pdftotext -bbox-layout` which physical page the footer's ".business-card" text
-// (active8.il / phone numbers) actually lands on:
-//   contentHeightMm=329.588 (line-height 1.132) -> footer text found on page 1 (fits)
-//   contentHeightMm=329.675 (line-height 1.135) -> footer text found on page 2 (dropped)
-// So the true no-scale-needed boundary sits at ~329.6mm in this proxy's units, with the gate
-// below (329.5) sitting only ~0.1mm below the last confirmed-good point - a thin margin, not a
-// generous one. (Fix round 2's write-up claimed the opposite - that marginal overflow "may be
-// under-rescued" - which had it backwards: the risk at this boundary is running the gate too
-// close, not under-correcting past it. Corrected in fix round 3.)
+// The invariant these protect: the footer ".business-card" text lands on printed page 1 (a second,
+// EMPTY trailing page from body min-height/margin spillover is normal and fine - even the fixture,
+// contentHeightMm=326.24, renders that way).
 //
-// Derivation (fix round 3) - the *criterion* fix round 2 calibrated its scale curve against was
-// wrong. It treated "whole document collapses to 1 physical page" as the target, but even the
-// fixture (contentHeightMm=326.24, comfortably below the gate) genuinely renders as 2 physical
-// pages at scale 1 - page 2 is harmless body min-height/margin spillover with no content on it,
-// and that fixture PDF is correct today. The only invariant that actually matters is "the footer
-// lands on printed page 1"; a second, empty trailing page is fine. Judged against that corrected
-// criterion, fix round 2's power-of-5 curve was badly over-corrected - independently re-bisected
-// here (via real, unrestricted `page.pdf({scale})` renders, checking with `pdftotext -bbox-layout`
-// which physical page the footer's ".business-card" text lands on) at three magnitudes:
-//   contentHeightMm=329.66 -> footer-on-page-1 needs scale <= ~1.00   (old ^5 curve applied 0.9629)
-//   contentHeightMm=336.05 -> footer-on-page-1 needs scale <= ~0.978  (old ^5 curve applied 0.8724)
-//   contentHeightMm=381.84 -> footer-on-page-1 needs scale <= ~0.850  (old ^5 curve applied 0.4606,
-//                                                                       i.e. ~5pt text, half the
-//                                                                       sheet left blank)
-// The old curve's justification - "a plain ratio can never correct enough while leaving the
-// fixture untouched" - assumed the correction had to hit ~0.96 at contentHeightMm=329.675 (the
-// wrong, too-strict criterion above). Under the real criterion, that same point only needs
-// scale <= ~1.00, i.e. next to no correction at all; the NO_SCALE_MM gate already keeps the
-// fixture untouched, so anchoring the ratio's target *above* the fixture height was never
-// necessary. A plain linear ratio is sufficient once anchored correctly:
-//   scale = Math.min(1, TARGET_MM / contentHeightMm)
+// NO_SCALE_MM: the true no-scale-needed boundary was bisected at ~329.6mm in these proxy units
+// (329.588 -> footer on page 1; 329.675 -> footer dropped to page 2, checked with
+// `pdftotext -bbox-layout` on unrestricted renders). The 329.5 gate sits only ~0.1mm below the
+// last confirmed-good point - a thin margin, not a generous one.
 //
-// Derivation (fix round 4) - choosing TARGET_MM. Fix round 3 picked 324 from three calibration
-// points that all sat at or below ~382mm, and a spot-check further out suggested the margin
-// shrank. Re-review pushed on that, and a full bisection sweep (this round, and independently by
-// the reviewer, in agreement) shows 324 is in fact *unsafe* just past ~388mm. For each content
-// height the true maximum scale that still puts the footer on printed page 1 was bisected (16
-// iterations, real `page.pdf({scale})` renders with pageRanges disabled, footer page read back
-// with `pdftotext -bbox-layout`); multiplying that by the content height gives the largest
-// TARGET_MM that would have been safe at that point ("implied-safe TARGET_MM"), which declines
-// monotonically as content grows:
-//   contentHeightMm=388.375 -> max safe scale 0.83500 -> implied-safe TARGET_MM 324.29
-//   contentHeightMm=401.456 -> max safe scale 0.80508 -> implied-safe TARGET_MM 323.20
-//   contentHeightMm=414.536 -> max safe scale 0.77773 -> implied-safe TARGET_MM 322.40
-//   contentHeightMm=437.427 -> max safe scale 0.73349 -> implied-safe TARGET_MM 320.85
-//   contentHeightMm=463.587 -> max safe scale 0.68892 -> implied-safe TARGET_MM 319.38
-//   contentHeightMm=476.668 -> max safe scale 0.66884 -> implied-safe TARGET_MM 318.82
-// So TARGET_MM=324 crosses into "footer lost on page 2" at roughly 388-390mm of content - well
-// inside reach, since the frontend's free-text fields accept up to 10,000 characters each and the
-// ~1,000-character pathology description used by the new regression test already measures 401mm.
-// TARGET_MM=318 sits below every implied-safe value measured above, so it is verified safe across
-// the whole sweep. Its cost on realistic submissions is negligible: at the 336mm long-text point
-// it prints at scale 0.946 instead of 0.964.
-//
-// Honest statement of what is and isn't verified: safety is empirically demonstrated from the
-// NO_SCALE_MM gate through ~477mm of measured content. Beyond that the implied-safe series is
-// still declining, so 318 is expected to go unsafe somewhere past ~480mm; that region is NOT
-// verified. Reaching it requires several thousand characters of free text, which the UI permits
-// (maxLength 10000 per textarea) and the server does not cap. Capping submitted free-text length
-// server-side is the right hardening for that tail and is deliberately left as future work rather
-// than smuggled into this task. See task-7-report.md, "Fix round 4" for the full data.
+// TARGET_MM: applied as scale = Math.min(1, TARGET_MM / contentHeightMm). The largest value that
+// would keep the footer on page 1 declines as content grows (bisected via real `page.pdf({scale})`
+// renders): implied-safe TARGET_MM is 324.29 at 388mm of content, 323.20 at 401mm, 322.40 at
+// 415mm, 320.85 at 437mm, 319.38 at 464mm, 318.82 at 477mm. 318 sits below every measured value,
+// so it is verified safe through ~477mm; the cost on realistic submissions is negligible (scale
+// 0.946 instead of 0.964 at the 336mm long-text point). Beyond ~480mm the series keeps declining
+// and is NOT verified - reaching it needs several thousand characters of free text, which the UI
+// permits (maxLength 10000 per textarea) and the server does not cap; capping server-side is the
+// right future hardening for that tail.
 const NO_SCALE_MM = 329.5; // below this, content already fits at scale 1 - no correction applied
-const TARGET_MM = 318; // linear ratio target; empirically verified (see derivation above) to stay
-                        // inside the measured safe region across the whole 330-477mm overflow
-                        // sweep, while the NO_SCALE_MM gate (not this constant) is what keeps
-                        // typical/fixture submissions untouched at scale 1
+const TARGET_MM = 318; // linear ratio target, verified safe across the measured 330-477mm sweep
 
 module.exports = {
 	init: function (req, res) {
@@ -175,20 +123,10 @@ module.exports = {
 			// print result) - it's a stable, deterministic proxy for "how tall the content wants to
 			// be". See the scale-to-fit constants above and server/test/pdf.test.js for how it's used
 			// and calibrated.
-			//
-			// Root cause of the Task 7 (Puppeteer 17 -> 25) overflow regression, corrected: `pdffonts`
-			// on the Task 1 baseline PDF (Puppeteer 17 / Chromium 106) shows every glyph embedded as
-			// Arial - the `Alef` webfont requested via <link> in this template's <head> was NEVER
-			// applied, i.e. the baseline shipped in a silent web-font-load failure/fallback. Under
-			// Puppeteer 25 / Chromium 151, Alef *does* load and apply (confirmed via `pdffonts` on a
-			// fresh render: embedded font is Alef-Regular), and Alef's normal line box is taller than
-			// Arial's. That per-line growth, compounded across every stacked text block on the page, is
-			// what pushes the footer business-card onto a second page that `pageRanges: '1'` then
-			// discards - it is a font-substitution change (Arial fallback -> real Alef), not "Alef's
-			// own line-height changing between browser versions." The explicit `line-height: 1.03` on
-			// `html` below in final-form.html compensates for Alef's taller line box; the dynamic
-			// scale-to-fit safety net here exists because the line-height compensation alone still has
-			// only a few mm of headroom for longer real-world submissions.
+			// Why content can overflow at all: Chromium >=151 actually applies the Alef webfont
+			// (older renders silently fell back to Arial) and Alef's line box is taller - see the
+			// line-height comment in final-form.html. The scale net exists because that line-height
+			// compensation leaves only a few mm of headroom for longer real-world submissions.
 			const { contentHeightMm, footerBottomMm } = await page.evaluate(() => {
 				const toMm = (px) => px / 96 * 25.4;
 				const footerEl = document.querySelector('.business-card');
@@ -199,11 +137,11 @@ module.exports = {
 			});
 
 			// Dynamic scale-to-fit safety net: the line-height fix restores parity for the fixture, but
-			// only leaves a few mm of headroom (see task-7-report.md fix round 2) before longer
-			// real-world submissions (extra lines in patalog/comments, etc.) push the footer onto page
-			// 2 again. Rather than relying solely on a static content-height ceiling to *detect* that
-			// (which a reviewer showed can pass while the footer is already lost), shrink the printed
-			// page whenever measured content exceeds NO_SCALE_MM, so pathological submissions degrade
+			// only leaves a few mm of headroom before longer real-world submissions (extra lines in
+			// patalog/comments, etc.) push the footer onto page 2 again. Rather than relying solely on
+			// a static content-height ceiling to *detect* that (which can pass while the footer is
+			// already lost), shrink the printed page whenever measured content exceeds NO_SCALE_MM,
+			// so pathological submissions degrade
 			// to a slightly smaller single page instead of silently losing the contact bar. Typical/
 			// fixture submissions measure below NO_SCALE_MM and print at scale 1 (unchanged from
 			// before this safety net existed). See the derivation comment above NO_SCALE_MM/TARGET_MM
