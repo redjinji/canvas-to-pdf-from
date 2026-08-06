@@ -33,9 +33,9 @@ himself. Do not merge PRs on his behalf.
 - `npm run start:dev` — start with `nodemon-dev.json` (gitignored; create locally).
 - `npm test` — `node:test` smoke + PDF regression suite (`server/test/*.test.js`, 12 tests). Runs
   without any Google credentials (the server must start cleanly with none configured — see
-  `server/google_api.js#getUserSheets` below). Two tests render real PDFs and read them back with
-  `pdftotext -bbox-layout` (poppler-utils); those two skip gracefully if `pdftotext` isn't
-  installed locally, everything else still runs. No linter for the backend.
+  `server/google_api.js#getUserSheets` below). The PDF-fit tests render real PDFs; two of them read
+  the output back with `pdftotext -bbox-layout` (poppler-utils) and skip gracefully if `pdftotext`
+  isn't installed locally, everything else still runs. No linter for the backend.
 - **Gotcha when testing `final-form.html` output**: `angular-template` emits the template's own
   static Hebrew text as numeric HTML entities (`&#x5E7;…`) while interpolated `{{field}}` values
   stay literal. Any assertion against Hebrew template text must decode entities first or it will
@@ -125,13 +125,12 @@ var, plus `PUPPETEER_SKIP_DOWNLOAD=true` so Puppeteer doesn't also fetch its own
 Heroku (heroku-26) checklist. The committed `charts6/dist/` is what gets served in production, so a
 frontend change is only live after rebuilding and committing the dist output.
 
-### Staging
-
-Gavriel's staging app is `midras-staging` (Heroku US,
-https://midras-staging-263106d691c6.herokuapp.com/), configured with his own Google OAuth
-client/tokens and test Sheet/Drive folder — safe for end-to-end testing. Deploy any branch with
+Production runs on the client's Heroku app `pro-active8` (deploys track `master`) — never deploy
+there without Gavriel's explicit go-ahead. A separate staging app `midras-staging`
+(https://midras-staging-263106d691c6.herokuapp.com/ — Gavriel's Heroku + Google account, own test
+Sheet/Drive) exists for pre-merge testing — deploy any branch to it with
 `git push staging <branch>:main --force` (the `staging` git remote; force is normally needed since
-deployed branches don't share linear history). Useful verification endpoints: `POST /sendForm`
-(fixture at `server/test/fixtures/sample-fields.json`), then `GET /latestpdf` returns the rendered
-HTML the PDF was printed from. The production app is `pro-active8` — never deploy there without
-Gavriel's explicit go-ahead.
+deployed branches don't share linear history); see `DEPLOY.md` for its full setup, including
+minting Google tokens with `server/tools/get-google-token.js`. Useful staging verification
+endpoints: `POST /sendForm` (fixture at `server/test/fixtures/sample-fields.json`), then
+`GET /latestpdf` returns the rendered HTML the PDF was printed from.
