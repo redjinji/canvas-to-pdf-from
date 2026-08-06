@@ -3,6 +3,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const htmlTemplate = require('angular-template');
 const path = require('path');
+const pdfGenerate = require('../pdfGenerate');
 const fixtureFields = require('./fixtures/sample-fields.json');
 
 const TEMPLATE_PATH = path.join(__dirname, '..', 'final-form.html');
@@ -12,7 +13,7 @@ const TEMPLATE_PATH = path.join(__dirname, '..', 'final-form.html');
 // while interpolated {{field}} values stay literal, so entities must be decoded before matching -
 // otherwise assertions against Hebrew template text silently match nothing.
 function renderedText(fields) {
-    const html = htmlTemplate(TEMPLATE_PATH, fields);
+    const html = htmlTemplate(TEMPLATE_PATH, pdfGenerate.prepareTemplateFields(Object.assign({}, fields)));
     return html
         .replace(/<[^>]*>/g, '')
         .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
@@ -30,7 +31,7 @@ test('each submitted foot photo is captioned with the stance the agent actually 
         image1: 'data:image/png;base64,MARKER-SLOT-1',
         image2: 'data:image/png;base64,MARKER-SLOT-2',
     });
-    const html = htmlTemplate(TEMPLATE_PATH, fields);
+    const html = htmlTemplate(TEMPLATE_PATH, pdfGenerate.prepareTemplateFields(fields));
 
     const figures = [...html.matchAll(/<figure><img src="([^"]+)">\s*<figcaption>([^<]+)<\/figcaption>/g)]
         .map(m => [m[1], m[2].trim()]);
@@ -67,4 +68,42 @@ test('a free-text מקור הגעה value is printed verbatim in the PDF', () =>
         text.includes('מקור הגעה: המלצה מרופא'),
         'expected the PDF text to print the typed free-text source verbatim under "מקור הגעה"'
     );
+});
+
+test('the treated-insoles answer and its follow-up details appear in the PDF', () => {
+    const text = renderedText(fixtureFields);
+    assert.ok(text.includes('האם מטופל במדרסים: כן'),
+        'expected the PDF to state the treated-insoles answer under the form\'s own wording');
+    assert.ok(text.includes('סוג: אקטיב פלקס'),
+        'expected the insole-type follow-up to be printed');
+    assert.ok(text.includes('זמן: שנתיים'),
+        'expected the duration follow-up to be printed');
+});
+
+test('the follow-up detail line disappears when both follow-ups are empty', () => {
+    const text = renderedText(Object.assign({}, fixtureFields,
+        { treatedInsoles: 'לא', insolesType: '', insolesDuration: '' }));
+    assert.ok(text.includes('האם מטופל במדרסים: לא'),
+        'the yes/no answer itself must still be printed');
+    assert.ok(!text.includes('סוג: ') && !text.includes('זמן: '),
+        'an empty follow-up pair must not leave an orphan "סוג:"/"זמן:" line in the PDF');
+});
+
+test('a legacy submission without the Task-3 keys still renders (regenerateLastPdf safety)', () => {
+    const legacy = Object.assign({}, fixtureFields);
+    delete legacy.treatedInsoles;
+    delete legacy.insolesType;
+    delete legacy.insolesDuration;
+    delete legacy.midrasType;
+    const text = renderedText(legacy);
+    assert.ok(!text.includes('האם מטופל במדרסים'),
+        'a submission predating the question must not print an empty question line');
+    assert.ok(!text.includes('סוג המדרס המומלץ'),
+        'a submission predating the midrasType field must not print an empty recommendation line');
+});
+
+test('the recommended midras type is printed in the PDF', () => {
+    const text = renderedText(fixtureFields);
+    assert.ok(text.includes('סוג המדרס המומלץ: אקטיבי'),
+        'the agent\'s selected midras type was previously collected but silently dropped from the PDF');
 });

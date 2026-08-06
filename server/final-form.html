@@ -267,7 +267,10 @@
 	<div>
 		<p class="title"><span class="lable">קשת קשיחה: </span><span>{{keshet}}</span></p>
 		<p><span class="lable">מקור הגעה: </span><span>{{referred}}</span></p>
+		<p ht-if="treatedInsoles.length != 0"><span class="lable">האם מטופל במדרסים: </span><span>{{treatedInsoles}}</span></p>
+		<p ht-if="insolesDetail.length != 0"><span>{{insolesDetail}}</span></p>
 		<p><span class="lable">ביטוח בריאות: </span><span>{{insurance}}</span></p>
+		<p ht-if="midrasType.length != 0"><span class="lable">סוג המדרס המומלץ: </span><span>{{midrasType}}</span></p>
 		<p><span class="lable">תאר מקום כאב ופרט פתולוגיה אם קיימת: </span><span>{{patalog}}</span></p>
 		<p><span class="lable">פרט אופי פעילות (ריצה, ספורט, עמידה ממושכת): </span><span>{{activity}}</span></p>
 		<p><span class="lable">יש צורך בהגבהה מטטראסל: </span><span>{{kolapsBow}}</span></p>
