@@ -4,14 +4,15 @@
 // a fixture rendering as 2 physical pages (page 2 empty, body min-height/margin spillover) is fine
 // and expected; it is not a regression.
 //
-// This file exercises both the proxy math and, in tests 3 and 4, real end-to-end checks. Proxy
-// algebra alone cannot catch a miscalibrated constant - test 2's scaled-footer assertion reduces to
-// `TARGET_MM <= NO_SCALE_MM - 3`, because `footerBottomMm` always equals `contentHeightMm` (the
-// footer is the last in-flow element). Only the real-PDF tests are render-sensitive: they render
-// with pageRanges disabled and read the result back with `pdftotext -bbox-layout`, asserting the
-// footer's own text lands on physical page 1. They cover two magnitudes deliberately:
-//   test 3 (~336mm) - a realistic long submission.
-//   test 4 (~401mm) - inside the region where a TARGET_MM=324 calibration empirically LOST the
+// This file exercises both the proxy math and, in tests 4 and 5, real end-to-end checks. Proxy
+// algebra alone cannot catch a miscalibrated constant - tests 2 and 3 both have scaled-footer
+// assertions that reduce to `TARGET_MM <= NO_SCALE_MM - 3`, because `footerBottomMm` always
+// equals `contentHeightMm` (the footer is the last in-flow element). Only the real-PDF tests are
+// render-sensitive: they render with pageRanges disabled and read the result back with
+// `pdftotext -bbox-layout`, asserting the footer's own text lands on physical page 1. They cover
+// two magnitudes deliberately:
+//   test 4 (~336mm) - a realistic long submission.
+//   test 5 (~401mm) - inside the region where a TARGET_MM=324 calibration empirically LOST the
 //     footer (bisected max safe scale 0.80508 there vs 0.8071 applied by 324); it fails if
 //     TARGET_MM is ever raised back to 324.
 const { test, after } = require('node:test');
@@ -88,6 +89,7 @@ after(() => {
     fs.rmSync(longTextOutPath, { force: true });
     fs.rmSync(longTextFullOutPath, { force: true });
     fs.rmSync(veryLongTextFullOutPath, { force: true });
+    fs.rmSync(path.join(os.tmpdir(), 'canvas-to-pdf-test-legacy-fixture.pdf'), { force: true });
 });
 
 test('a legacy submission (without Task-3 keys) renders below the single-page boundary at scale 1', async () => {
@@ -120,8 +122,6 @@ test('a legacy submission (without Task-3 keys) renders below the single-page bo
         `boundary (${pdfGenerate.NO_SCALE_MM}mm) at scale 1 - see the derivation comment in ` +
         'pdfGenerate.js for how that boundary was found'
     );
-
-    fs.rmSync(legacyOutPath, { force: true });
 });
 
 test('the full fixture with Task-3 fields now exceeds NO_SCALE_MM and scales down to keep the footer on page 1', async () => {
@@ -185,7 +185,7 @@ test('puppetPdf scales down a long pathology description so the footer still fit
     // element, footerBottomMm always equals contentHeightMm, so once the safety net engages this
     // reduces algebraically to the constant check `TARGET_MM <= NO_SCALE_MM - 3` and is not
     // sensitive to what the renderer actually produced. It is kept as a cheap sanity check on the
-    // constants; the real proof lives in tests 3 and 4, which read back genuinely rendered PDFs
+    // constants; the real proof lives in tests 4 and 5, which read back genuinely rendered PDFs
     // with `pdftotext -bbox-layout`.
     assert.ok(
         footerBottomMm * scale <= pdfGenerate.NO_SCALE_MM - 3,

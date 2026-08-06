@@ -31,7 +31,7 @@ himself. Do not merge PRs on his behalf.
 ### Backend (run from repo root)
 - `npm start` — start the server with nodemon (uses `nodemon.json`). Listens on `PORT` env var or 3000.
 - `npm run start:dev` — start with `nodemon-dev.json` (gitignored; create locally).
-- `npm test` — `node:test` smoke + PDF regression suite (`server/test/*.test.js`, 12 tests). Runs
+- `npm test` — `node:test` smoke + PDF regression suite (`server/test/*.test.js`, 18 tests). Runs
   without any Google credentials (the server must start cleanly with none configured — see
   `server/google_api.js#getUserSheets` below). The PDF-fit tests render real PDFs; two of them read
   the output back with `pdftotext -bbox-layout` (poppler-utils) and skip gracefully if `pdftotext`
