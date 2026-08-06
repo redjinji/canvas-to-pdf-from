@@ -39,8 +39,7 @@ export class SelectComponent implements OnInit{
     @Input() selectElem: ISelect;
     @Input() parentForm: FormGroup;
 
-    // Present only when an option carries other: true. The <select> then binds to this internal
-    // control and the parent-form control holds the resolved value instead.
+    // Present only when an option has other: true; the parent-form control then holds the resolved value.
     choiceControl?: FormControl;
     otherTextControl = new FormControl('');
     private otherLabel?: string;
@@ -81,10 +80,8 @@ export class SelectComponent implements OnInit{
         }
     }
 
-    // The parent-form control always holds what gets submitted (and printed in the PDF): the chosen
-    // option, or the typed text while the "other" option is selected (empty text -> the plain label).
     private syncResolvedValue() {
-        const choice = this.choiceControl!.value; // only ever called when choiceControl exists
+        const choice = this.choiceControl!.value;
         const resolved = this.otherSelected
             ? ((this.otherTextControl.value || '').trim() || this.otherLabel)
             : choice;

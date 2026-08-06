@@ -3,9 +3,6 @@ import { FormGroup } from '@angular/forms';
 import { SelectComponent } from './select.component';
 import { ISelect } from './form-interface';
 
-// Task 6: an option flagged other: true turns the select into "resolved-value" mode — choosing it
-// reveals a free-text input, and the parent-form control receives the typed text (or the plain
-// option label when the text is empty). Selects without the flag must behave exactly as before.
 describe('SelectComponent', () => {
   const REFERRED: ISelect = {
     label: 'מקור הגעה',
@@ -13,7 +10,6 @@ describe('SelectComponent', () => {
     id: 'referred',
     options: [{ text: 'מזדמן' }, { text: 'פרסום' }, { text: 'אחר', other: true }]
   };
-  // An אחר option WITHOUT the flag (like the insurance select) keeps plain behavior.
   const PLAIN: ISelect = {
     name: 'insurance',
     options: [{ text: 'כללית' }, { text: 'אחר' }]
@@ -72,8 +68,6 @@ describe('SelectComponent', () => {
     expect(submittedValue(fixture)).toBe('מזדמן');
   });
 
-  // The component sits bottom-aligned in a min-height grid cell; without top clearance the
-  // revealed input makes it grow upward and the floating label overlaps the field above (מין).
   it('adds top clearance while the free-text input is revealed', () => {
     const fixture = createSelect(REFERRED);
     const wrapper = () => fixture.nativeElement.querySelector('.select-component') as HTMLElement;

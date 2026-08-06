@@ -1,14 +1,4 @@
-// server/test/template.test.js
-// Task 5 - "reversed marking" (סימון הפוך בטופס שנשלח אל מול הטופס במערכת).
-//
-// Root cause: the form asks the agent "קשת קשיחה?" (is the arch rigid?) and the submitted כן/לא
-// answer was copied verbatim into the PDF - but under the heading "ניתן לבצע הטבעה פעילה ישירה"
-// (direct active molding is possible), which means the *opposite* clinical fact. So an agent who
-// marked כן (rigid arch) produced a PDF stating "כן, ניתן לבצע הטבעה" - read by everyone downstream
-// as לא-קשיחה. The value was never flipped anywhere in code; the heading inverted its meaning.
-//
-// The fix (confirmed with Sahar): the PDF prints the answer under the exact wording the agent
-// answered - "קשת קשיחה: כן/לא" - so form and PDF can never disagree again.
+// Text-level regression tests over the rendered final-form.html (the HTML the PDF is printed from).
 const { test } = require('node:test');
 const assert = require('node:assert');
 const htmlTemplate = require('angular-template');
@@ -30,15 +20,8 @@ function renderedText(fields) {
         .replace(/\s+/g, ' ');
 }
 
-// Task 7 - "images vs recorded text" (תיקון של תמונות מול טקסט שנרשם).
-//
-// The form's three capture slots have shown the agent, in this order since 2019:
-//   image0 - stand-regular (straight leg, foot flat: natural standing)
-//   image1 - stand-knee    (knee bent forward: the athletic "power" stance)
-//   image2 - stand-toe     (toes raised: the windlass / talus-neutral test)
-// but the PDF captioned them Talus / Natural Standing / Power - every caption rotated one slot
-// off its photo (also unchanged since 2019). The image *data* always landed in the right slot;
-// only the caption-to-slot pairing in the template was wrong.
+// The form's three capture slots show the agent, in this order: image0 natural standing,
+// image1 bent-knee "power" stance, image2 toes-raised talus test - captions must match.
 test('each submitted foot photo is captioned with the stance the agent actually photographed', () => {
     // The fixture's three images are byte-identical placeholders, so distinguishable markers are
     // injected per slot - the template interpolates them into each <figure>'s img src verbatim.
@@ -77,9 +60,6 @@ test('the keshet answer appears in the PDF under the same wording the agent mark
     );
 });
 
-// Task 6 - free-text מקור הגעה: when the agent picks אחר and types a custom source, the frontend
-// submits the typed text itself as the referred field, and the PDF must print it verbatim under
-// "מקור הגעה". The template interpolates {{referred}} generically; this locks that contract.
 test('a free-text מקור הגעה value is printed verbatim in the PDF', () => {
     const fields = Object.assign({}, fixtureFields, { referred: 'המלצה מרופא' });
     const text = renderedText(fields);
