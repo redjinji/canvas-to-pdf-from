@@ -72,6 +72,18 @@ describe('SelectComponent', () => {
     expect(submittedValue(fixture)).toBe('מזדמן');
   });
 
+  // The component sits bottom-aligned in a min-height grid cell; without top clearance the
+  // revealed input makes it grow upward and the floating label overlaps the field above (מין).
+  it('adds top clearance while the free-text input is revealed', () => {
+    const fixture = createSelect(REFERRED);
+    const wrapper = () => fixture.nativeElement.querySelector('.select-component') as HTMLElement;
+    expect(wrapper().className).not.toContain('select-component--expanded');
+    choose(fixture, 'אחר');
+    expect(wrapper().className).toContain('select-component--expanded');
+    choose(fixture, 'מזדמן');
+    expect(wrapper().className).not.toContain('select-component--expanded');
+  });
+
   it('submits the typed free text instead of אחר', () => {
     const fixture = createSelect(REFERRED);
     choose(fixture, 'אחר');

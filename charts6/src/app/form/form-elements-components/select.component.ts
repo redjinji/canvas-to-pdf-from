@@ -8,7 +8,7 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/
     selector: 'select-component',
     imports: [CommonModule, ReactiveFormsModule],
     template: `
-<div class="select-component" [formGroup]="parentForm">
+<div class="select-component" [class.select-component--expanded]="otherSelected" [formGroup]="parentForm">
         <label class="selected--label selected--{{parentForm.controls[selectElem.name].dirty}}" *ngIf="selectElem.label" [attr.for]="selectElem.id ? selectElem.id : null">{{selectElem.label}}</label>
         <div class="select-container">
             <span class="arrow"></span>

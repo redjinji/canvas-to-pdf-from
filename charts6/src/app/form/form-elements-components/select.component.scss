@@ -46,6 +46,14 @@ select {
   background-color: red;
 }
 
+// The component sits bottom-aligned in a min-height flex cell, so the revealed free-text
+// input makes it grow upward and the floating label (top: -2rem) escapes over the field
+// above it. The margin keeps the label's clearance inside the component's own box, so the
+// extra height pushes the fields below downward instead.
+.select-component--expanded {
+  margin-top: 2rem;
+}
+
 .select-other-input {
   background-color: #fff;
   border: 0;
