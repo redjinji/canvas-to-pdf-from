@@ -19,7 +19,7 @@ describe('FormSubmitService', () => {
     autosave = TestBed.inject(FormAutosaveService);
     http = TestBed.inject(HttpTestingController);
 
-    // Set up localStorage mock if not available
+    // This vitest/jsdom environment exposes no window.localStorage — polyfill it.
     if (!window.localStorage) {
       const store: Record<string, string> = {};
       (window as any).localStorage = {
@@ -37,9 +37,7 @@ describe('FormSubmitService', () => {
 
   afterEach(async () => {
     http.verify();
-    if (window.localStorage) {
-      localStorage.clear();
-    }
+    localStorage.clear();
     await autosave.clearDraft();
   });
 

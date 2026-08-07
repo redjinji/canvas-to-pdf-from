@@ -78,13 +78,9 @@ export class FootImageComponent implements OnInit, AfterViewInit {
                 if (!value || this.thumbnailGalleryAmount[i]?.['imageTaken']) return;
                 const img = new Image();
                 img.onload = () => {
-                    this.thumbnailGalleryAmount[i]['imageTaken'] = true;
-                    this.canvasParams.images[i] = img;
-                    this.currentCameraInput = i;
-                    this.updateCanvasThumbnails(img, i);
-                    this.updateCanvasElements();
+                    this.applyImageToCanvasState(img, i);
 
-                    // Angular >=18 ticks only marked views; Image.onload callback.
+                    // markForCheck: Image.onload callback, not a DOM event.
                     this.cdr.markForCheck();
                 };
                 img.src = value;
@@ -200,12 +196,17 @@ export class FootImageComponent implements OnInit, AfterViewInit {
         thumbContext.drawImage(image, 0, 0, 100, 100);
     }
 
-    drew(image, index) {
-        this.thumbnailGalleryAmount[index].imageTaken=true;
+    // Shared by drew() (user takes a photo) and the draft-restore subscription.
+    applyImageToCanvasState(image, index) {
+        this.thumbnailGalleryAmount[index]['imageTaken'] = true;
         this.currentCameraInput = index;
-        this.canvasParams.images[this.currentCameraInput] = image;
+        this.canvasParams.images[index] = image;
         this.updateCanvasThumbnails(image, index);
         this.updateCanvasElements();
+    }
+
+    drew(image, index) {
+        this.applyImageToCanvasState(image, index);
         this.updateFormWithImage(image, index);
     }
 

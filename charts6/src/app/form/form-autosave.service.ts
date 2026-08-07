@@ -14,15 +14,20 @@ const KEY = 'current';
 @Injectable({providedIn: 'root'})
 export class FormAutosaveService {
 
+    private dbPromise: Promise<IDBDatabase> | null = null;
+
     constructor(private formService: FormService) {}
 
+    // One connection for the service's lifetime; autosave writes every ~500ms
+    // while filling, so per-call open/close would be pure overhead.
     private openDb(): Promise<IDBDatabase> {
-        return new Promise((resolve, reject) => {
+        this.dbPromise ??= new Promise((resolve, reject) => {
             const req = indexedDB.open(DB_NAME, 1);
             req.onupgradeneeded = () => req.result.createObjectStore(STORE);
             req.onsuccess = () => resolve(req.result);
             req.onerror = () => reject(req.error);
         });
+        return this.dbPromise;
     }
 
     // A failed IndexedDB (private mode, quota) must never break the form itself.
@@ -30,11 +35,12 @@ export class FormAutosaveService {
         return this.openDb().then(db => new Promise<T>((resolve, reject) => {
             const tx = db.transaction(STORE, mode);
             const req = run(tx.objectStore(STORE));
-            tx.oncomplete = () => { db.close(); resolve(req.result); };
-            tx.onerror = () => { db.close(); reject(tx.error); };
-            tx.onabort = () => { db.close(); reject(tx.error); };
+            tx.oncomplete = () => resolve(req.result);
+            tx.onerror = () => reject(tx.error);
+            tx.onabort = () => reject(tx.error);
         })).catch(err => {
             console.log('autosave unavailable:', err);
+            this.dbPromise = null; // retry a fresh connection on the next call
             return null;
         });
     }
@@ -55,12 +61,7 @@ export class FormAutosaveService {
     // Fields that other fields' visibility depends on (showIf) must be set first,
     // otherwise SimpleForm's cleanup resets the still-hidden conditional answers.
     applyDraft(form: FormGroup, values: Record<string, any>) {
-        const controllers = new Set<string>();
-        for (const elem of this.formService.getFormElements()) {
-            for (const detail of elem.customerDetails ?? []) {
-                if (detail.showIf) controllers.add(detail.showIf.field);
-            }
-        }
+        const controllers = this.formService.getShowIfControllers();
         const keys = Object.keys(values);
         const ordered = [...keys.filter(k => controllers.has(k)), ...keys.filter(k => !controllers.has(k))];
         for (const key of ordered) {

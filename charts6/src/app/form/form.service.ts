@@ -9,6 +9,16 @@ export class FormService {
     getLength(){
         return FORM_ELEMENTS.length;
     }
+    // Field names other fields' visibility depends on (showIf targets).
+    getShowIfControllers(): Set<string> {
+        const controllers = new Set<string>();
+        for (const elem of FORM_ELEMENTS) {
+            for (const detail of elem.customerDetails ?? []) {
+                if (detail.showIf) controllers.add(detail.showIf.field);
+            }
+        }
+        return controllers;
+    }
 }
 
 const FORM_ELEMENTS: IFormElement[] = [
