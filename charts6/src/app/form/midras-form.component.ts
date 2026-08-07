@@ -112,6 +112,12 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
 
   sendForm() {
     if (this.parentForm.valid) {
+      // Edits inside the debounce window would otherwise never be persisted,
+      // and a failed submit's שלח שוב retry would re-send stale values.
+      this.autosave.saveDraft({
+        values: this.parentForm.value,
+        step: this.fromNavigationService.currentPosition
+      });
       this.draftSaveSuspended = true;
       this.formSubmit.submit(this.parentForm.value).subscribe(
         response => {
