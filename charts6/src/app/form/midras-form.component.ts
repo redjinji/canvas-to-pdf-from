@@ -1,4 +1,15 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild
+} from "@angular/core";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {debounceTime, merge} from "rxjs";
 import {Router} from "@angular/router";
 import {UserAnthentityService} from "../login";
 import {IFormElement} from "./form-elements-components";
@@ -13,6 +24,7 @@ import {RadioComponent} from "./form-elements-components/radio-component/radio.c
 import {TextAreaComponent} from "./form-elements-components/textArea.component";
 import {FootImageComponent} from "./form-elements-components/take-image-elements/foot-image-component";
 import {SimpleFormComponent} from "./form-elements-components/simple-form.component";
+import {FormAutosaveService, FormDraft} from "./form-autosave.service";
 
 interface FormResponse {
   status: string;
@@ -33,6 +45,9 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
   nextDisable = false;
   activeSpinner = false;
   url: string = `${environment.serverCall}/sendForm`;
+  restorePromptVisible = false;
+  private pendingDraft: FormDraft | null = null;
+  private destroyRef = inject(DestroyRef);
 
   @ViewChild('screenContainer', { static: true }) screenContainer: ElementRef;
   @ViewChild('overlaySpinner') overlaySpinner: ElementRef;
@@ -43,7 +58,8 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
               private formBuilder: FormBuilder,
               private fromNavigationService: FormNavigationService,
               private _http: HttpClient,
-              private cdr: ChangeDetectorRef) {
+              private cdr: ChangeDetectorRef,
+              private autosave: FormAutosaveService) {
 
     fromNavigationService.navigate.subscribe(this.formMoveTo.bind(this))
   }
@@ -59,6 +75,17 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     this.getElement();
     this.parentForm = this.formBuilder.group({inValidForInit: new FormControl('', Validators.required)});
     window['activeForm'] = this.parentForm;
+
+    this.autosave.loadDraft().then(draft => {
+      if (draft && Object.values(draft.values).some(value => value)) {
+        this.pendingDraft = draft;
+        this.restorePromptVisible = true;
+      } else {
+        this.startAutosave();
+      }
+      // Angular >=18 ticks only marked views; promise callback, not a template listener.
+      this.cdr.markForCheck();
+    });
   }
 
   getElement() {
@@ -117,5 +144,32 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
       );
       this.activeSpinner = true;
     }
+  }
+
+  restoreDraft() {
+    const draft = this.pendingDraft;
+    this.restorePromptVisible = false;
+    this.pendingDraft = null;
+    this.autosave.applyDraft(this.parentForm, draft.values);
+    this.fromNavigationService.goto(draft.step);
+    this.startAutosave();
+  }
+
+  startFresh() {
+    this.restorePromptVisible = false;
+    this.pendingDraft = null;
+    this.autosave.clearDraft();
+    this.startAutosave();
+  }
+
+  private startAutosave() {
+    merge(this.parentForm.valueChanges, this.fromNavigationService.navigate)
+      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.autosave.saveDraft({
+          values: this.parentForm.value,
+          step: this.fromNavigationService.currentPosition
+        });
+      });
   }
 }
