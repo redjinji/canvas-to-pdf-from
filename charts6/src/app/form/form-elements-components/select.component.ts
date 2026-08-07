@@ -67,6 +67,18 @@ export class SelectComponent implements OnInit{
             this.otherTextControl.valueChanges
                 .pipe(takeUntilDestroyed(this.destroyRef))
                 .subscribe(() => this.syncResolvedValue());
+
+            // A restored draft writes the resolved value straight to the parent control;
+            // mirror it back into the choice/other controls so the UI shows it.
+            this.parentForm.controls[this.selectElem.name].valueChanges
+                .pipe(takeUntilDestroyed(this.destroyRef))
+                .subscribe(value => {
+                    if (!value || value === this.resolvedValue()) return; // our own write
+                    const isOption = this.selectElem.options.some(option => !option.other &&
+                        this.checkDefaultValue(option.hidden, option.disabled, option.defaultSelect, option.value, option.text) === value);
+                    this.choiceControl!.setValue(isOption ? value : this.otherLabel, {emitEvent: false});
+                    this.otherTextControl.setValue(isOption || value === this.otherLabel ? '' : value, {emitEvent: false});
+                });
         }
     }
 
@@ -80,13 +92,17 @@ export class SelectComponent implements OnInit{
         }
     }
 
-    private syncResolvedValue() {
+    private resolvedValue() {
         const choice = this.choiceControl!.value;
-        const resolved = this.otherSelected
+        return this.otherSelected
             ? ((this.otherTextControl.value || '').trim() || this.otherLabel)
             : choice;
+    }
+
+    private syncResolvedValue() {
+        const choice = this.choiceControl!.value;
         const target = this.parentForm.controls[this.selectElem.name];
-        target.setValue(resolved);
+        target.setValue(this.resolvedValue());
         if (choice) {
             target.markAsDirty(); // setValue alone doesn't; the floating label keys off .dirty
         }

@@ -108,4 +108,24 @@ describe('SelectComponent', () => {
     const label: HTMLElement = fixture.nativeElement.querySelector('label');
     expect(label.className).toContain('selected--true');
   });
+
+  it('reflects a restored regular value in the select UI', () => {
+    const fixture = createSelect(REFERRED);
+    const component = fixture.componentInstance;
+    component.parentForm.controls['referred'].setValue('מזדמן');
+    fixture.detectChanges();
+    expect(component.selectControl.value).toBe('מזדמן');
+    expect(otherInput(fixture)).toBeNull();
+  });
+
+  it('reflects a restored free-text value as אחר + filled text input', () => {
+    const fixture = createSelect(REFERRED);
+    const component = fixture.componentInstance;
+    component.parentForm.controls['referred'].setValue('שכן המליץ');
+    fixture.detectChanges();
+    expect(component.selectControl.value).toBe('אחר');
+    const other = otherInput(fixture);
+    expect(other).not.toBeNull();
+    expect(other!.value).toBe('שכן המליץ');
+  });
 });
