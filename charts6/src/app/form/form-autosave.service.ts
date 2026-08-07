@@ -1,4 +1,6 @@
 import {Injectable} from "@angular/core";
+import {FormControl, FormGroup} from "@angular/forms";
+import {FormService} from "./form.service";
 
 export interface FormDraft {
     values: Record<string, any>;
@@ -11,6 +13,8 @@ const KEY = 'current';
 
 @Injectable({providedIn: 'root'})
 export class FormAutosaveService {
+
+    constructor(private formService: FormService) {}
 
     private openDb(): Promise<IDBDatabase> {
         return new Promise((resolve, reject) => {
@@ -46,5 +50,23 @@ export class FormAutosaveService {
 
     clearDraft(): Promise<unknown> {
         return this.withStore('readwrite', store => store.delete(KEY));
+    }
+
+    // Fields that other fields' visibility depends on (showIf) must be set first,
+    // otherwise SimpleForm's cleanup resets the still-hidden conditional answers.
+    applyDraft(form: FormGroup, values: Record<string, any>) {
+        const controllers = new Set<string>();
+        for (const elem of this.formService.getFormElements()) {
+            for (const detail of elem.customerDetails ?? []) {
+                if (detail.showIf) controllers.add(detail.showIf.field);
+            }
+        }
+        const keys = Object.keys(values);
+        const ordered = [...keys.filter(k => controllers.has(k)), ...keys.filter(k => !controllers.has(k))];
+        for (const key of ordered) {
+            const control = form.controls[key];
+            if (control) control.setValue(values[key]);
+            else form.addControl(key, new FormControl(values[key]));
+        }
     }
 }
