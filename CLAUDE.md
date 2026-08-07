@@ -36,6 +36,10 @@ himself. Do not merge PRs on his behalf.
   `server/google_api.js#getUserSheets` below). The PDF-fit tests render real PDFs; two of them read
   the output back with `pdftotext -bbox-layout` (poppler-utils) and skip gracefully if `pdftotext`
   isn't installed locally, everything else still runs. No linter for the backend.
+  **Gotcha:** running `npm test` from a checkout under a dot-directory (e.g. a
+  `.claude/worktrees/` worktree) fails the 5 server smoke tests — every route uses
+  `res.sendFile`, whose default `dotfiles: 'ignore'` 404s any absolute path containing a
+  dot-segment. Environmental, not a bug; run the backend suite from a non-dotted path.
 - **Gotcha when testing `final-form.html` output**: `angular-template` emits the template's own
   static Hebrew text as numeric HTML entities (`&#x5E7;…`) while interpolated `{{field}}` values
   stay literal. Any assertion against Hebrew template text must decode entities first or it will
@@ -49,7 +53,9 @@ himself. Do not merge PRs on his behalf.
   you must rebuild after frontend changes for them to appear in the running app.** `npm run
   build:prod` is kept as an alias for muscle-memory compatibility.
 - `ng test` — unit tests, now run via **vitest** (not Karma). `ng test --include='**/some.spec.ts'`
-  to run a single spec.
+  to run a single spec. **Gotcha:** `charts6/tsconfig.json` sets
+  `noPropertyAccessFromIndexSignature: true` — spec code must bracket-index `Record` types and
+  `form.controls` (`values['keshet']`, not `values.keshet`); do not relax the tsconfig for tests.
 
 ## Architecture & request flow
 
@@ -90,9 +96,18 @@ stdin** to complete the OAuth flow and prints the token to the console for you t
   `form-navigation.service.ts` drives next/prev navigation (horizontal `translateX` transitions).
 - Foot images are captured in-browser via the camera components under
   `form/form-elements-components/take-image-elements/`.
-- On submit, `midras-form.component.ts#sendForm` builds a `FormData` (including the logged-in
-  agent's name/mail from `localStorage.userAuth` and a Hebrew-locale timestamp) and POSTs to
-  `${environment.serverCall}/sendForm`.
+- On submit, `midras-form.component.ts#sendForm` delegates to `form/form-submit.service.ts`, which
+  builds a `FormData` (including the logged-in agent's name/mail from `localStorage.userAuth` and a
+  Hebrew-locale timestamp) and POSTs to `${environment.serverCall}/sendForm`.
+- **Autosave/restore (Task 2):** `form/form-autosave.service.ts` persists a single draft
+  (`{values, step}` — all fields incl. the 3 base64 foot photos) to IndexedDB (db `midras-form`,
+  store `drafts`, key `current`; **not** localStorage — photos exceed its quota), debounced 500ms
+  on value/navigation changes, plus a synchronous flush on submit. Returning to `/form` with a
+  draft shows a continue/start-fresh prompt; `applyDraft` must set `showIf`-controller fields
+  first or `simple-form`'s cleanup wipes the conditional answers, and marks restored non-empty
+  controls dirty+touched so the floating labels shrink. The draft is cleared on successful
+  submission (in `form-submit.service.ts`) and on "start fresh", kept on failure — the reject page
+  offers a manual "שלח שוב" that re-submits the saved draft.
 - Auth: `login/user-anthentity.service.ts` POSTs credentials to `/get-user-sheets`;
   the functional `loginGuard` (exported from `charts6/src/app/login/login-route-activator.ts`) guards the `/form` route. Login state is the in-memory
   `loginAlready` flag (lost on refresh) plus `localStorage.userAuth`.

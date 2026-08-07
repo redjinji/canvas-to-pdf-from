@@ -37,10 +37,9 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
   formElements: IFormElement[];
   prevDisable = true;
   nextDisable = false;
-  activeSpinner = false;
+  submitting = false;
   restorePromptVisible = false;
   private pendingDraft: FormDraft | null = null;
-  private draftSaveSuspended = false;
   private destroyRef = inject(DestroyRef);
 
   @ViewChild('screenContainer', { static: true }) screenContainer: ElementRef;
@@ -77,7 +76,7 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
       } else {
         this.startAutosave();
       }
-      // Angular >=18 ticks only marked views; promise callback, not a template listener.
+      // markForCheck: async callback, not a DOM event (see formMoveTo's note).
       this.cdr.markForCheck();
     });
   }
@@ -114,15 +113,14 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     if (this.parentForm.valid) {
       // Edits inside the debounce window would otherwise never be persisted,
       // and a failed submit's שלח שוב retry would re-send stale values.
-      this.autosave.saveDraft({
-        values: this.parentForm.value,
-        step: this.fromNavigationService.currentPosition
-      });
-      this.draftSaveSuspended = true;
+      this.autosave.saveDraft(this.currentDraft());
+      // `submitting` also gates the debounced autosave, so a save pending at
+      // submit time can't re-write the draft after the success-path clear.
+      this.submitting = true;
       this.formSubmit.submit(this.parentForm.value).subscribe(
         response => {
           if (response.status === 'fail') {
-            this.draftSaveSuspended = false;
+            this.submitting = false;
             console.log(response);
             this.router.navigate(['/reject-form']);
           } else {
@@ -130,40 +128,46 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
           }
         },
         error => {
-          this.draftSaveSuspended = false;
+          this.submitting = false;
           console.log(error);
           this.router.navigate(['/reject-form']);
         }
       );
-      this.activeSpinner = true;
     }
   }
 
   restoreDraft() {
     const draft = this.pendingDraft;
-    this.restorePromptVisible = false;
-    this.pendingDraft = null;
+    this.dismissPrompt();
     this.autosave.applyDraft(this.parentForm, draft.values);
     this.fromNavigationService.goto(draft.step);
     this.startAutosave();
   }
 
   startFresh() {
-    this.restorePromptVisible = false;
-    this.pendingDraft = null;
+    this.dismissPrompt();
     this.autosave.clearDraft();
     this.startAutosave();
+  }
+
+  private dismissPrompt() {
+    this.restorePromptVisible = false;
+    this.pendingDraft = null;
+  }
+
+  private currentDraft(): FormDraft {
+    return {
+      values: this.parentForm.value,
+      step: this.fromNavigationService.currentPosition
+    };
   }
 
   private startAutosave() {
     merge(this.parentForm.valueChanges, this.fromNavigationService.navigate)
       .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        if (this.draftSaveSuspended) return;
-        this.autosave.saveDraft({
-          values: this.parentForm.value,
-          step: this.fromNavigationService.currentPosition
-        });
+        if (this.submitting) return;
+        this.autosave.saveDraft(this.currentDraft());
       });
   }
 }

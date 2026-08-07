@@ -2,7 +2,7 @@
 	<h1 class="main-title">טופס לא נשלח</h1>
 	<ng-container *ngIf="canRetry">
 		<p class="retry-note">הנתונים נשמרו במכשיר — אפשר לנסות לשלוח שוב</p>
-		<button type="button" class="btn retry-btn" [disabled]="sending" (click)="retry()">
+		<button type="button" class="retry-btn" [disabled]="sending" (click)="retry()">
 			{{ sending ? 'שולח...' : 'שלח שוב' }}
 		</button>
 		<p class="retry-failed" *ngIf="retryFailed">השליחה נכשלה שוב, בדקו את חיבור האינטרנט ונסו שוב</p>

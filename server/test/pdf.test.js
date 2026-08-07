@@ -125,12 +125,9 @@ test('a legacy submission (without Task-3 keys) renders below the single-page bo
 });
 
 test('the full fixture with Task-3 fields now exceeds NO_SCALE_MM and scales down to keep the footer on page 1', async () => {
-    // Task 3 added the treated-insoles question and recommended-type fields to the form. The fixture
-    // includes values for these fields, so all three new template lines display (treatedInsoles
-    // question, derived detail line, and midrasType recommendation). This increases the fixture's
-    // measured contentHeightMm to ~337.6, exceeding NO_SCALE_MM (329.5). The scale-to-fit safety net
-    // engages and applies ~0.94 scale rather than increasing template complexity or reclaiming space.
-    // This behavior was accepted on 2026-08-06 as preferable to further layout reduction.
+    // The treated-insoles question and recommended-type fields add three template lines, pushing
+    // the fixture's measured contentHeightMm to ~337.6 — past NO_SCALE_MM (329.5) — so the
+    // scale-to-fit net engages (~0.94) rather than shrinking the layout further.
     const { contentHeightMm, scale, footerBottomMm } = await pdfGenerate.puppetPdf(fixtureFields, fixtureOutPath);
 
     assert.ok(fs.existsSync(fixtureOutPath), 'PDF file should have been written');

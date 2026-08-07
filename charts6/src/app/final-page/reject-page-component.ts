@@ -28,7 +28,7 @@ export class RejectPageComponent implements OnInit {
             this.draft = draft;
             this.canRetry = !!draft;
 
-            // Angular >=18 ticks only marked views; promise callback, not a template listener.
+            // markForCheck: async callback, not a DOM event (Angular >=18 ticks only marked views).
             this.cdr.markForCheck();
         });
     }
