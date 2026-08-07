@@ -212,3 +212,37 @@ foot-image {
     transform: translate(-50%, -50%);
   }
 }
+
+.restore-prompt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+
+  .restore-prompt {
+    direction: rtl;
+    text-align: center;
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px 32px;
+    max-width: 90vw;
+
+    .restore-prompt__buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 16px;
+
+      .btn {
+        cursor: pointer;
+        background: var(--bg-gradiant);
+        border: .1rem solid;
+        border-radius: .6rem;
+        padding: .8rem 1.5rem;
+      }
+    }
+  }
+}

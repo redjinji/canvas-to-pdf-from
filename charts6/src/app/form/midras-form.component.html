@@ -47,6 +47,16 @@
 		</button>
 	</nav>
 </div>
+<div class="restore-prompt-overlay" *ngIf="restorePromptVisible">
+	<div class="restore-prompt">
+		<h3 class="restore-prompt__title">נמצא טופס שלא נשלח</h3>
+		<p class="restore-prompt__question">להמשיך את הטופס הקודם או להתחיל טופס חדש?</p>
+		<div class="restore-prompt__buttons">
+			<button type="button" class="btn restore-prompt__continue" (click)="restoreDraft()">המשך טופס קודם</button>
+			<button type="button" class="btn restore-prompt__fresh" (click)="startFresh()">טופס חדש</button>
+		</div>
+	</div>
+</div>
 <div class="send-from-overlay" [ngClass]="{'active':activeSpinner}">
 
 	<svg class="spinner" width="135" height="135" viewBox="0 0 135 135" xmlns="http://www.w3.org/2000/svg">

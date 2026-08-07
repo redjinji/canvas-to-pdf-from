@@ -1,4 +1,15 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild
+} from "@angular/core";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {debounceTime, merge} from "rxjs";
 import {Router} from "@angular/router";
 import {UserAnthentityService} from "../login";
 import {IFormElement} from "./form-elements-components";
@@ -6,18 +17,13 @@ import {FormService} from "./form.service";
 import {VideoService} from "./form-elements-components/take-image-elements";
 import {CommonModule} from "@angular/common";
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {HttpClient} from "@angular/common/http";
-import {environment} from "../../environments/environment";
 import {FormNavigationService} from "./form-navigation.service";
 import {RadioComponent} from "./form-elements-components/radio-component/radio.component";
 import {TextAreaComponent} from "./form-elements-components/textArea.component";
 import {FootImageComponent} from "./form-elements-components/take-image-elements/foot-image-component";
 import {SimpleFormComponent} from "./form-elements-components/simple-form.component";
-
-interface FormResponse {
-  status: string;
-  error?: any;
-}
+import {FormAutosaveService, FormDraft} from "./form-autosave.service";
+import {FormSubmitService} from "./form-submit.service";
 
 @Component({
   selector: 'midras-form',
@@ -32,7 +38,10 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
   prevDisable = true;
   nextDisable = false;
   activeSpinner = false;
-  url: string = `${environment.serverCall}/sendForm`;
+  restorePromptVisible = false;
+  private pendingDraft: FormDraft | null = null;
+  private draftSaveSuspended = false;
+  private destroyRef = inject(DestroyRef);
 
   @ViewChild('screenContainer', { static: true }) screenContainer: ElementRef;
   @ViewChild('overlaySpinner') overlaySpinner: ElementRef;
@@ -42,8 +51,9 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
               private videoService: VideoService,
               private formBuilder: FormBuilder,
               private fromNavigationService: FormNavigationService,
-              private _http: HttpClient,
-              private cdr: ChangeDetectorRef) {
+              private cdr: ChangeDetectorRef,
+              private autosave: FormAutosaveService,
+              private formSubmit: FormSubmitService) {
 
     fromNavigationService.navigate.subscribe(this.formMoveTo.bind(this))
   }
@@ -59,6 +69,17 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     this.getElement();
     this.parentForm = this.formBuilder.group({inValidForInit: new FormControl('', Validators.required)});
     window['activeForm'] = this.parentForm;
+
+    this.autosave.loadDraft().then(draft => {
+      if (draft && Object.values(draft.values).some(value => value)) {
+        this.pendingDraft = draft;
+        this.restorePromptVisible = true;
+      } else {
+        this.startAutosave();
+      }
+      // Angular >=18 ticks only marked views; promise callback, not a template listener.
+      this.cdr.markForCheck();
+    });
   }
 
   getElement() {
@@ -91,19 +112,17 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
 
   sendForm() {
     if (this.parentForm.valid) {
-      const formData = new FormData();
-      const fieldAgent = JSON.parse(localStorage.getItem('userAuth'));
-
-      formData.append('fieldAgentName', fieldAgent.userName);
-      formData.append('fieldAgentMail', fieldAgent.mail);
-      formData.append('submitTime', new Date().toLocaleString('he-il'));
-      for (const formItem in this.parentForm.value) {
-        formData.append(formItem, this.parentForm.value[formItem] || '');
-      }
-
-      this._http.post(this.url, formData).subscribe(
-        (response: FormResponse) => {
+      // Edits inside the debounce window would otherwise never be persisted,
+      // and a failed submit's שלח שוב retry would re-send stale values.
+      this.autosave.saveDraft({
+        values: this.parentForm.value,
+        step: this.fromNavigationService.currentPosition
+      });
+      this.draftSaveSuspended = true;
+      this.formSubmit.submit(this.parentForm.value).subscribe(
+        response => {
           if (response.status === 'fail') {
+            this.draftSaveSuspended = false;
             console.log(response);
             this.router.navigate(['/reject-form']);
           } else {
@@ -111,11 +130,40 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
           }
         },
         error => {
+          this.draftSaveSuspended = false;
           console.log(error);
           this.router.navigate(['/reject-form']);
         }
       );
       this.activeSpinner = true;
     }
+  }
+
+  restoreDraft() {
+    const draft = this.pendingDraft;
+    this.restorePromptVisible = false;
+    this.pendingDraft = null;
+    this.autosave.applyDraft(this.parentForm, draft.values);
+    this.fromNavigationService.goto(draft.step);
+    this.startAutosave();
+  }
+
+  startFresh() {
+    this.restorePromptVisible = false;
+    this.pendingDraft = null;
+    this.autosave.clearDraft();
+    this.startAutosave();
+  }
+
+  private startAutosave() {
+    merge(this.parentForm.valueChanges, this.fromNavigationService.navigate)
+      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.draftSaveSuspended) return;
+        this.autosave.saveDraft({
+          values: this.parentForm.value,
+          step: this.fromNavigationService.currentPosition
+        });
+      });
   }
 }

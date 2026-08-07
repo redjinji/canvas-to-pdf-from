@@ -69,6 +69,27 @@ export class FootImageComponent implements OnInit, AfterViewInit {
         this.parentForm.addControl('image0', new FormControl());
         this.parentForm.addControl('image1', new FormControl());
         this.parentForm.addControl('image2', new FormControl());
+
+        for (let i = 0; i < 3; i++) {
+            this.parentForm.controls[`image${i}`].valueChanges.subscribe(value => {
+                // Only a restored draft sets these controls from outside; a photo the
+                // user takes goes through drew(), which flags imageTaken before the
+                // control value lands here — skip those.
+                if (!value || this.thumbnailGalleryAmount[i]?.['imageTaken']) return;
+                const img = new Image();
+                img.onload = () => {
+                    this.thumbnailGalleryAmount[i]['imageTaken'] = true;
+                    this.canvasParams.images[i] = img;
+                    this.currentCameraInput = i;
+                    this.updateCanvasThumbnails(img, i);
+                    this.updateCanvasElements();
+
+                    // Angular >=18 ticks only marked views; Image.onload callback.
+                    this.cdr.markForCheck();
+                };
+                img.src = value;
+            });
+        }
     }
 
     ngOnInit() {
