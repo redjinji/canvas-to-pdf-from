@@ -17,19 +17,13 @@ import {FormService} from "./form.service";
 import {VideoService} from "./form-elements-components/take-image-elements";
 import {CommonModule} from "@angular/common";
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {HttpClient} from "@angular/common/http";
-import {environment} from "../../environments/environment";
 import {FormNavigationService} from "./form-navigation.service";
 import {RadioComponent} from "./form-elements-components/radio-component/radio.component";
 import {TextAreaComponent} from "./form-elements-components/textArea.component";
 import {FootImageComponent} from "./form-elements-components/take-image-elements/foot-image-component";
 import {SimpleFormComponent} from "./form-elements-components/simple-form.component";
 import {FormAutosaveService, FormDraft} from "./form-autosave.service";
-
-interface FormResponse {
-  status: string;
-  error?: any;
-}
+import {FormSubmitService} from "./form-submit.service";
 
 @Component({
   selector: 'midras-form',
@@ -44,7 +38,6 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
   prevDisable = true;
   nextDisable = false;
   activeSpinner = false;
-  url: string = `${environment.serverCall}/sendForm`;
   restorePromptVisible = false;
   private pendingDraft: FormDraft | null = null;
   private destroyRef = inject(DestroyRef);
@@ -57,9 +50,9 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
               private videoService: VideoService,
               private formBuilder: FormBuilder,
               private fromNavigationService: FormNavigationService,
-              private _http: HttpClient,
               private cdr: ChangeDetectorRef,
-              private autosave: FormAutosaveService) {
+              private autosave: FormAutosaveService,
+              private formSubmit: FormSubmitService) {
 
     fromNavigationService.navigate.subscribe(this.formMoveTo.bind(this))
   }
@@ -118,18 +111,8 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
 
   sendForm() {
     if (this.parentForm.valid) {
-      const formData = new FormData();
-      const fieldAgent = JSON.parse(localStorage.getItem('userAuth'));
-
-      formData.append('fieldAgentName', fieldAgent.userName);
-      formData.append('fieldAgentMail', fieldAgent.mail);
-      formData.append('submitTime', new Date().toLocaleString('he-il'));
-      for (const formItem in this.parentForm.value) {
-        formData.append(formItem, this.parentForm.value[formItem] || '');
-      }
-
-      this._http.post(this.url, formData).subscribe(
-        (response: FormResponse) => {
+      this.formSubmit.submit(this.parentForm.value).subscribe(
+        response => {
           if (response.status === 'fail') {
             console.log(response);
             this.router.navigate(['/reject-form']);
