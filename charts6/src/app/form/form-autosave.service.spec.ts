@@ -25,7 +25,7 @@ describe('FormAutosaveService', () => {
   it('overwrites the previous draft on save', async () => {
     await service.saveDraft({ values: { keshet: 'כן' }, step: 0 });
     await service.saveDraft({ values: { keshet: 'לא' }, step: 1 });
-    expect((await service.loadDraft()).values.keshet).toBe('לא');
+    expect((await service.loadDraft())!.values['keshet']).toBe('לא');
   });
 
   it('clearDraft removes the draft', async () => {
