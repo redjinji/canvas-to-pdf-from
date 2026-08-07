@@ -34,3 +34,20 @@
     background-color: rgba(var(--dark-blue),.5);
   }
 }
+
+.retry-note,
+.retry-failed {
+  direction: rtl;
+  text-align: center;
+}
+
+.retry-btn {
+  display: block;
+  margin: 16px auto 0;
+  cursor: pointer;
+
+  &[disabled] {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
