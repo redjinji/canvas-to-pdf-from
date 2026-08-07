@@ -40,6 +40,7 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
   activeSpinner = false;
   restorePromptVisible = false;
   private pendingDraft: FormDraft | null = null;
+  private draftSaveSuspended = false;
   private destroyRef = inject(DestroyRef);
 
   @ViewChild('screenContainer', { static: true }) screenContainer: ElementRef;
@@ -111,9 +112,11 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
 
   sendForm() {
     if (this.parentForm.valid) {
+      this.draftSaveSuspended = true;
       this.formSubmit.submit(this.parentForm.value).subscribe(
         response => {
           if (response.status === 'fail') {
+            this.draftSaveSuspended = false;
             console.log(response);
             this.router.navigate(['/reject-form']);
           } else {
@@ -121,6 +124,7 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
           }
         },
         error => {
+          this.draftSaveSuspended = false;
           console.log(error);
           this.router.navigate(['/reject-form']);
         }
@@ -149,6 +153,7 @@ export class MidrasFormComponent implements OnInit, AfterViewInit {
     merge(this.parentForm.valueChanges, this.fromNavigationService.navigate)
       .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        if (this.draftSaveSuspended) return;
         this.autosave.saveDraft({
           values: this.parentForm.value,
           step: this.fromNavigationService.currentPosition
