@@ -54,6 +54,15 @@ describe('FormAutosaveService.applyDraft', () => {
     expect(form.controls['insolesType'].value).toBe('סיליקון');
   });
 
+  it('marks restored controls dirty+touched so floating labels float, empty ones stay pristine', () => {
+    const form = new FormGroup({ name: new FormControl(''), phone: new FormControl('') });
+    service.applyDraft(form, { name: 'לקוח בדיקה', phone: '' });
+    expect(form.controls['name'].dirty).toBe(true);
+    expect(form.controls['name'].touched).toBe(true);
+    expect(form.controls['phone'].dirty).toBe(false);
+    expect(form.controls['phone'].touched).toBe(false);
+  });
+
   it('restores conditional answers through SimpleForm without them being cleaned up', () => {
     // Mount the real SimpleFormComponent so its hidden-field cleanup subscription is live,
     // then verify controller-first ordering keeps the conditional answers.

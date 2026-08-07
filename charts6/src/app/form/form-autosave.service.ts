@@ -67,6 +67,13 @@ export class FormAutosaveService {
             const control = form.controls[key];
             if (control) control.setValue(values[key]);
             else form.addControl(key, new FormControl(values[key]));
+            if (values[key]) {
+                // setValue leaves controls pristine+untouched, but the floating
+                // labels (inputs: .ng-dirty/.ng-untouched CSS, selects: .dirty
+                // binding) only shrink for dirty+touched controls.
+                form.controls[key].markAsDirty();
+                form.controls[key].markAsTouched();
+            }
         }
     }
 }
